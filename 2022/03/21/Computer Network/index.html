@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  在本专栏中，我们将使用*公共因特网*（一种特定的计算机网络）作为讨论计算机网络机器协议的主要载体。  一、因特网：网络的网络 何为因特网？可以有两种解释： ——构成因特网的基本硬件和软件组件  ——为分布式应用提供服务的联网基础设施  下面我们分别以这两方面作为切入点，剖析因特网 1.1 具体构成描述因特网是一个世界范围的计算机网络，它是一个互联了遍及">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络：自顶向下（一）">
+<meta property="og:url" content="http://example.com/2022/03/21/Computer%20Network/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  在本专栏中，我们将使用*公共因特网*（一种特定的计算机网络）作为讨论计算机网络机器协议的主要载体。  一、因特网：网络的网络 何为因特网？可以有两种解释： ——构成因特网的基本硬件和软件组件  ——为分布式应用提供服务的联网基础设施  下面我们分别以这两方面作为切入点，剖析因特网 1.1 具体构成描述因特网是一个世界范围的计算机网络，它是一个互联了遍及">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-21T12:16:25.598Z">
+<meta property="article:modified_time" content="2022-03-21T12:28:46.244Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>计算机网络：自顶向下（一） - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="计算机网络：自顶向下（一）">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-03-21 20:16" pubdate>
+        2022年3月21日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.6k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      30 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">计算机网络：自顶向下（一）</h1>
+            
+            <div class="markdown-body">
+              <h1 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h1><blockquote>
+<p><em><strong>纸上得来终觉浅，绝知此事要躬行。</strong></em></p>
+</blockquote>
+<div class="code-wrapper"><pre><code class="hljs">在本专栏中，我们将使用*公共因特网*（一种特定的计算机网络）作为讨论计算机网络机器协议的主要载体。
+</code></pre></div>
+<h1 id="一、因特网：网络的网络"><a href="#一、因特网：网络的网络" class="headerlink" title="一、因特网：网络的网络"></a>一、因特网：网络的网络</h1><blockquote>
+<p>何为因特网？可以有两种解释：<br> ——构成因特网的基本硬件和软件组件<br>  ——为分布式应用提供服务的联网基础设施</p>
+</blockquote>
+<p>下面我们分别以这两方面作为切入点，剖析因特网</p>
+<h2 id="1-1-具体构成描述"><a href="#1-1-具体构成描述" class="headerlink" title="1.1 具体构成描述"></a>1.1 具体构成描述</h2><p><strong>因特网</strong>是一个世界范围的计算机网络，它是一个互联了遍及全世界的数以亿计的计算设备的网络。不久之前，人们的计算设备只包含有传统的桌面PC、Linux工作站以及所谓的服务器（只用于存储和传输Web页面和电子邮件报文等信息。可伴随着时代变迁，智能手机、ipad、电视、游戏机、汽车等等非传统的<strong>因特网端系统</strong>和<strong>安全系统</strong>也正在与因特网相联系。在因特网广泛普及，如此大量的非传统设备连接到因特网的情况之下，计算机网络这个术语也开始过时了。</p>
+<h3 id="1-1-1-端系统、通信链路、分组交换机、分组简介"><a href="#1-1-1-端系统、通信链路、分组交换机、分组简介" class="headerlink" title="1.1.1 端系统、通信链路、分组交换机、分组简介"></a>1.1.1 端系统、通信链路、分组交换机、分组简介</h3><p>用因特网术语来说，所有与它相联系的设备统称为<strong>主机</strong>（host）或<strong>端系统</strong>（end system）。截止到2011年7月，已经有大约8.5亿台端系统与因特网连接，这个数字并未将智能手机、便捷机和仅断断续续与因特网连接的其他设备计算在内[ISC 2011]。大致估计一下，因特网用户数已经超过20亿。</p>
+<p>下面我们对上文中的端系统（主机）进行介绍。</p>
+<blockquote>
+<p>端系统通过<strong>通信链路</strong>（communication link）和<strong>分组交换机</strong>（packet switch）连接到一起。</p>
+</blockquote>
+<p><em>通信链路</em>。在后文我们将介绍许多类型的通信链路，它们由不同类型的物理媒体（同轴电缆、铜线、光纤和无线电频谱）组成。不同的链路有不同的传输速率（以bit/s或bps度量）。当一台端系统要向另一台端系统发送数据时，发送端系统将数据分段，并为每段加上首部字节。由此形成的信息包我们将其称为<strong>分组</strong>（packet）。这些分组通过网络发送到目的端系统，在那里被装配成初始数据。</p>
+<p><em>分组交换机</em>。分组交换机从它的一条入通信链路接收到达的分组，并从它的一条出通信链路转发该分组。在当今的因特网中，两种最著名的类型是<strong>路由器</strong>（router）和<strong>链路层交换机</strong>（link-layer switch）。</p>
+<blockquote>
+<p><strong>路由器</strong>通常用于网络核心中<br><strong>链路层交换机</strong>通常用于接入网中</p>
+</blockquote>
+<p>从发送端系统到接收端系统，一个分组所经历的一系列通信链路和分组交换机称为通过该网络的<strong>路径</strong>（route或path）。</p>
+<p>用于传送分组的分组交换网络在许多方面类似于承载运输车辆的运输网络，该网络包括了高速公路、公路和立交桥。当工厂需要将大量货物搬运至远方的仓库时，工厂就要将货物分开装上卡车车队，通过高速公路、公路和立交桥将货物搬运至仓库。在这一过程中，各个环节扮演的角色如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>环节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>分组</td>
+<td>卡车</td>
+</tr>
+<tr>
+<td>通信链路</td>
+<td>高速公路、公路</td>
+</tr>
+<tr>
+<td>分组交换机</td>
+<td>立交桥</td>
+</tr>
+<tr>
+<td>端系统</td>
+<td>工厂、仓库</td>
+</tr>
+</tbody></table>
+<h3 id="1-1-2-ISP简介"><a href="#1-1-2-ISP简介" class="headerlink" title="1.1.2 ISP简介"></a>1.1.2 ISP简介</h3><p>端系统通过<strong>因特网服务提供商</strong>（ISP）接入因特网，包括如本地电缆或电话公司那样的住宅区ISP、公司ISP、大学ISP等等。每个ISP是一个由多个分组交换机和多段通信链路组成的网络。各ISP为端系统提供各种不同类型的网络接入（线缆调制解调器或如DSL的住宅宽带接入、高速局域网接入、无线接入和56kbps拨号调制解调器接入）。</p>
+<p>因特网将端系统彼此互联，因此ISP也必须互联。后文将详细介绍ISP和互联情况。</p>
+<blockquote>
+<p><strong>低层ISP</strong>通过国家、国际的高层ISP（Level 3 Communications、AT&amp;T、Sprint和NTT）互联；<br><strong>高层ISP</strong>是由通过高速光纤链路互联的高速路由器组成的</p>
+</blockquote>
+<h3 id="1-1-3-协议简介"><a href="#1-1-3-协议简介" class="headerlink" title="1.1.3 协议简介"></a>1.1.3 协议简介</h3><p>端系统、分组交换机和其他因特网部件都要运行一系列协议（protocol），这些协议控制因特网中信息的接收和发送。<strong>传输控制协议</strong>（TCP）和<strong>网络协议</strong>（IP）是因特网中两个最为重要的协议。IP协议定义了在路由器和端系统之间发送和接收的分组格式。因特网的主要协议统称为TCP/IP。在我们后面的学习中将有许多地方与协议有关。</p>
+<p>鉴于因特网协议的重要性，每个人就各个协议及其作用取得一致认识很重要，这样人们就能创造协同工作的系统和产品。自然而然，我们引入了因特网<strong>标准</strong>（Internet standard），它由因特网工程任务组（IETF）研发。IETF的标准文档称为<strong>请求评论</strong>（RFC），它们定义了TCP、IP、HTTP（用于Web）和SMTP（用于电子邮件）等协议。当然，其他组织也在制定用于网络组件的标准。</p>
+<h2 id="1-2-服务描述"><a href="#1-2-服务描述" class="headerlink" title="1.2 服务描述"></a>1.2 服务描述</h2><blockquote>
+<p>何为因特网？可以有两种解释：<br> ——构成因特网的基本硬件和软件组件<br>  ——为分布式应用提供服务的联网基础设施</p>
+</blockquote>
+<p>上文以前者作为切入点，现在我们从<em>应用程序提供服务的基础设施</em>的角度来描述因特网。</p>
+<p>我们平时接触到的大部分应用程序，例如电子邮件、Web冲浪、即时讯息、社交网络、IP语音（VoIP）、流式视频、分布式游戏、对等（P2P）文件共享、网络电视、远程注册等等，它们称为<strong>分布式应用程序</strong>（distributed application），因为它们涉及多台相互交换数据的端系统。这些应用程序运行在端系统上，并不是运行在网络核心中的分组交换机中，尽管分组交换机促进端系统之间的数据交换，但它们并不关心作为数据的源或宿的应用程序。</p>
+<p>假定你对分布式应用程序有一个新的思想，那么如何将这种思想转换称为一种实际的因特网应用程序呢？因为应用程序运行在端系统上，所以你需要使用Java、C++、Python等计算机语言编写成能够运行在端系统上的软件。而你的应用程序需要在运行这款软件的不同端系统间互相发送数据，至此，我们引入了因特网作为应用程序的平台。</p>
+<p>与因特网相连的端系统提供了一个<strong>应用程序编程接口</strong>（API）。API规定了运行在一个端系统上的软件请求因特网基础设施向运行在另一个端系统上的特定目的地软件交付数据的方式。后文会详细介绍API。</p>
+<p>举个例子，Alice要向Bob寄一封信，Alice不能写完信后就将信丢出窗外，邮政服务要求Alice将信放入 信封并贴上邮票，还要投进邮箱中。对应到因特网中，就有如下类比：</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>环节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>软件A</td>
+<td>Alice</td>
+</tr>
+<tr>
+<td>软件B</td>
+<td>Bob</td>
+</tr>
+<tr>
+<td>API</td>
+<td>邮政服务规定</td>
+</tr>
+</tbody></table>
+<h2 id="1-3-什么是协议"><a href="#1-3-什么是协议" class="headerlink" title="1.3 什么是协议"></a>1.3 什么是协议</h2><h3 id="1-3-1-人类活动类比"><a href="#1-3-1-人类活动类比" class="headerlink" title="1.3.1 人类活动类比"></a>1.3.1 人类活动类比</h3><blockquote>
+<p>我们用一张图生动形象的表达协议的含义</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://img-blog.csdnimg.cn/86635908c0e14a5aa3909b7848af7ccb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbTBfNTI3NTUwNTk=,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center">图为人类协议和计算机网络协议</a> </p>
+<p>如果人们使用不同的协议（例如，一个人讲礼貌而另一个人不讲礼貌），该协议就不能互动，因而不能完成有用的工作。在网络中这个道理同样成立。即为了完成一项工作，要求两个（或多个）通信实体运行相同协议。</p>
+<h3 id="1-3-2-网络协议"><a href="#1-3-2-网络协议" class="headerlink" title="1.3.2 网络协议"></a>1.3.2 网络协议</h3><blockquote>
+<p>在因特网中，凡是涉及两个或多个远程通信实体的所有活动都受<strong>协议</strong>的制约。</p>
+</blockquote>
+<p>例如，在两台物理上连接的计算机中，硬件实现的协议控制了在两块网络接口卡间的“线上”的比特流；在端系统中，拥塞控制协议控制了在发送方和接收方之间传输的分组发送的速率。以我们熟悉的一个计算机网络协议为例，当你在Web浏览器中键入一个Web网页的URL时，你的计算机将向该Web服务器发送一条连接请求报文，并等待回答。在该Web服务器接收到连接请求报文时，会返回一条连接响应报文。得知请求该Web文档正常后，计算机则在一条GET报文中发送要从这台Web服务器上取回的网页名字。最后，Web服务器向计算机返回该Web网页（文件）。</p>
+<p>从上述的人类活动和网络的例子中可见，报文的交换以及发送和接收这些报文时所采取的动作是定义一个协议的关键元素：</p>
+<blockquote>
+<p>一个<strong>协议</strong>定义了在两个或多个通信实体之间交换的<strong>报文格式和次序</strong>，以及报文发送和（或）接收一条报文或其他事件所采取的<strong>动作</strong>。</p>
+</blockquote>
+<h1 id="二、网络边缘"><a href="#二、网络边缘" class="headerlink" title="二、网络边缘"></a>二、网络边缘</h1><p>我们通常把与因特网相连的计算机和其他设备称为端系统，因为它们位于<strong>互联网的边缘</strong>，故而被称为端系统。端系统也称为<strong>主机</strong>，因为它们容纳（即运行）应用程序，如Web浏览器程序、Web服务器程序、电子邮件阅读程序或电子邮件服务器程序等。端系统有时又被进一步划分为两类：<strong>客户</strong>（client）和<strong>服务器</strong>（server）。</p>
+<blockquote>
+<p><strong>客户</strong>相当于是桌面PC、移动PC和智能手机等，<br><strong>服务器</strong>相当于是更为强大的机器，用于存储和发布Web页面、流视频、中继电子邮件等。</p>
+</blockquote>
+<h2 id="2-1-接入网"><a href="#2-1-接入网" class="headerlink" title="2.1 接入网"></a>2.1 接入网</h2><blockquote>
+<p><strong>接入网</strong>是指将端系统连接到其<strong>边缘路由器</strong>的<strong>物理链路</strong></p>
+</blockquote>
+<p>边缘路由器是端系统到任何其他远程端系统的路径上的<strong>第一台路由器</strong>。</p>
+<p><a target="_blank" rel="noopener" href="https://img-blog.csdnimg.cn/0adfe3517b9f4caaad181ea94136954e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbTBfNTI3NTUwNTk=,size_20,color_FFFFFF,t_70,g_se,x_16">图为端系统交互的大致组成部分</a></p>
+<h3 id="2-1-1-家庭接入：DSL、电缆、FTTH、拨号和卫星"><a href="#2-1-1-家庭接入：DSL、电缆、FTTH、拨号和卫星" class="headerlink" title="2.1.1 家庭接入：DSL、电缆、FTTH、拨号和卫星"></a>2.1.1 家庭接入：DSL、电缆、FTTH、拨号和卫星</h3><p>目前，宽带住宅接入有两种最流行的类型：<strong>数字用户线</strong>（DSL）和<strong>电缆</strong>。住户通常从提供本地电话接入的本地电话公司处获得DSL因特网接入。因此，当使用DSL时，用户的本地电话公司也是它的ISP。每个用户的DSL调制解调器使用现有的电话线（双绞铜线）与位于本地电话公司的本地中心局（CO）中的数字用户线接入复用器（DSLAM）来交换数据。家庭的DSL调制解调器得到数字数据后将其转换为高频音，以通过电话线传输给本地中心局；来自许多家庭的模拟信号在DSLAM处被转换回数字形式。</p>
+<p><a target="_blank" rel="noopener" href="https://img-blog.csdnimg.cn/c9e80d89bf684f809beca1e20b49e770.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbTBfNTI3NTUwNTk=,size_20,color_FFFFFF,t_70,g_se,x_16">图为DSL因特网接入</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/21/hello-world/">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
