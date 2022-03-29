@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  一、应用层协议原理研发网络应用程序的核心是写出能够运行在不同的端系统和通过网络彼此通信的程序。因此研发新应用时需要编写将在多台端系统上运行的软件。 1.1 网络应用程序体系结构应用程序体系结构（application architecture）明显不同于网络体系结构。网络体系结构是固定的，而应用程序体系结构由应用程序研发者设计。应用程序体系结构目前有两">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-28T09:46:37.524Z">
-<meta property="article:modified_time" content="2022-03-29T01:56:37.957Z">
+<meta property="article:modified_time" content="2022-03-29T05:08:36.354Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.7k 字
+      7k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      40 分钟
+      59 分钟
     </span>
   
 
@@ -304,7 +304,50 @@
 <p>HTTP定义了Web客户向Web服务器请求Web页面的方式，以及服务器向客户传送Web页面的方式。当用户请求一个Web页面时，浏览器向服务器发出对该页面中所包含对象的HTTP请求报文，服务器接收到请求并用包含这些对象的HTTP响应报文进行响应。<br><a href="/img/cn2.4.png">图为HTTP的请求-响应行为</a></p>
 <p>HTTP使用<strong>TCP</strong>作为它的支撑运输协议。HTTP客户首先发起一个与服务器的TCP连接。一旦连接建立，该浏览器和服务器进程就可以通过套接字接口访问TCP。一旦客户向它的套接字接口发送了一个请求报文，该报文就脱离了客户控制并进入TCP的控制。</p>
 <p>HTTP是一个<strong>无状态协议</strong>（stateless protrol），即不保存关于客户的任何信息。Web是一个<strong>客户-服务器体系结构</strong>。</p>
-<h2 id="2-2-非持续连接和持续连接"><a href="#2-2-非持续连接和持续连接" class="headerlink" title="2.2 非持续连接和持续连接"></a>2.2 非持续连接和持续连接</h2>
+<h2 id="2-2-非持续连接和持续连接"><a href="#2-2-非持续连接和持续连接" class="headerlink" title="2.2 非持续连接和持续连接"></a>2.2 非持续连接和持续连接</h2><p>在许多因特网应用程序中，客户发出一系列请求并且服务器对每个请求进行响应。<strong>非持续连接</strong>是指每个请求/响应经一个单独的TCP发送，<strong>持续连接</strong>指所有的请求/响应经相同的TCP发送。</p>
+<p>以<strong>HTTP</strong>举例研究持续连接和非持续连接的<strong>优缺点</strong>。</p>
+<h3 id="2-2-1-采用非持续连接的HTTP"><a href="#2-2-1-采用非持续连接的HTTP" class="headerlink" title="2.2.1 采用非持续连接的HTTP"></a>2.2.1 采用非持续连接的HTTP</h3><p>在<strong>非持续连接</strong>的情况下，从服务器向客户传送一个Web页面的<strong>步骤</strong>，假设该页面含有一个HTML基本页面和10个JPEG图形，并且这11个对象位于同一台服务器上。该HTML文件的URL为：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://www.someschool.edu/someDepartment/home.index">http://www.someSchool.edu/someDepartment/home.index</a></p>
+</blockquote>
+<ol>
+<li>HTTP<strong>客户进程</strong>在端口号80发起一个到服务器<a target="_blank" rel="noopener" href="http://www.someschool.edu的tcp连接,该端口号是http的默认端口./">www.someSchool.edu的TCP连接，该端口号是HTTP的默认端口。</a></li>
+<li>HTTP<strong>客户</strong>经它的<strong>套接字</strong>向该服务器发送一个HTTP请求报文。请求报文中包含了<strong>路径名</strong>/someDepartment/home.index</li>
+<li>HTTP<strong>服务器进程</strong>经它的<strong>套接字</strong>向该服务器发送一个HTTP请求报文。从其<strong>存储器</strong>（RAM或磁盘）中检索出对象<a target="_blank" rel="noopener" href="http://www.someschool.edu/someDepartment/home.index%EF%BC%8C%E5%9C%A8%E4%B8%80%E4%B8%AAHTTP%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87%E4%B8%AD**%E5%B0%81%E8%A3%85**%E5%AF%B9%E8%B1%A1%EF%BC%8C%E5%B9%B6%E9%80%9A%E8%BF%87%E5%85%B6%E5%A5%97%E6%8E%A5%E5%AD%97%E5%90%91%E5%AE%A2%E6%88%B7%E5%8F%91%E9%80%81**%E5%93%8D%E5%BA%94**%E6%8A%A5%E6%96%87%E3%80%82">www.someSchool.edu/someDepartment/home.index，在一个HTTP响应报文中**封装**对象，并通过其套接字向客户发送**响应**报文。</a></li>
+<li>HTTP<strong>服务器进程</strong>通知TCP断开该TCP连接。</li>
+<li>HTTP<strong>客户</strong>接收响应报文，TCP连接关闭。该报文指出封装的对象是一个HTML文件，客户从响应报文中提取出该文件，检查该HTML文件，得到对10个JPEG图形的<strong>引用</strong>。</li>
+<li>对每个引用的JPEG图形对象<strong>重复</strong>前4个步骤。</li>
+</ol>
+<p>其中每个TCP连接在服务器发送一个对象后关闭，即该连接并不为其他的对象而持续下来。每个TCP连接只传输一个请求报文和一个响应报文，因此在本例中要产生11个TCP连接。</p>
+<p>其中这10个JPEG图形对象是使用10个串行的TCP连接，还是某些JPEG对象使用了一些并行的TCP连接，这可以由用户通过配置浏览器进行控制。</p>
+<p><strong>往返时间</strong>（RTT）是指一个短分组从客户到服务器然后再返回客户所花费的时间。RTT包括分组传播时延、分组在中间路由器和交换机上的排队时延以及分组处理时延。</p>
+<p>当浏览器和Web服务器之间发起一个TCP连接时，会涉及一次”<strong>三次握手</strong>“过程：</p>
+<ol>
+<li>客户向服务器发送一个小TCP报文段</li>
+<li>服务器用一个小TCP报文段做出确认和响应</li>
+<li>客户向服务器返回确认</li>
+</ol>
+<p>三次握手中前两个部分占用了一个RTT。完成前两个部分后，客户结合三次握手的第三部分向该TCP连接发送一个HTTP请求报文，一旦该请求报文到达服务器，服务器就在该TCP连接上发送HTML文件。该HTTP请求/响应占用了一个RTT。因此，总的响应时间就是<strong>两个RTT加上服务器传输HTML文件的时间</strong>。<br><a href="/img/cn2.5.png">图为三次握手过程</a></p>
+<h3 id="2-2-2-采用持续连接的HTTP"><a href="#2-2-2-采用持续连接的HTTP" class="headerlink" title="2.2.2 采用持续连接的HTTP"></a>2.2.2 采用持续连接的HTTP</h3><p>非持续连接有两个缺点：</p>
+<ol>
+<li>必须为每一个请求的对象建立和维护一个全新的TCP连接。对于每个连接，客户和服务器都要分配TCP的缓冲区和保持TCP变量。</li>
+<li>每一个对象要经受两倍RTT的交付时延。</li>
+</ol>
+<p> 在采用持续连接时，服务器在发送响应后保持该TCP连接打开。在相同的客户与服务器之间的后续请求和响应报文能够通过相同的连接进行传送。一般来说，如果一条连接经过一定时间间隔（一个可配置的超时间隔）仍未被使用，HTTP服务器就关闭该连接。</p>
+<h2 id="2-3-HTTP报文格式"><a href="#2-3-HTTP报文格式" class="headerlink" title="2.3 HTTP报文格式"></a>2.3 HTTP报文格式</h2><p>HTTP规范包含了对HTTP报文格式的定义。HTTP报文有两种：请求报文和响应报文。</p>
+<h3 id="2-3-1-HTTP请求报文"><a href="#2-3-1-HTTP请求报文" class="headerlink" title="2.3.1 HTTP请求报文"></a>2.3.1 HTTP请求报文</h3><blockquote>
+<p>下面提供一个<strong>典型</strong>的HTTP请求报文：<br>GET /somedir/page.html HTTP/1.1<br>Host: <a target="_blank" rel="noopener" href="http://www.someschool.edu/">www.someschool.edu</a><br>Connection: close<br>User-agent: Mozilla/5.0<br>Accept-language: fr</p>
+</blockquote>
+<p>HTTP请求报文的第一行叫做<strong>请求行</strong>（request line），其后继的行叫做<strong>首部行</strong>（header line）。</p>
+<p>1 <strong>请求行</strong><br>有3个字段：<strong>方法字段</strong>、<strong>URL字段</strong>和<strong>HTTP版本字段</strong>。方法字段可以取几种不同的值，包括GET、POST、HEAD、PUT和DELETE，绝大部分采用GET方法。</p>
+<p>2 <strong>首部行</strong><br><strong>Host: <a target="_blank" rel="noopener" href="http://www.someschool.edu/">www.someschool.edu</a></strong>，指明了对象所在的主机。<br><strong>Connection: close</strong>，浏览器告诉服务器不使用持续连接。<br><strong>User-agent</strong>，用来指明用户代理，即向服务器发送请求的浏览器的类型。<br><strong>Accept-language</strong>，表示用户想得到该对象的法语版本（如果服务器中有），否则发送默认版本。</p>
+<p>在首部行后有一个“<strong>实体体</strong>”（entire body）。使用GET方法时实体体为空，在使用<strong>POST方法</strong>时使用。例如当用户在搜索引擎搜索关键词时，实体体包含的就是用户在表单字段的输入值。</p>
+<p><a href="/img/cn2.6.png">图为一个HTTP请求报文的通用格式</a></p>
+<p>用表单生成的请求报文不是必须使用<strong>POST方法</strong>，HTML表单经常使用GET方法，并在所请求的URL中包括输入的数据。例如<a target="_blank" rel="noopener" href="http://www.somesite.com/animalsearch?monkeys&amp;bananas%E3%80%82">www.somesite.com/animalsearch?monkeys&amp;bananas。</a></p>
+<p><strong>HEAD方法</strong>类似于GET方法，当服务器收到使用HEAD方法的请求时，将会用一个HTTP报文进行响应，但不返回对象。应用程序开发者经常使用HEAD方法进行调试跟踪。</p>
+<p><strong>PUT方法</strong>常与Web发行工具联合使用，它允许用户上传对象到指定的Web服务器上指定的路径（目录）。同时，它也被那些需要向Web服务器上传对象的应用程序使用。</p>
+<p><strong>DELETE方法</strong>允许用户或者应用程序删除Web服务器上的对象。</p>
+<h3 id="2-3-2-HTTP响应报文"><a href="#2-3-2-HTTP响应报文" class="headerlink" title="2.3.2 HTTP响应报文"></a>2.3.2 HTTP响应报文</h3>
             </div>
             <hr>
             <div>
