@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  一、应用层协议原理研发网络应用程序的核心是写出能够运行在不同的端系统和通过网络彼此通信的程序。因此研发新应用时需要编写将在多台端系统上运行的软件。 1.1 网络应用程序体系结构应用程序体系结构（application architecture）明显不同于网络体系结构。网络体系结构是固定的，而应用程序体系结构由应用程序研发者设计。应用程序体系结构目前有两">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-28T09:46:37.524Z">
-<meta property="article:modified_time" content="2022-03-30T04:45:01.454Z">
+<meta property="article:modified_time" content="2022-03-30T09:50:58.746Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10k 字
+      11k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      85 分钟
+      91 分钟
     </span>
   
 
@@ -408,7 +408,7 @@
 <p>1 <strong>用户代理</strong>允许用户阅读、回复、转发、保存和撰写报文。当发送方完成邮件撰写时，<strong>邮件代理</strong>向其<strong>邮件服务器</strong>发送邮件，此时邮件放在<strong>邮件服务器</strong>的外出报文队列中。</p>
 <p>2 <strong>邮件服务器</strong>形成了电子邮件体系结构的核心。每个接收方在其中的某个<strong>邮件服务器</strong>上有一个<strong>邮箱</strong>（mailbox），<strong>邮箱</strong>管理和维护着发送给用户的报文。当用户要在他的<strong>邮箱</strong>中读取该报文时，包含他邮箱的<strong>邮件服务器</strong>要鉴别用户。</p>
 <p>如果发送方的服务器不能将邮件交付给接收方的服务器，发送方的邮件服务器在一个<strong>报文队列</strong>（message queue）中保持该报文并在以后尝试再次发送。通常每30分钟进行一次尝试，如果几天后仍不能成功，服务器就删除该报文并以电子邮件的形式通知发送方。</p>
-<p>3 <strong>SMTF</strong>是因特网电子邮件中主要的应用层协议。它使用TCP可靠数据传输服务，从发送方的邮件服务器向接收方的邮件服务器发送邮件。SMTF也有两个部分：运行在发送方邮件服务器的<strong>客户端</strong>和接收方邮件服务器的<strong>服务器端</strong>。</p>
+<p>3 <strong>SMTP</strong>是因特网电子邮件中主要的应用层协议。它使用TCP可靠数据传输服务，从发送方的邮件服务器向接收方的邮件服务器发送邮件。SMTF也有两个部分：运行在发送方邮件服务器的<strong>客户端</strong>和接收方邮件服务器的<strong>服务器端</strong>。</p>
 <h2 id="4-2-SMTP"><a href="#4-2-SMTP" class="headerlink" title="4.2 SMTP"></a>4.2 SMTP</h2><p>SMTP是因特网电子邮件应用的核心，用于从发送方的邮件服务器发送报文到接收方的邮件服务器。</p>
 <p>假设Alice想给Bob发送一封简单的ASCII报文：</p>
 <ol>
@@ -420,7 +420,30 @@
 <li>在Bob方便的时候，他调用<strong>用户代理</strong>阅读该报文。</li>
 </ol>
 <p>SMTP一般不使用中间服务器发送邮件。而且它用的是持续连接，通过同一个TCP连接发送所有报文。</p>
-<h2 id="4-3-HTTP和SMTP的对比"><a href="#4-3-HTTP和SMTP的对比" class="headerlink" title="4.3 HTTP和SMTP的对比"></a>4.3 HTTP和SMTP的对比</h2>
+<h2 id="4-3-HTTP和SMTP的对比"><a href="#4-3-HTTP和SMTP的对比" class="headerlink" title="4.3 HTTP和SMTP的对比"></a>4.3 HTTP和SMTP的对比</h2><h3 id="4-3-1-共同点"><a href="#4-3-1-共同点" class="headerlink" title="4.3.1 共同点"></a>4.3.1 共同点</h3><ul>
+<li>都用于从一台主机向另一台主机传送文件。</li>
+<li>进行文件发送时，二者都使用<strong>持续连接</strong>。</li>
+</ul>
+<h3 id="4-3-2-不同点"><a href="#4-3-2-不同点" class="headerlink" title="4.3.2 不同点"></a>4.3.2 不同点</h3><p><strong>一、</strong></p>
+<ul>
+<li>HTTP主要是一个<strong>拉协议</strong>（pull protocol），即在方便的时候，用户使用HTTP从服务器拉取这些信息。TCP由想接收文件的机器发起的。</li>
+<li>SMTP基本是一个<strong>推协议</strong>（push protocol），即发送邮件服务器把文件推向接收邮件服务器。TCP由要发送该文件的机器发起。</li>
+</ul>
+<p><strong>二、</strong></p>
+<ul>
+<li>SMTP要求每个报文使用<strong>7比特ASCII码</strong>格式。如果文件包含非7比特ASCII字符，则必须要按照7比特ASCII码进行编码。</li>
+<li>HTTP没有格式限制。</li>
+</ul>
+<p><strong>三、</strong></p>
+<ul>
+<li>在处理一个既包含文本又包含图形（或其他）的文档时，HTTP把每个对象<strong>封装</strong>到响应报文中。</li>
+<li>SMTP把所有报文对象放在一个报文之中。</li>
+</ul>
+<h2 id="4-4-邮件报文格式和MIME"><a href="#4-4-邮件报文格式和MIME" class="headerlink" title="4.4 邮件报文格式和MIME"></a>4.4 邮件报文格式和MIME</h2><p>当发送电子邮件时，一个包含<strong>环境信息</strong>的首部位于报文体前面。这些<strong>环境信息</strong>包括在一系列<strong>首部行</strong>中，这些行由RFC 5322定义。注意这里的首部行不同于SMTP命令，SMTP命令是握手协议的一部分。</p>
+<blockquote>
+<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#97;&#x6c;&#105;&#x63;&#101;&#64;&#x63;&#x72;&#x65;&#x70;&#101;&#115;&#46;&#x66;&#114;">&#97;&#x6c;&#105;&#x63;&#101;&#64;&#x63;&#x72;&#x65;&#x70;&#101;&#115;&#46;&#x66;&#114;</a><br>To: <a href="mailto:&#98;&#x6f;&#x62;&#x40;&#104;&#x61;&#109;&#98;&#117;&#x72;&#103;&#101;&#114;&#46;&#101;&#100;&#117;">&#98;&#x6f;&#x62;&#x40;&#104;&#x61;&#109;&#98;&#117;&#x72;&#103;&#101;&#114;&#46;&#101;&#100;&#117;</a><br>Subject: Searching for the meaning of life</p>
+</blockquote>
+<h2 id="4-5-邮件访问协议"><a href="#4-5-邮件访问协议" class="headerlink" title="4.5 邮件访问协议"></a>4.5 邮件访问协议</h2>
             </div>
             <hr>
             <div>
