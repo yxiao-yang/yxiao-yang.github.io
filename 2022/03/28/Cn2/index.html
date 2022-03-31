@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  一、应用层协议原理研发网络应用程序的核心是写出能够运行在不同的端系统和通过网络彼此通信的程序。因此研发新应用时需要编写将在多台端系统上运行的软件。 1.1 网络应用程序体系结构应用程序体系结构（application architecture）明显不同于网络体系结构。网络体系结构是固定的，而应用程序体系结构由应用程序研发者设计。应用程序体系结构目前有两">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-28T09:46:37.524Z">
-<meta property="article:modified_time" content="2022-03-30T09:50:58.746Z">
+<meta property="article:modified_time" content="2022-03-31T01:17:45.333Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      11k 字
+      12k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      91 分钟
+      102 分钟
     </span>
   
 
@@ -441,9 +441,46 @@
 </ul>
 <h2 id="4-4-邮件报文格式和MIME"><a href="#4-4-邮件报文格式和MIME" class="headerlink" title="4.4 邮件报文格式和MIME"></a>4.4 邮件报文格式和MIME</h2><p>当发送电子邮件时，一个包含<strong>环境信息</strong>的首部位于报文体前面。这些<strong>环境信息</strong>包括在一系列<strong>首部行</strong>中，这些行由RFC 5322定义。注意这里的首部行不同于SMTP命令，SMTP命令是握手协议的一部分。</p>
 <blockquote>
-<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#97;&#x6c;&#105;&#x63;&#101;&#64;&#x63;&#x72;&#x65;&#x70;&#101;&#115;&#46;&#x66;&#114;">&#97;&#x6c;&#105;&#x63;&#101;&#64;&#x63;&#x72;&#x65;&#x70;&#101;&#115;&#46;&#x66;&#114;</a><br>To: <a href="mailto:&#98;&#x6f;&#x62;&#x40;&#104;&#x61;&#109;&#98;&#117;&#x72;&#103;&#101;&#114;&#46;&#101;&#100;&#117;">&#98;&#x6f;&#x62;&#x40;&#104;&#x61;&#109;&#98;&#117;&#x72;&#103;&#101;&#114;&#46;&#101;&#100;&#117;</a><br>Subject: Searching for the meaning of life</p>
+<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#97;&#x6c;&#105;&#x63;&#x65;&#x40;&#x63;&#114;&#x65;&#112;&#x65;&#115;&#46;&#102;&#x72;">&#97;&#x6c;&#105;&#x63;&#x65;&#x40;&#x63;&#114;&#x65;&#112;&#x65;&#115;&#46;&#102;&#x72;</a><br>To: <a href="mailto:&#98;&#x6f;&#98;&#64;&#x68;&#97;&#109;&#x62;&#x75;&#x72;&#103;&#x65;&#114;&#46;&#x65;&#100;&#117;">&#98;&#x6f;&#98;&#64;&#x68;&#97;&#109;&#x62;&#x75;&#x72;&#103;&#x65;&#114;&#46;&#x65;&#100;&#117;</a><br>Subject: Searching for the meaning of life</p>
 </blockquote>
-<h2 id="4-5-邮件访问协议"><a href="#4-5-邮件访问协议" class="headerlink" title="4.5 邮件访问协议"></a>4.5 邮件访问协议</h2>
+<h2 id="4-5-邮件访问协议"><a href="#4-5-邮件访问协议" class="headerlink" title="4.5 邮件访问协议"></a>4.5 邮件访问协议</h2><p>目前用户是通过在用户端系统上运行的客户程序来阅读电子邮件。用户通常在本地PC上运行一个<strong>用户代理程序</strong>，它访问存储在总是保持开机的<strong>共享邮件服务器</strong>（由用户的ISP维护）上的邮箱。</p>
+<p>为了接收方能够通过<strong>用户代理</strong>获得<strong>某ISP</strong>上的<strong>邮件服务器</strong>上的邮件，目前有一些流行的邮件访问协议，包括<strong>第三版的邮局协议</strong>（POP3）、<strong>因特网邮件访问协议</strong>（IMAP）和<strong>HTTP</strong>。</p>
+<p><a href="/img/cn2.9.png">图为电子邮件协议及其通信实体</a></p>
+<h3 id="4-5-1-POP3"><a href="#4-5-1-POP3" class="headerlink" title="4.5.1 POP3"></a>4.5.1 POP3</h3><p>POP3是一个<strong>极为简单、功能相当有限</strong>的邮件访问协议，由RFC1939定义。随着建立TCP连接，POP3按照三个阶段进行工作：</p>
+<ol>
+<li><strong>特许</strong>（authorization）<br>用户代理发送（以明文形式）用户名和口令以鉴别用户。</li>
+<li><strong>事务处理</strong><br>用户代理取回报文，还能对报文做删除标记，取消报文删除标记，以及获取邮件的统计信息。</li>
+<li><strong>更新</strong><br>出现在客户发出quit命令之后，结束该POP3会话。同时，该邮件服务器删除哪些被标记为删除的报文。</li>
+</ol>
+<h3 id="4-5-2-IMAP"><a href="#4-5-2-IMAP" class="headerlink" title="4.5.2 IMAP"></a>4.5.2 IMAP</h3><p>略</p>
+<h3 id="4-5-3基于Web的电子邮件"><a href="#4-5-3基于Web的电子邮件" class="headerlink" title="4.5.3基于Web的电子邮件"></a>4.5.3基于Web的电子邮件</h3><p>略</p>
+<h1 id="五、DNS：因特网的目录服务"><a href="#五、DNS：因特网的目录服务" class="headerlink" title="五、DNS：因特网的目录服务"></a>五、DNS：因特网的目录服务</h1><p>因特网上的主机可以使用多种方式进行标识，其中的一种标识方法是<strong>主机名</strong>（hostname）。然而，主机名几乎没有提供关于主机在因特网中位置的信息，而且以不定长的字母数字组成，路由器难以处理。由于这些原因，主机也使用<strong>IP地址</strong>（IP address）进行标识。</p>
+<blockquote>
+<p>一个IP地址由四个字节组成，并有着严格的层次结构，如121.7.106.83，其中的每个字节都被句点分隔开，表示了0~255的十进制数字。当从左至右扫描它时，会得到越来越具体的关于主机位于因特网何处的信息。</p>
+</blockquote>
+<h2 id="5-1-DNS提供的服务"><a href="#5-1-DNS提供的服务" class="headerlink" title="5.1 DNS提供的服务"></a>5.1 DNS提供的服务</h2><p><strong>域名系统</strong>（DNS）的主要任务是进行主机名到IP地址转换的<strong>目录服务</strong>。</p>
+<blockquote>
+<p>DNS是：<br>①一个由分层的DNS服务器（DNS server）实现的分布式数据库<br>②一个使得主机能够查询分布式数据库的应用层协议。</p>
+</blockquote>
+<p>DNS通常是由其他应用层协议所使用的（不直接面向用户），包括HTTP、SMTP和FTP，将用户提供的主机名解析为IP地址。例如，当用户要将一个HTTP请求报文发送到Web服务器时，必须要获得该网页的IP地址：</p>
+<ul>
+<li>同一台用户主机上运行着DNS应用的客户端。</li>
+<li>浏览器从URL抽取出主机名，并将主机名传给DNS应用的客户端。</li>
+<li>DNS客户向DNS服务器发送一个包含主机名的请求。</li>
+<li>DNS客户最终会收到一份回答报文，其中含有对应于该主机名的IP地址。</li>
+<li>一旦浏览器接收到该IP地址，它能够向位于该IP地址80端口的HTTP服务器进程发起一个TCP连接。</li>
+</ul>
+<p>DNS将会为因特网应用带来大量<strong>时延</strong>。目前想获得的IP地址通常就<strong>缓存</strong>在“附近的”DNS服务器中，这有助于减少DNS的网络流量和平均时延。</p>
+<p>除了上述的主机名到IP地址的转换，DNS还提供了一些重要的服务：</p>
+<ul>
+<li>主机别名</li>
+<li>邮件服务器别名</li>
+<li>负债分配</li>
+<li>……</li>
+</ul>
+<p>DNS由RFC定义，它是一个复杂的系统，这里不再详述。</p>
+<h2 id="5-2-DNS工作机理概述"><a href="#5-2-DNS工作机理概述" class="headerlink" title="5.2 DNS工作机理概述"></a>5.2 DNS工作机理概述</h2><p>从用户之际上调用应用程序的角度看，DNS是一个提供简单、直接的转换服务的黑盒子，事实上它的构造非常复杂。<strong>DNS由分布于全球的大量DNS服务器以及定义了DNS服务器与查询主机通信方式的应用层协议组成</strong>。</p>
+
             </div>
             <hr>
             <div>

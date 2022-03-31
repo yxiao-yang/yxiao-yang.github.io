@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  在本专栏中，我们将使用*公共因特网*（一种特定的计算机网络）作为讨论计算机网络机器协议的主要载体。  一、因特网：网络的网络 何为因特网？可以有两种解释： ——构成因特网的基本硬件和软件组件  ——为分布式应用提供服务的联网基础设施  下面我们分别以这两方面作为切入点，剖析因特网 1.1 具体构成描述1.1.1 端系统、通信链路、分组交换机、分组简介用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-21T12:16:25.598Z">
-<meta property="article:modified_time" content="2022-03-28T05:27:02.069Z">
+<meta property="article:modified_time" content="2022-03-31T00:52:28.954Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -419,7 +419,7 @@
 <p>协议分层<br>优点：<strong>概念化</strong>和<strong>结构化</strong>。<br>潜在的缺点：<br>1 一层可能冗余较低层的功能<br>2 某层的功能可能需要仅在其他某层才出现的信息，违反了层次分离的目标。</p>
 </blockquote>
 <p>各层的所有协议称为协议栈（protocol stack），因特网的协议栈由5个层次组成：物理层、链路层、网络层、运输层和应用层。</p>
-<p>1 <strong>应用层</strong><br>应用层是网络应用程序及它们的应用层协议存留的地方。因特网的应用层包含许多协议，例如HTTP（Web文档的请求和传送）、SMTF（电子邮件报文的传输）和FTP（两个端系统之间的文件传送）。应用层协议分布在多个端系统上，一个端系统中的应用程序使用协议与另一个端系统中的应用程序交换信息的分组，这种位于应用层的信息分组称为<strong>报文</strong>（message）。</p>
+<p>1 <strong>应用层</strong><br>应用层是网络应用程序及它们的应用层协议存留的地方。因特网的应用层包含许多协议，例如HTTP（Web文档的请求和传送）、SMTP（电子邮件报文的传输）和FTP（两个端系统之间的文件传送）。应用层协议分布在多个端系统上，一个端系统中的应用程序使用协议与另一个端系统中的应用程序交换信息的分组，这种位于应用层的信息分组称为<strong>报文</strong>（message）。</p>
 <p>2 <strong>运输层</strong><br>因特网的运输层在应用程序端点之间传送应用层报文。在因特网中，运输层包含TCP和UDP两个运输协议，利用其中任一个都能运输应用层报文。我们把运输层报文称作<strong>报文段</strong>（segment）。<br>——<strong>TCP</strong>提供连接服务，包括了应用层报文向目的地的确保传递和流量控制（即发送方/接收方速率匹配）。<br>——<strong>UDP</strong>提供无连接服务，它不提供不必要服务的服务（没有可靠性、流量控制、拥塞控制等）。</p>
 <p>3 <strong>网络层</strong><br>因特网的网络层负责将称为<strong>数据报</strong>（datagram）的网络层分组从一台主机移动到另一台主机。在一台源主机中的因特网运输层协议（TCP或UDP）向网络层递交运输层报文段和目的地址。</p>
 <p>因特网的网络层包括内容如下：<br>1、著名的<strong>IP协议</strong>，该协议定义了在数据报中的各个字段以及端系统和路由器如何作用于这些字段。IP协议是唯一的，所有具有网络层的因特网组件必须运行IP协议。<br>2、决定路由的<strong>路由选择协议</strong>，它使得数据报根据该路由从源传输到目的地。路由选择协议不唯一。</p>
