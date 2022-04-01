@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  一、应用层协议原理研发网络应用程序的核心是写出能够运行在不同的端系统和通过网络彼此通信的程序。因此研发新应用时需要编写将在多台端系统上运行的软件。 1.1 网络应用程序体系结构应用程序体系结构（application architecture）明显不同于网络体系结构。网络体系结构是固定的，而应用程序体系结构由应用程序研发者设计。应用程序体系结构目前有两">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-28T09:46:37.524Z">
-<meta property="article:modified_time" content="2022-03-31T01:17:45.333Z">
+<meta property="article:modified_time" content="2022-04-01T06:18:10.562Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      12k 字
+      14k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      102 分钟
+      115 分钟
     </span>
   
 
@@ -441,7 +441,7 @@
 </ul>
 <h2 id="4-4-邮件报文格式和MIME"><a href="#4-4-邮件报文格式和MIME" class="headerlink" title="4.4 邮件报文格式和MIME"></a>4.4 邮件报文格式和MIME</h2><p>当发送电子邮件时，一个包含<strong>环境信息</strong>的首部位于报文体前面。这些<strong>环境信息</strong>包括在一系列<strong>首部行</strong>中，这些行由RFC 5322定义。注意这里的首部行不同于SMTP命令，SMTP命令是握手协议的一部分。</p>
 <blockquote>
-<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#97;&#x6c;&#105;&#x63;&#x65;&#x40;&#x63;&#114;&#x65;&#112;&#x65;&#115;&#46;&#102;&#x72;">&#97;&#x6c;&#105;&#x63;&#x65;&#x40;&#x63;&#114;&#x65;&#112;&#x65;&#115;&#46;&#102;&#x72;</a><br>To: <a href="mailto:&#98;&#x6f;&#98;&#64;&#x68;&#97;&#109;&#x62;&#x75;&#x72;&#103;&#x65;&#114;&#46;&#x65;&#100;&#117;">&#98;&#x6f;&#98;&#64;&#x68;&#97;&#109;&#x62;&#x75;&#x72;&#103;&#x65;&#114;&#46;&#x65;&#100;&#117;</a><br>Subject: Searching for the meaning of life</p>
+<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#x61;&#108;&#x69;&#x63;&#x65;&#x40;&#99;&#114;&#101;&#x70;&#x65;&#115;&#46;&#x66;&#x72;">&#x61;&#108;&#x69;&#x63;&#x65;&#x40;&#99;&#114;&#101;&#x70;&#x65;&#115;&#46;&#x66;&#x72;</a><br>To: <a href="mailto:&#98;&#111;&#98;&#x40;&#x68;&#x61;&#109;&#98;&#x75;&#x72;&#x67;&#101;&#114;&#46;&#x65;&#100;&#x75;">&#98;&#111;&#98;&#x40;&#x68;&#x61;&#109;&#98;&#x75;&#x72;&#x67;&#101;&#114;&#46;&#x65;&#100;&#x75;</a><br>Subject: Searching for the meaning of life</p>
 </blockquote>
 <h2 id="4-5-邮件访问协议"><a href="#4-5-邮件访问协议" class="headerlink" title="4.5 邮件访问协议"></a>4.5 邮件访问协议</h2><p>目前用户是通过在用户端系统上运行的客户程序来阅读电子邮件。用户通常在本地PC上运行一个<strong>用户代理程序</strong>，它访问存储在总是保持开机的<strong>共享邮件服务器</strong>（由用户的ISP维护）上的邮箱。</p>
 <p>为了接收方能够通过<strong>用户代理</strong>获得<strong>某ISP</strong>上的<strong>邮件服务器</strong>上的邮件，目前有一些流行的邮件访问协议，包括<strong>第三版的邮局协议</strong>（POP3）、<strong>因特网邮件访问协议</strong>（IMAP）和<strong>HTTP</strong>。</p>
@@ -480,6 +480,50 @@
 </ul>
 <p>DNS由RFC定义，它是一个复杂的系统，这里不再详述。</p>
 <h2 id="5-2-DNS工作机理概述"><a href="#5-2-DNS工作机理概述" class="headerlink" title="5.2 DNS工作机理概述"></a>5.2 DNS工作机理概述</h2><p>从用户之际上调用应用程序的角度看，DNS是一个提供简单、直接的转换服务的黑盒子，事实上它的构造非常复杂。<strong>DNS由分布于全球的大量DNS服务器以及定义了DNS服务器与查询主机通信方式的应用层协议组成</strong>。</p>
+<p>采用单一DNS服务器（集中式设计）会有如下问题：</p>
+<ul>
+<li><strong>单点故障</strong>（a single point of failure）</li>
+<li><strong>通信容量</strong>（traffic volume）</li>
+<li><strong>远距离的集中式数据库</strong>（distant centralized database）</li>
+<li><strong>维护</strong>（maintenance）</li>
+</ul>
+<p>因此，DNS采用了分布式的设计方案。</p>
+<h3 id="5-2-1-分布式、层次数据库"><a href="#5-2-1-分布式、层次数据库" class="headerlink" title="5.2.1 分布式、层次数据库"></a>5.2.1 分布式、层次数据库</h3><p>DNS使用了大量DNS服务器，它们以<strong>层次</strong>方式组织，并且分布在全世界范围内。<strong>没有一台DNS服务器拥有因特网上所有主机的映射，该映射分布在所有的DNS服务器上</strong>。</p>
+<p>大致说来，有三种类型的DNS服务器：</p>
+<ul>
+<li><strong>根DNS服务器</strong><br>在因特网上有<strong>13</strong>个根DNS服务器（标号从A到M），大部分位于北美洲。为了提高安全性和可靠性，每台“服务器”实际上是一个<strong>服务器网络</strong>。</li>
+<li><strong>顶级域（TLD）DNS服务器</strong><br>这些服务器负责<strong>顶级域名</strong>，如com、org、net、edu等以及所有<strong>国家的顶级域名</strong>。</li>
+<li><strong>权威DNS服务器</strong><br>在因特网上具有<strong>公共可访问主机</strong>（如Web服务器和邮件服务器）的组织（机构）必须提供公共可访问的<strong>DNS记录</strong>，这些记录将这些主机的名字映射为IP地址。这个组织（机构）能够选择实现<strong>自己的</strong>权威DNS服务器收藏这些DNS记录，也可以选择将这些记录存储在<strong>第三方的</strong>权威DNS服务器中。</li>
+</ul>
+<p><a href="/img/cn2.10.png">图为DNS服务器的部分层次结构</a></p>
+<p>除了在层次结构中的三种DNS服务器，还有一类，叫做<strong>本地DNS服务器</strong>，它起到一个<strong>代理</strong>的作用。对于某居民区ISP，本地DNS服务器通常与主机相隔很近。</p>
+<p><a href="/img/cn2.11.png">图为各种DNS服务器的交互</a></p>
+<p>主机、服务器之间的查询有两种形式：</p>
+<ul>
+<li><strong>递归查询</strong>。在该模式下DNS 服务器接收到客户机请求，必须使用一个<strong>准确的查询结果</strong>回复客户机。如果DNS 服务器本地没有存储查询DNS 信息，那么该服务器会询问其他服务器，并将返回的查询结果提交给客户机。客户机和服务器之间的查询是递归查询。</li>
+</ul>
+<p> <strong>递归查询告诉客户机IP地址</strong></p>
+<ul>
+<li><strong>迭代查询</strong>。DNS 服务器会向客户机提供其他能够解析查询请求的<strong>DNS 服务器地址</strong>，当客户机发送查询请求时，DNS 服务器并不直接回复查询结果，而是告诉客户机另一台DNS 服务器地址，客户机再向这台DNS 服务器提交请求，依次循环直到返回查询的结果为止。</li>
+</ul>
+<p><strong>服务器之间的查询是迭代查询</strong></p>
+<h3 id="5-2-2-DNS缓存"><a href="#5-2-2-DNS缓存" class="headerlink" title="5.2.2 DNS缓存"></a>5.2.2 DNS缓存</h3><p>为了改善时延性能并减少在因特网上到处传输的DNS报文数量，DNS广泛使用了<strong>缓存</strong>技术。在一个请求链中，当某DNS服务器接收一个DNS回答时，它能将该回答中的信息缓存在本地存储器中。由于主机和和主机名与IP地址的映射不是永久的，DNS服务器在一段时间后（通常设置为两天）将丢弃缓存的信息。</p>
+<h2 id="5-3-DNS记录和报文"><a href="#5-3-DNS记录和报文" class="headerlink" title="5.3 DNS记录和报文"></a>5.3 DNS记录和报文</h2><p>共同实现DNS分布式数据库的所有DNS服务器存储了<strong>资源记录</strong>（RR），RR提供了主机名到IP地址的映射。每个DNS回答报文包含了<strong>一条或多条</strong>RR。</p>
+<p>RR是一个包含了下列字段的4元组：<br>（Name，Value，Type，TTL）</p>
+<p>关于RR的详细内容以后再补。</p>
+<h3 id="5-3-1-DNS报文"><a href="#5-3-1-DNS报文" class="headerlink" title="5.3.1 DNS报文"></a>5.3.1 DNS报文</h3><p>DNS报文中各字段的语义如下：</p>
+<p><a href="/img/cn2.12.png">图为DNS报文格式</a></p>
+<ul>
+<li>前12个字节是<strong>首部区域</strong>。</li>
+</ul>
+<p><strong>1</strong> <strong>标识符</strong>是一个<em>16比特的数</em>。用于标识该查询，它会被复制到回答报文中，以便让客户用它来匹配发送的请求和接收到的回答。<br><strong>2</strong> <strong>标志字段</strong>中含有<em>若干标志</em>。<br>1比特的“<em>查询/回答</em>”标志位指出报文是查询报文（0）还是回答报文（1）；<br>当某DNS服务器是所请求名字的权威DNS服务器时，1比特的“<em>权威的</em>”标志位被置入；<br>如果客户在该DNS服务器没有某记录时希望它执行递归查询，将设置1比特的“<em>希望递归</em>”标志位；<br>如果该DNS服务器支持递归查询，在它的回答报文中会显示1比特的“递归可用”标志位。<br><strong>3</strong> 除此之外，首部区域还有4个<strong>有关数量的字段</strong>，它们分别指出了4类数据区域出现的数量。</p>
+<ul>
+<li><strong>问题区域</strong>包含着正在进行的查询信息。该区域包括：</li>
+</ul>
+<p><strong>1 名字字段</strong>，指出正在被查询的主机名字。<br><strong>2 类型字段</strong>，指出有关该名字的正被询问的问题类型。</p>
+<ul>
+<li><strong>回答区域</strong>包含了对最初请求的名字的<strong>资源记录</strong>。</li>
+</ul>
 
             </div>
             <hr>
