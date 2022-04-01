@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 纸上得来终觉浅，绝知此事要躬行。  一、应用层协议原理研发网络应用程序的核心是写出能够运行在不同的端系统和通过网络彼此通信的程序。因此研发新应用时需要编写将在多台端系统上运行的软件。 1.1 网络应用程序体系结构应用程序体系结构（application architecture）明显不同于网络体系结构。网络体系结构是固定的，而应用程序体系结构由应用程序研发者设计。应用程序体系结构目前有两">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-28T09:46:37.524Z">
-<meta property="article:modified_time" content="2022-04-01T06:18:10.562Z">
+<meta property="article:modified_time" content="2022-04-01T10:50:52.587Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -78,7 +78,7 @@
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>小羊</strong>
+      <strong>羊</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      115 分钟
+      119 分钟
     </span>
   
 
@@ -243,6 +243,12 @@
           <article class="post-content mx-auto">
             <!-- SEO header -->
             <h1 style="display: none">02：应用层</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：7 分钟前
+                
+              </p>
             
             <div class="markdown-body">
               <h1 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h1><blockquote>
@@ -441,7 +447,7 @@
 </ul>
 <h2 id="4-4-邮件报文格式和MIME"><a href="#4-4-邮件报文格式和MIME" class="headerlink" title="4.4 邮件报文格式和MIME"></a>4.4 邮件报文格式和MIME</h2><p>当发送电子邮件时，一个包含<strong>环境信息</strong>的首部位于报文体前面。这些<strong>环境信息</strong>包括在一系列<strong>首部行</strong>中，这些行由RFC 5322定义。注意这里的首部行不同于SMTP命令，SMTP命令是握手协议的一部分。</p>
 <blockquote>
-<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#x61;&#108;&#x69;&#x63;&#x65;&#x40;&#99;&#114;&#101;&#x70;&#x65;&#115;&#46;&#x66;&#x72;">&#x61;&#108;&#x69;&#x63;&#x65;&#x40;&#99;&#114;&#101;&#x70;&#x65;&#115;&#46;&#x66;&#x72;</a><br>To: <a href="mailto:&#98;&#111;&#98;&#x40;&#x68;&#x61;&#109;&#98;&#x75;&#x72;&#x67;&#101;&#114;&#46;&#x65;&#100;&#x75;">&#98;&#111;&#98;&#x40;&#x68;&#x61;&#109;&#98;&#x75;&#x72;&#x67;&#101;&#114;&#46;&#x65;&#100;&#x75;</a><br>Subject: Searching for the meaning of life</p>
+<p>一个典型的报文首部如下：<br>From: <a href="mailto:&#97;&#x6c;&#105;&#x63;&#101;&#64;&#x63;&#x72;&#x65;&#x70;&#101;&#x73;&#x2e;&#x66;&#x72;">&#97;&#x6c;&#105;&#x63;&#101;&#64;&#x63;&#x72;&#x65;&#x70;&#101;&#x73;&#x2e;&#x66;&#x72;</a><br>To: <a href="mailto:&#98;&#x6f;&#x62;&#64;&#104;&#97;&#x6d;&#x62;&#117;&#x72;&#103;&#101;&#114;&#46;&#x65;&#100;&#117;">&#98;&#x6f;&#x62;&#64;&#104;&#97;&#x6d;&#x62;&#117;&#x72;&#103;&#101;&#114;&#46;&#x65;&#100;&#117;</a><br>Subject: Searching for the meaning of life</p>
 </blockquote>
 <h2 id="4-5-邮件访问协议"><a href="#4-5-邮件访问协议" class="headerlink" title="4.5 邮件访问协议"></a>4.5 邮件访问协议</h2><p>目前用户是通过在用户端系统上运行的客户程序来阅读电子邮件。用户通常在本地PC上运行一个<strong>用户代理程序</strong>，它访问存储在总是保持开机的<strong>共享邮件服务器</strong>（由用户的ISP维护）上的邮箱。</p>
 <p>为了接收方能够通过<strong>用户代理</strong>获得<strong>某ISP</strong>上的<strong>邮件服务器</strong>上的邮件，目前有一些流行的邮件访问协议，包括<strong>第三版的邮局协议</strong>（POP3）、<strong>因特网邮件访问协议</strong>（IMAP）和<strong>HTTP</strong>。</p>
@@ -523,8 +529,20 @@
 <p><strong>1 名字字段</strong>，指出正在被查询的主机名字。<br><strong>2 类型字段</strong>，指出有关该名字的正被询问的问题类型。</p>
 <ul>
 <li><strong>回答区域</strong>包含了对最初请求的名字的<strong>资源记录</strong>。</li>
+<li><strong>权威区域</strong>包含了其他权威服务器的记录。</li>
+<li><strong>附加区域</strong>包含了其他有帮助的记录。</li>
 </ul>
-
+<h3 id="5-3-2-在DNS数据库中插入记录"><a href="#5-3-2-在DNS数据库中插入记录" class="headerlink" title="5.3.2 在DNS数据库中插入记录"></a>5.3.2 在DNS数据库中插入记录</h3><p>如果你想注册域名，需要向注册登记机构（register）提供基本和辅助权威DNS服务器的名字和IP地址。对这两个权威DNS服务器，该注册登记机构确保将一个类型NS和一个类型A的记录输入TLD com服务器。</p>
+<blockquote>
+<p>例如，输入如下信息：<br>(networkutopia.com, dnsl.networkutopia.com, NS)<br>(dnsl.networkutopia.com,  212.212.212.1, A)</p>
+</blockquote>
+<p>除此之外，你还需要确保用于Web服务器的类型A资源记录和用于邮件服务器的类型MX资源记录被输入到你的权威DNS服务器中。</p>
+<h1 id="六、P2P应用"><a href="#六、P2P应用" class="headerlink" title="六、P2P应用"></a>六、P2P应用</h1><p>P2P体系结构不同于客户-服务器体系结构，成对间歇地主机（称为对等方）彼此直接通信。有两种特别适合于P2P设计的应用。</p>
+<ul>
+<li>文件分发，其中应用程序从单个源向大量的对等方分发一个文件。</li>
+<li>分布在大型对等方社区中的数据库。</li>
+</ul>
+<h2 id="6-1-P2P文件分发"><a href="#6-1-P2P文件分发" class="headerlink" title="6.1 P2P文件分发"></a>6.1 P2P文件分发</h2>
             </div>
             <hr>
             <div>
