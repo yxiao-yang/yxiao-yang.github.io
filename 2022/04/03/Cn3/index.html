@@ -16,17 +16,21 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="写在前面  纸上得来终觉浅，绝知此事要躬行   一、概述和运输层服务 运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信（logic communication）功能。 逻辑通信 概览  1.1 运输层和网络层的关系 网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。 运输层和网络层的逻辑通信  1.2 因特网运输层概述 因特网网络层协议有一个名字叫IP，">
+    <meta name="description" content="写在前面  纸上得来终觉浅，绝知此事要躬行   一、概述和运输层服务 运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信（logic communication）功能。    1.1 运输层和网络层的关系 网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。   1.2 因特网运输层概述 因特网网络层协议有一个名字叫IP，即国际协议。IP尽最大努力交付报文段">
 <meta property="og:type" content="article">
 <meta property="og:title" content="03：运输层">
 <meta property="og:url" content="http://example.com/2022/04/03/Cn3/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="写在前面  纸上得来终觉浅，绝知此事要躬行   一、概述和运输层服务 运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信（logic communication）功能。 逻辑通信 概览  1.1 运输层和网络层的关系 网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。 运输层和网络层的逻辑通信  1.2 因特网运输层概述 因特网网络层协议有一个名字叫IP，">
+<meta property="og:description" content="写在前面  纸上得来终觉浅，绝知此事要躬行   一、概述和运输层服务 运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信（logic communication）功能。    1.1 运输层和网络层的关系 网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。   1.2 因特网运输层概述 因特网网络层协议有一个名字叫IP，即国际协议。IP尽最大努力交付报文段">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/cn3.1.png">
+<meta property="og:image" content="http://example.com/img/cn3.2.png">
+<meta property="og:image" content="http://example.com/img/cn3.3.png">
 <meta property="article:published_time" content="2022-04-03T10:51:27.703Z">
-<meta property="article:modified_time" content="2022-04-03T10:51:45.843Z">
+<meta property="article:modified_time" content="2022-04-03T10:59:52.118Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/cn3.1.png">
   
   
   <title>03：运输层 - Hexo</title>
@@ -196,7 +200,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      393 字
+      375 字
     </span>
   
 
@@ -249,11 +253,11 @@
 </blockquote>
 <h1 id="一-概述和运输层服务"><a class="markdownIt-Anchor" href="#一-概述和运输层服务"></a> 一、概述和运输层服务</h1>
 <p>运输层协议为运行在不同主机上的应用进程之间提供了<strong>逻辑通信</strong>（logic communication）功能。<br />
-<a href="/img/cn3.1.png">逻辑通信</a><br />
-<a href="/img/cn3.2.png">概览</a></p>
+<img src="/img/cn3.1.png" srcset="/img/loading.gif" lazyload alt="逻辑通信" /><br />
+<img src="/img/cn3.2.png" srcset="/img/loading.gif" lazyload alt="概览" /></p>
 <h2 id="11-运输层和网络层的关系"><a class="markdownIt-Anchor" href="#11-运输层和网络层的关系"></a> 1.1 运输层和网络层的关系</h2>
 <p>网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。<br />
-<a href="/img/cn3.3.png">运输层和网络层的逻辑通信</a></p>
+<img src="/img/cn3.3.png" srcset="/img/loading.gif" lazyload alt="运输层和网络层的逻辑通信" /></p>
 <h2 id="12-因特网运输层概述"><a class="markdownIt-Anchor" href="#12-因特网运输层概述"></a> 1.2 因特网运输层概述</h2>
 <p>因特网网络层协议有一个名字叫<strong>IP</strong>，即国际协议。IP尽最大努力交付报文段，但不做任何确保，因此它是<strong>不可靠服务</strong>。每台主机至少有一个IP地址。</p>
 <p>UDP和TCP最基本的责任是，将两个端系统间IP的交付服务扩展为运行在端系统上的两个进程之间的交付服务，这种服务被称为运输层的<strong>多路运输</strong>与<strong>多路分解</strong>。其次，UDP和TCP还可以通过在其报文段首部中包括差错检查字段而提供<strong>完整性检查</strong>。UDP仅能提供这两种服务，TCP还有附加服务（可靠数据传输、拥塞控制等）。</p>
