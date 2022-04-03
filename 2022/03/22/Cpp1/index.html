@@ -16,12 +16,12 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="C++的一些特点1 main()函数1.1 主函数必须是int main()或int main(void)原因：运行cpp程序时，通常从main()函数开始执行。因此，如果没有main()，程序将不完整，编译器将指出未定义main()函数。 1.2 main()最后可以不返回0原因：ANSI&#x2F;ISO C++标准为，如果编译器到达main()函数末尾时没有遇到返回语句，则认为main()函数以ret">
+    <meta name="description" content="C++的一些特点  1 main()函数 1.1 主函数必须是int main()或int main(void) 原因：运行cpp程序时，通常从main()函数开始执行。因此，如果没有main()，程序将不完整，编译器将指出未定义main()函数。 1.2 main()最后可以不返回0 原因：ANSI&#x2F;ISO C++标准为，如果编译器到达main()函数末尾时没有遇到返回语句，则认为main()">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++的一些特点">
 <meta property="og:url" content="http://example.com/2022/03/22/Cpp1/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="C++的一些特点1 main()函数1.1 主函数必须是int main()或int main(void)原因：运行cpp程序时，通常从main()函数开始执行。因此，如果没有main()，程序将不完整，编译器将指出未定义main()函数。 1.2 main()最后可以不返回0原因：ANSI&#x2F;ISO C++标准为，如果编译器到达main()函数末尾时没有遇到返回语句，则认为main()函数以ret">
+<meta property="og:description" content="C++的一些特点  1 main()函数 1.1 主函数必须是int main()或int main(void) 原因：运行cpp程序时，通常从main()函数开始执行。因此，如果没有main()，程序将不完整，编译器将指出未定义main()函数。 1.2 main()最后可以不返回0 原因：ANSI&#x2F;ISO C++标准为，如果编译器到达main()函数末尾时没有遇到返回语句，则认为main()">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-22T07:38:18.000Z">
 <meta property="article:modified_time" content="2022-03-22T07:40:13.441Z">
@@ -246,17 +246,27 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：10 天前
+                  本文最后更新于：12 天前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="C-的一些特点"><a href="#C-的一些特点" class="headerlink" title="C++的一些特点"></a>C++的一些特点</h1><h2 id="1-main-函数"><a href="#1-main-函数" class="headerlink" title="1 main()函数"></a>1 main()函数</h2><p><strong>1.1</strong> 主函数必须是int main()或int main(void)<br><em>原因</em>：运行cpp程序时，通常从main()函数开始执行。因此，如果没有main()，程序将不完整，编译器将指出未定义main()函数。</p>
-<p><strong>1.2</strong> main()最后可以不返回0<br><em>原因</em>：ANSI/ISO C++标准为，如果编译器到达main()函数末尾时没有遇到返回语句，则认为main()函数以return 0结尾。</p>
-<h2 id="2-注释"><a href="#2-注释" class="headerlink" title="2 注释"></a>2 注释</h2><p><strong>2.1</strong> 注释以“//”打头，到行尾结束<br><strong>2.2</strong> 注释可以位于单独一行，也可和代码位于同一行</p>
-<h2 id="3-预处理器和头文件名"><a href="#3-预处理器和头文件名" class="headerlink" title="3 预处理器和头文件名"></a>3 预处理器和头文件名</h2><p><strong>3.1</strong> 如果程序要使用某些工具，要在前几行标明#include…<br><em>原因</em>：C++和C一样，使用一个预处理器，在主编译之前对源文件进行处理，例如在源代码被编译之前，替换或添加文本。</p>
+              <h1 id="c的一些特点"><a class="markdownIt-Anchor" href="#c的一些特点"></a> C++的一些特点</h1>
+<h2 id="1-main函数"><a class="markdownIt-Anchor" href="#1-main函数"></a> 1 main()函数</h2>
+<p><strong>1.1</strong> 主函数必须是int main()或int main(void)<br />
+<em>原因</em>：运行cpp程序时，通常从main()函数开始执行。因此，如果没有main()，程序将不完整，编译器将指出未定义main()函数。</p>
+<p><strong>1.2</strong> main()最后可以不返回0<br />
+<em>原因</em>：ANSI/ISO C++标准为，如果编译器到达main()函数末尾时没有遇到返回语句，则认为main()函数以return 0结尾。</p>
+<h2 id="2-注释"><a class="markdownIt-Anchor" href="#2-注释"></a> 2 注释</h2>
+<p><strong>2.1</strong> 注释以“//”打头，到行尾结束<br />
+<strong>2.2</strong> 注释可以位于单独一行，也可和代码位于同一行</p>
+<h2 id="3-预处理器和头文件名"><a class="markdownIt-Anchor" href="#3-预处理器和头文件名"></a> 3 预处理器和头文件名</h2>
+<p><strong>3.1</strong> 如果程序要使用某些工具，要在前几行标明#include…<br />
+<em>原因</em>：C++和C一样，使用一个预处理器，在主编译之前对源文件进行处理，例如在源代码被编译之前，替换或添加文本。</p>
 <p><strong>3.2</strong> 头文件名没有扩展名</p>
-<h2 id="4-名称空间"><a href="#4-名称空间" class="headerlink" title="4 名称空间"></a>4 名称空间</h2><p><strong>4.1</strong> using namespace std;<br>原因：有助于组织程序，在调用同名函数时可以指定哪个名称空间的函数,如下所示：</p>
+<h2 id="4-名称空间"><a class="markdownIt-Anchor" href="#4-名称空间"></a> 4 名称空间</h2>
+<p><strong>4.1</strong> using namespace std;<br />
+原因：有助于组织程序，在调用同名函数时可以指定哪个名称空间的函数,如下所示：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><pre><code class="hljs cpp">Microflop::<span class="hljs-built_in">wanda</span>(<span class="hljs-string">&quot;go dancing?&quot;</span>);<br>Piscine::<span class="hljs-built_in">wanda</span>(<span class="hljs-string">&quot;a fish named Desire&quot;</span>);<br></code></pre></td></tr></table></figure>
 <p>如果省略了这条语句，那么就要使用如下语句编码：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">std::cout &lt;&lt; <span class="hljs-string">&quot;Come up and C++ me some time.&quot;</span>;<br>std::cout &lt;&lt; std::endl;<br></code></pre></td></tr></table></figure>
@@ -473,6 +483,13 @@
 
 
 
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
 
 
 
