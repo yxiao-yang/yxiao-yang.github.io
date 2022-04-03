@@ -16,19 +16,38 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="分类 - 自顶向下方法">
-<meta property="og:url" content="http://example.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95/index.html">
+    <meta name="description" content="写在前面  纸上得来终觉浅，绝知此事要躬行   一、概述和运输层服务 运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信（logic communication）功能。 逻辑通信 概览  1.1 运输层和网络层的关系 网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。 运输层和网络层的逻辑通信  1.2 因特网运输层概述 因特网网络层协议有一个名字叫IP，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="03：运输层">
+<meta property="og:url" content="http://example.com/2022/04/03/Cn3/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="写在前面  纸上得来终觉浅，绝知此事要躬行   一、概述和运输层服务 运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信（logic communication）功能。 逻辑通信 概览  1.1 运输层和网络层的关系 网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。 运输层和网络层的逻辑通信  1.2 因特网运输层概述 因特网网络层协议有一个名字叫IP，">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-03T10:51:27.703Z">
+<meta property="article:modified_time" content="2022-04-03T10:51:45.843Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>分类 - 自顶向下方法 - Hexo</title>
+  <title>03：运输层 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
@@ -55,7 +74,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -156,9 +175,43 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分类 - 自顶向下方法">
+            <span class="h2" id="subtitle" title="03：运输层">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-04-03 18:51" pubdate>
+        2022年4月3日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      393 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      4 分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -171,52 +224,104 @@
 
   <main>
     
-      <div class="container nopadding-x-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
-
-<div class="list-group">
-  <p class="h4">共计 3 篇文章</p>
-  <hr>
-  
-  
-    
       
-      <p class="h5">2022</p>
-    
-    <a href="/2022/04/03/Cn3/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">03：运输层</span>
-      <time style="float: right;">04-03</time>
-    </a>
-  
-    
-    <a href="/2022/03/28/Cn2/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">02：应用层</span>
-      <time style="float: right;">03-28</time>
-    </a>
-  
-    
-    <a href="/2022/03/21/Cn1/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">01：计算机网络和因特网</span>
-      <time style="float: right;">03-21</time>
-    </a>
-  
-</div>
 
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">03：运输层</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：几秒前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h1>
+<blockquote>
+<p>纸上得来终觉浅，绝知此事要躬行</p>
+</blockquote>
+<h1 id="一-概述和运输层服务"><a class="markdownIt-Anchor" href="#一-概述和运输层服务"></a> 一、概述和运输层服务</h1>
+<p>运输层协议为运行在不同主机上的应用进程之间提供了<strong>逻辑通信</strong>（logic communication）功能。<br />
+<a href="/img/cn3.1.png">逻辑通信</a><br />
+<a href="/img/cn3.2.png">概览</a></p>
+<h2 id="11-运输层和网络层的关系"><a class="markdownIt-Anchor" href="#11-运输层和网络层的关系"></a> 1.1 运输层和网络层的关系</h2>
+<p>网络层提供了主机之间的逻辑通信，而运输层为运行在不同主机上的进程之间提供了逻辑通信。<br />
+<a href="/img/cn3.3.png">运输层和网络层的逻辑通信</a></p>
+<h2 id="12-因特网运输层概述"><a class="markdownIt-Anchor" href="#12-因特网运输层概述"></a> 1.2 因特网运输层概述</h2>
+<p>因特网网络层协议有一个名字叫<strong>IP</strong>，即国际协议。IP尽最大努力交付报文段，但不做任何确保，因此它是<strong>不可靠服务</strong>。每台主机至少有一个IP地址。</p>
+<p>UDP和TCP最基本的责任是，将两个端系统间IP的交付服务扩展为运行在端系统上的两个进程之间的交付服务，这种服务被称为运输层的<strong>多路运输</strong>与<strong>多路分解</strong>。其次，UDP和TCP还可以通过在其报文段首部中包括差错检查字段而提供<strong>完整性检查</strong>。UDP仅能提供这两种服务，TCP还有附加服务（可靠数据传输、拥塞控制等）。</p>
+<h1 id="二-多路复用与多路分解"><a class="markdownIt-Anchor" href="#二-多路复用与多路分解"></a> 二、多路复用与多路分解</h1>
 
-
-
-
-              </div>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95/">自顶向下方法</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/31/Suanfa1/">
+                        <span class="hidden-mobile">常用算法模板</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -324,6 +429,19 @@
 
 
 
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
 
 
   <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
@@ -345,6 +463,13 @@
 
 
 
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
 
 
 
