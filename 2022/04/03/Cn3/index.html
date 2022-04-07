@@ -40,7 +40,7 @@
 <meta property="og:image" content="http://example.com/img/cn3.15.png">
 <meta property="og:image" content="http://example.com/img/cn3.16.png">
 <meta property="article:published_time" content="2022-04-03T10:51:27.703Z">
-<meta property="article:modified_time" content="2022-04-07T02:40:50.924Z">
+<meta property="article:modified_time" content="2022-04-07T05:45:55.226Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cn3.1.png">
@@ -213,7 +213,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.9k 字
+      4.1k 字
     </span>
   
 
@@ -222,7 +222,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      33 分钟
+      35 分钟
     </span>
   
 
@@ -255,7 +255,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 分钟前
+                  本文最后更新于：4 小时前
                 
               </p>
             
@@ -365,6 +365,15 @@
 <p>通过基于ACK、无NAK的GBN协议的FSM图来了解GBN的原理：</p>
 <p><img src="/img/cn3.15.png" srcset="/img/loading.gif" lazyload alt="GBN发送方的扩展FSM描述" /><br />
 <img src="/img/cn3.16.png" srcset="/img/loading.gif" lazyload alt="GBN接收方的扩展FSM描述" /></p>
+<h2 id="44-选择重传sr协议"><a class="markdownIt-Anchor" href="#44-选择重传sr协议"></a> 4.4 选择重传（SR协议）</h2>
+<p>GBN协议虽然实现了<strong>流水线式传输</strong>数据，提高了发送方信道的利用率,但是GBN有一个很大的缺陷就是一旦超时，会有许多<strong>不必要重传的分组</strong>被重新传送。尤其是当窗口长度N很大时，随着差错率的提升，信道中会充斥着不必要重传的分组。</p>
+<p>SR协议原理：</p>
+<ul>
+<li><strong>发送方</strong>：<br />
+为每一个分组设置一个定时器，这样可以在某一个分组超时时对其单独进行重传。</li>
+<li><strong>接收方</strong>：<br />
+SR接收方将确认一个正确接收的分组而不管其是否按序。在未出现分组丢失之前，正确接收到的分组都会被交付给上层。一旦出现分组丢失，失序的分组将被接收方<strong>缓存</strong>起来，直到所有丢失分组（即序号更小的分组）皆被接收为止，这时将缓存中的分组一起交付给上层。</li>
+</ul>
 
             </div>
             <hr>
