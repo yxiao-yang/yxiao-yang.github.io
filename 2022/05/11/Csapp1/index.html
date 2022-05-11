@@ -16,15 +16,15 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="1 Date lab详解  写在前面 最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。  实验环境 笔者使用Ubuntu22.04的虚拟机，用vscode做主要编程软件。 lab相关文件可以从课程页面下载，这里放置课程链接：csapp lab 再贴一个链接，里面包含有中文版的详细描述，简洁明了：csapp中文版电子书及lab 关于实验环境的配置这里不再赘述。  实">
+    <meta name="description" content="Date lab详解  写在前面 最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。  实验环境 笔者使用Ubuntu22.04的虚拟机，用vscode做主要编程软件。 lab相关文件可以从课程页面下载，这里放置课程链接：csapp lab 再贴一个链接，里面包含有中文版的详细描述，简洁明了：csapp中文版电子书及lab 关于实验环境的配置这里不再赘述。  实验内">
 <meta property="og:type" content="article">
 <meta property="og:title" content="1 Date lab详解">
 <meta property="og:url" content="http://example.com/2022/05/11/Csapp1/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="1 Date lab详解  写在前面 最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。  实验环境 笔者使用Ubuntu22.04的虚拟机，用vscode做主要编程软件。 lab相关文件可以从课程页面下载，这里放置课程链接：csapp lab 再贴一个链接，里面包含有中文版的详细描述，简洁明了：csapp中文版电子书及lab 关于实验环境的配置这里不再赘述。  实">
+<meta property="og:description" content="Date lab详解  写在前面 最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。  实验环境 笔者使用Ubuntu22.04的虚拟机，用vscode做主要编程软件。 lab相关文件可以从课程页面下载，这里放置课程链接：csapp lab 再贴一个链接，里面包含有中文版的详细描述，简洁明了：csapp中文版电子书及lab 关于实验环境的配置这里不再赘述。  实验内">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-05-11T10:23:34.254Z">
-<meta property="article:modified_time" content="2022-05-11T10:24:46.527Z">
+<meta property="article:modified_time" content="2022-05-11T14:00:30.617Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      407 字
+      1.1k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      4 分钟
+      10 分钟
     </span>
   
 
@@ -238,12 +238,12 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="1-date-lab详解"><a class="markdownIt-Anchor" href="#1-date-lab详解"></a> 1 Date lab详解</h1>
+              <h1 id="date-lab详解"><a class="markdownIt-Anchor" href="#date-lab详解"></a> Date lab详解</h1>
 <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
 <p>最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。</p>
 <h2 id="实验环境"><a class="markdownIt-Anchor" href="#实验环境"></a> 实验环境</h2>
@@ -252,13 +252,115 @@ lab相关文件可以从课程页面下载，这里放置课程链接：<a targe
 再贴一个链接，里面包含有中文版的详细描述，简洁明了：<a target="_blank" rel="noopener" href="https://hansimov.gitbook.io/csapp/">csapp中文版电子书及lab</a><br />
 关于实验环境的配置这里不再赘述。</p>
 <h2 id="实验内容"><a class="markdownIt-Anchor" href="#实验内容"></a> 实验内容</h2>
+<p>首先贴上一张表格，里面是这个lab需要实现的13个函数</p>
+<table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>描述</th>
+<th>难度级别</th>
+<th>最大操作符数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bitXor(x,y)</td>
+<td>x 异或 y</td>
+<td>1</td>
+<td>14</td>
+</tr>
+<tr>
+<td>tmin()</td>
+<td>最小的整数补码</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>isTmax(x)</td>
+<td>x 为最大的整数补码时为真</td>
+<td>1</td>
+<td>10</td>
+</tr>
+<tr>
+<td>allOddBits(x)</td>
+<td>x 的奇数位都为 1 时为真</td>
+<td>2</td>
+<td>12</td>
+</tr>
+<tr>
+<td>negate(x)</td>
+<td>使用 ~ 操作符返回 -x</td>
+<td>2</td>
+<td>5</td>
+</tr>
+<tr>
+<td>isAsciDigit(x)</td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mi>x</mi><mn>30</mn><mo>⩽</mo><mi>x</mi><mo>⩽</mo><mn>0</mn><mi>x</mi><mn>39</mn></mrow><annotation encoding="application/x-tex">0x30⩽x⩽0x39</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.78111em;vertical-align:-0.13667em;"></span><span class="mord">0</span><span class="mord mathdefault">x</span><span class="mord">3</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel amsrm">⩽</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7733399999999999em;vertical-align:-0.13667em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel amsrm">⩽</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord mathdefault">x</span><span class="mord">3</span><span class="mord">9</span></span></span></span> 时为真</td>
+<td>3</td>
+<td>15</td>
+</tr>
+<tr>
+<td>conditional</td>
+<td>等同于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo stretchy="false">?</mo><mi>y</mi><mo>:</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">x ? y : z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">x</span><span class="mclose">?</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span></span></td>
+<td>3</td>
+<td>16</td>
+</tr>
+<tr>
+<td>isLessOrEqual(x, y)</td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>⩽</mo><mi>y</mi></mrow><annotation encoding="application/x-tex">x⩽y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7733399999999999em;vertical-align:-0.13667em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel amsrm">⩽</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span> 时为真，否则为假</td>
+<td>3</td>
+<td>24</td>
+</tr>
+<tr>
+<td>logicalNeg(x))</td>
+<td>不用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">!</mo></mrow><annotation encoding="application/x-tex">!</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mclose">!</span></span></span></span> 运算符计算 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">!</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">!x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mclose">!</span><span class="mord mathdefault">x</span></span></span></span></td>
+<td>4</td>
+<td>12</td>
+</tr>
+<tr>
+<td>howManyBits(x)</td>
+<td>用补码表示 x 的最小位数</td>
+<td>4</td>
+<td>90</td>
+</tr>
+<tr>
+<td>floatScale2(uf)</td>
+<td>对于浮点参数 f，返回 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mo>×</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">2 \times f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span></span></span></span> 的位级等价数</td>
+<td>4</td>
+<td>30</td>
+</tr>
+<tr>
+<td>floatFloat2Int(uf)</td>
+<td>对于浮点参数 f，返回 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">(</mo><mi>i</mi><mi>n</mi><mi>t</mi><mo stretchy="false">)</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">(int) f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span></span></span></span> 的位级等价数</td>
+<td>4</td>
+<td>30</td>
+</tr>
+<tr>
+<td>floatPower2(x)</td>
+<td>对于整数 x，返回 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2.</mn><msup><mn>0</mn><mi>x</mi></msup></mrow><annotation encoding="application/x-tex">2.0^x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">.</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">x</span></span></span></span></span></span></span></span></span></span></span></td>
+<td>4</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
 <h3 id="1-bitxorint-x-int-y"><a class="markdownIt-Anchor" href="#1-bitxorint-x-int-y"></a> 1 bitXor(int x, int y)</h3>
 <h4 id="题目要求"><a class="markdownIt-Anchor" href="#题目要求"></a> 题目要求</h4>
 <blockquote>
-<p>编写一个函数，返回x异或y的值，要求只能使用 ~  &amp;</p>
+<p>返回 x 异或 y 的值，<br />
+要求只能使用 ~  &amp;</p>
 </blockquote>
 <h4 id="代码"><a class="markdownIt-Anchor" href="#代码"></a> 代码</h4>
 <figure class="highlight c"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* </span><br><span class="hljs-comment"> * bitXor - x^y using only ~ and &amp; </span><br><span class="hljs-comment"> *   Example: bitXor(4, 5) = 1</span><br><span class="hljs-comment"> *   Legal ops: ~ &amp;</span><br><span class="hljs-comment"> *   Max ops: 14</span><br><span class="hljs-comment"> *   Rating: 1</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">bitXor</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> &#123;<br>  <span class="hljs-keyword">return</span> ~(~x&amp;~y)&amp;~(x&amp;y);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="2-tminvoid"><a class="markdownIt-Anchor" href="#2-tminvoid"></a> 2 tmin(void)</h3>
+<h4 id="题目要求-2"><a class="markdownIt-Anchor" href="#题目要求-2"></a> 题目要求</h4>
+<blockquote>
+<p>返回最小的整数补码，<br />
+要求只能使用 ! ~ &amp; ^ | +</p>
+</blockquote>
+<h4 id="代码-2"><a class="markdownIt-Anchor" href="#代码-2"></a> 代码</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * isTmax - returns 1 if x is the maximum, two&#x27;s complement number,</span><br><span class="hljs-comment"> *     and 0 otherwise </span><br><span class="hljs-comment"> *   Legal ops: ! ~ &amp; ^ | +</span><br><span class="hljs-comment"> *   Max ops: 10</span><br><span class="hljs-comment"> *   Rating: 1</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">isTmax</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;<br>  <span class="hljs-keyword">return</span> !((~x^(x+<span class="hljs-number">1</span>)) | !(x+<span class="hljs-number">1</span>));<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="解析"><a class="markdownIt-Anchor" href="#解析"></a> 解析</h4>
+<p>由于int类型为4字节，其对应最小的整数补码</p>
 
             </div>
             <hr>
