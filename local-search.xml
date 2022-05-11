@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>1 Date lab详解</title>
+    <link href="/2022/05/11/Csapp1/"/>
+    <url>/2022/05/11/Csapp1/</url>
+    
+    <content type="html"><![CDATA[<h1 id="1-date-lab详解"><a class="markdownIt-Anchor" href="#1-date-lab详解"></a> 1 Date lab详解</h1><h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2><p>最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。</p><h2 id="实验环境"><a class="markdownIt-Anchor" href="#实验环境"></a> 实验环境</h2><p>笔者使用Ubuntu22.04的虚拟机，用vscode做主要编程软件。<br />lab相关文件可以从课程页面下载，这里放置课程链接：<a href="http://csapp.cs.cmu.edu/3e/labs.html">csapp lab</a><br />再贴一个链接，里面包含有中文版的详细描述，简洁明了：<a href="https://hansimov.gitbook.io/csapp/">csapp中文版电子书及lab</a><br />关于实验环境的配置这里不再赘述。</p><h2 id="实验内容"><a class="markdownIt-Anchor" href="#实验内容"></a> 实验内容</h2><h3 id="1-bitxorint-x-int-y"><a class="markdownIt-Anchor" href="#1-bitxorint-x-int-y"></a> 1 bitXor(int x, int y)</h3><h4 id="题目要求"><a class="markdownIt-Anchor" href="#题目要求"></a> 题目要求</h4><blockquote><p>编写一个函数，返回x异或y的值，要求只能使用 ~  &amp;</p></blockquote><h4 id="代码"><a class="markdownIt-Anchor" href="#代码"></a> 代码</h4><figure class="highlight c"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* </span><br><span class="hljs-comment"> * bitXor - x^y using only ~ and &amp; </span><br><span class="hljs-comment"> *   Example: bitXor(4, 5) = 1</span><br><span class="hljs-comment"> *   Legal ops: ~ &amp;</span><br><span class="hljs-comment"> *   Max ops: 14</span><br><span class="hljs-comment"> *   Rating: 1</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">bitXor</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> &#123;<br>  <span class="hljs-keyword">return</span> ~(~x&amp;~y)&amp;~(x&amp;y);<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机系统</category>
+      
+      <category>csapp</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>背包九讲</title>
     <link href="/2022/05/04/Suanfa2/"/>
     <url>/2022/05/04/Suanfa2/</url>
