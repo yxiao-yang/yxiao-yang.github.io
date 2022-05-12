@@ -24,7 +24,7 @@
 <meta property="og:description" content="Date lab详解  写在前面 最近在读大名鼎鼎的cs:app，很懵懂，开一个专栏记录解答下本课程自带的lab。  实验环境 笔者使用Ubuntu22.04的虚拟机，用vscode做主要编程软件。 lab相关文件可以从课程页面下载，这里放置课程链接：csapp lab 再贴一个链接，里面包含有中文版的详细描述，简洁明了：csapp中文版电子书及lab 关于实验环境的配置这里不再赘述。  实验内">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-05-11T10:23:34.254Z">
-<meta property="article:modified_time" content="2022-05-12T13:43:04.121Z">
+<meta property="article:modified_time" content="2022-05-12T14:17:02.217Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.8k 字
+      4.6k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      24 分钟
+      39 分钟
     </span>
   
 
@@ -238,7 +238,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：几秒前
+                  本文最后更新于：1 分钟前
                 
               </p>
             
@@ -417,60 +417,44 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
 <p><strong>运算符:</strong> ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</p>
 <p><strong>解析:</strong><br />
 将问题转换为下列公式：</p>
-(y >=0 \&\& x <0) || ((x * y >= 0) \&\& (y + (-x) >= 0))$$具体见代码注释。
-
-**代码:**
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>&gt;</mo><mo>=</mo><mn>0</mn><mi mathvariant="normal">&amp;</mi><mi mathvariant="normal">&amp;</mi><mi>x</mi><mo>&lt;</mo><mn>0</mn><mo stretchy="false">)</mo><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mo stretchy="false">(</mo><mo stretchy="false">(</mo><mi>x</mi><mo>∗</mo><mi>y</mi><mo>&gt;</mo><mo>=</mo><mn>0</mn><mo stretchy="false">)</mo><mi mathvariant="normal">&amp;</mi><mi mathvariant="normal">&amp;</mi><mo stretchy="false">(</mo><mi>y</mi><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mi>x</mi><mo stretchy="false">)</mo><mo>&gt;</mo><mo>=</mo><mn>0</mn><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(y &gt;=0 \&amp;\&amp; x &lt;0) || ((x * y &gt;= 0) \&amp;\&amp; (y + (-x) &gt;= 0)) 
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.73354em;vertical-align:-0.0391em;"></span><span class="mord">0</span><span class="mord">&amp;</span><span class="mord">&amp;</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mord">∣</span><span class="mord">∣</span><span class="mopen">(</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.7335400000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mord">&amp;</span><span class="mord">&amp;</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord mathdefault">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
+<p>具体见代码注释。</p>
+<p><strong>代码:</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">isLessOrEqual</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> &#123;<br>  <span class="hljs-type">int</span> signX = (x &gt;&gt; <span class="hljs-number">31</span>) &amp; <span class="hljs-number">1</span>; <span class="hljs-comment">// 判断x是否为负</span><br>  <span class="hljs-type">int</span> signY = (y &gt;&gt; <span class="hljs-number">31</span>) &amp; <span class="hljs-number">1</span>; <span class="hljs-comment">// 判断y是否为负</span><br>  <span class="hljs-type">int</span> signXSubY = ((y + ~x + <span class="hljs-number">1</span>) &gt;&gt; <span class="hljs-number">31</span>) &amp; <span class="hljs-number">1</span>; <span class="hljs-comment">// 判断y+(-x)是否为负</span><br>  <span class="hljs-keyword">return</span> (signX &amp; ~signY) | (!(signX ^ signY) &amp; !signXSubY);<br>&#125;<br></code></pre></td></tr></table></figure>
-### 9 logicalNeg(int x)
-**要求:** implement the ! operator, using all of the legal operators except !
-
-**运算符:** ~ & ^ | + << >>
-
-**解析:**  
-当 x≠0 时，x|(−x) 的符号位必然为 1
-
-**代码:**
+<h3 id="9-logicalnegint-x"><a class="markdownIt-Anchor" href="#9-logicalnegint-x"></a> 9 logicalNeg(int x)</h3>
+<p><strong>要求:</strong> implement the ! operator, using all of the legal operators except !</p>
+<p><strong>运算符:</strong> ~ &amp; ^ | + &lt;&lt; &gt;&gt;</p>
+<p><strong>解析:</strong><br />
+当 x≠0 时，x|(−x) 的符号位必然为 1</p>
+<p><strong>代码:</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">logicalNeg</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;<br>  <span class="hljs-keyword">return</span> ~(x|(~x+<span class="hljs-number">1</span>))&gt;&gt;<span class="hljs-number">31</span>&amp;<span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-### 10 howManyBits(int x)
-**要求:** return the minimum number of bits required to represent x in two's complement
-
-**运算符:** ! ~ & ^ | + << >>
-
-**解析:**  
-当 $x≥0$ 时，位数取决于 1 的最高位数；当 $x<0$ 时，位数则取决于 0 的最高位数（根据补码表示的定义，符号位起连续的 1 可合并起来用一个位表示）。
-
-首先考虑将负数取反，将问题统一成计算 1 的最高位，利用算术右移即可完成， 即 $x=x⊕(x>>31)$。
-
-然后使用二分法计算 1 的最高位：判断高 16 位是否大于 0，若大于 0 说明高 16 位中存在 1，否则 1 在低 16 位中。使用 conditional 函数更新 x（取出高 16 位或低 16 位）。迭代判断 8 位、4 位等等。
-
-**代码:**
+<h3 id="10-howmanybitsint-x"><a class="markdownIt-Anchor" href="#10-howmanybitsint-x"></a> 10 howManyBits(int x)</h3>
+<p><strong>要求:</strong> return the minimum number of bits required to represent x in two’s complement</p>
+<p><strong>运算符:</strong> ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</p>
+<p><strong>解析:</strong><br />
+当 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">x≥0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719400000000001em;vertical-align:-0.13597em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span> 时，位数取决于 1 的最高位数；当 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">x&lt;0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span> 时，位数则取决于 0 的最高位数（根据补码表示的定义，符号位起连续的 1 可合并起来用一个位表示）。</p>
+<p>首先考虑将负数取反，将问题统一成计算 1 的最高位，利用算术右移即可完成， 即 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>=</mo><mi>x</mi><mo>⊕</mo><mo stretchy="false">(</mo><mi>x</mi><mo>&gt;</mo><mo>&gt;</mo><mn>31</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">x=x⊕(x&gt;&gt;31)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⊕</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>。</p>
+<p>然后使用二分法计算 1 的最高位：判断高 16 位是否大于 0，若大于 0 说明高 16 位中存在 1，否则 1 在低 16 位中。使用 conditional 函数更新 x（取出高 16 位或低 16 位）。迭代判断 8 位、4 位等等。</p>
+<p><strong>代码:</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">howManyBits</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;<br>  <span class="hljs-type">int</span> bit;<br>  <span class="hljs-type">int</span> res = <span class="hljs-number">1</span>;<br>  x = x ^ (x &gt;&gt; <span class="hljs-number">31</span>); <span class="hljs-comment">// 将负数取反</span><br><br>  bit = !!(x &gt;&gt; <span class="hljs-number">16</span>) &lt;&lt; <span class="hljs-number">4</span>;<br>  res = res + bit;<br>  x = x &gt;&gt; bit;<br><br>  bit = !!(x &gt;&gt; <span class="hljs-number">8</span>) &lt;&lt; <span class="hljs-number">3</span>;<br>  res = res + bit;<br>  x = x &gt;&gt; bit;<br><br>  bit = !!(x &gt;&gt; <span class="hljs-number">4</span>) &lt;&lt; <span class="hljs-number">2</span>;<br>  res = res + bit;<br>  x = x &gt;&gt; bit;<br><br>  bit = !!(x &gt;&gt; <span class="hljs-number">2</span>) &lt;&lt; <span class="hljs-number">1</span>;<br>  res = res + bit;<br>  x = x &gt;&gt; bit;<br><br>  bit = !!(x &gt;&gt; <span class="hljs-number">1</span>);<br>  res = res + bit;<br>  x = x &gt;&gt; bit;<br><br>  <span class="hljs-keyword">return</span> x + res;<br>&#125;<br></code></pre></td></tr></table></figure>
-### 11 floatScale2(unsigned uf)
-**要求:** Return bit-level equivalent of expression $2 \times f$ for floating point argument f. Both the argument and result are passed as unsigned int's, but they are to be interpreted as the bit-level representation of single-precision floating point values. When argument is NaN, return argument.
-
-**运算符:** Any integer/unsigned operations incl.  ||, &&. also if, while
-
-**解析:**  
-
-**代码:**
+<h3 id="11-floatscale2unsigned-uf"><a class="markdownIt-Anchor" href="#11-floatscale2unsigned-uf"></a> 11 floatScale2(unsigned uf)</h3>
+<p><strong>要求:</strong> Return bit-level equivalent of expression <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mo>×</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">2 \times f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span></span></span></span> for floating point argument f. Both the argument and result are passed as unsigned int’s, but they are to be interpreted as the bit-level representation of single-precision floating point values. When argument is NaN, return argument.</p>
+<p><strong>运算符:</strong> Any integer/unsigned operations incl.  ||, &amp;&amp;. also if, while</p>
+<p><strong>解析:</strong></p>
+<p><strong>代码:</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><br></code></pre></td></tr></table></figure>
-### 12 floatFloat2Int(unsigned uf)
-**要求:** Return bit-level equivalent of expression (int) f for floating point argument f.
-
-**运算符:** Any integer/unsigned operations incl.  ||, &&. also if, while
-
-**解析:**  
-
-**代码:**
+<h3 id="12-floatfloat2intunsigned-uf"><a class="markdownIt-Anchor" href="#12-floatfloat2intunsigned-uf"></a> 12 floatFloat2Int(unsigned uf)</h3>
+<p><strong>要求:</strong> Return bit-level equivalent of expression (int) f for floating point argument f.</p>
+<p><strong>运算符:</strong> Any integer/unsigned operations incl.  ||, &amp;&amp;. also if, while</p>
+<p><strong>解析:</strong></p>
+<p><strong>代码:</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><br></code></pre></td></tr></table></figure>
-### 13 floatPower2(int x)
-**要求:** Return bit-level equivalent of the expression $2.0^x$ (2.0 raised to the power x) for any 32-bit integer x.
-
-**运算符:** Any integer/unsigned operations incl.  ||, &&. also if, while
-
-**解析:**  
-
-**代码:**
+<h3 id="13-floatpower2int-x"><a class="markdownIt-Anchor" href="#13-floatpower2int-x"></a> 13 floatPower2(int x)</h3>
+<p><strong>要求:</strong> Return bit-level equivalent of the expression <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2.</mn><msup><mn>0</mn><mi>x</mi></msup></mrow><annotation encoding="application/x-tex">2.0^x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">.</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">x</span></span></span></span></span></span></span></span></span></span></span> (2.0 raised to the power x) for any 32-bit integer x.</p>
+<p><strong>运算符:</strong> Any integer/unsigned operations incl.  ||, &amp;&amp;. also if, while</p>
+<p><strong>解析:</strong></p>
+<p><strong>代码:</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><br></code></pre></td></tr></table></figure>
 
             </div>
