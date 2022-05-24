@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="第7章 进程调度：介绍  homework详解  实验环境 笔者采用的是Ubuntu22.04的虚拟机。 本次作业需要先通过所学知识手动解题，再按教程运行程序scheduler.py即可。 需要用到cpu-sched文件，先阅读readme文件。  实验内容  1 1234567891011121314151617181920212223$ .&#x2F;scheduler.py -p SJF -l 20">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第7章 进程调度：介绍">
+<meta property="og:url" content="http://example.com/2022/05/24/Ostep(7)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="第7章 进程调度：介绍  homework详解  实验环境 笔者采用的是Ubuntu22.04的虚拟机。 本次作业需要先通过所学知识手动解题，再按教程运行程序scheduler.py即可。 需要用到cpu-sched文件，先阅读readme文件。  实验内容  1 1234567891011121314151617181920212223$ .&#x2F;scheduler.py -p SJF -l 20">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-24T14:09:06.799Z">
+<meta property="article:modified_time" content="2022-05-24T14:09:06.985Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>第7章 进程调度：介绍 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第7章 进程调度：介绍">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-24 22:09" pubdate>
+        2022年5月24日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      34 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第7章 进程调度：介绍</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：1 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="第7章-进程调度介绍-homework详解"><a class="markdownIt-Anchor" href="#第7章-进程调度介绍-homework详解"></a> 第7章 <em>进程调度：介绍</em>  homework详解</h1>
+<h2 id="实验环境"><a class="markdownIt-Anchor" href="#实验环境"></a> 实验环境</h2>
+<p>笔者采用的是<strong>Ubuntu22.04</strong>的虚拟机。<br />
+本次作业需要先通过所学知识手动解题，再按教程运行程序<strong><a target="_blank" rel="noopener" href="http://scheduler.py">scheduler.py</a></strong>即可。<br />
+需要用到<strong>cpu-sched</strong>文件，先阅读<strong>readme</strong>文件。</p>
+<h2 id="实验内容"><a class="markdownIt-Anchor" href="#实验内容"></a> 实验内容</h2>
+<h3 id="1"><a class="markdownIt-Anchor" href="#1"></a> 1</h3>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><pre><code class="hljs livecodeserver">$ ./scheduler.py -p SJF -l <span class="hljs-number">200</span>,<span class="hljs-number">200</span>,<span class="hljs-number">200</span> -c<br>ARG policy SJF<br>ARG jlist <span class="hljs-number">200</span>,<span class="hljs-number">200</span>,<span class="hljs-number">200</span><br><br>Here is <span class="hljs-keyword">the</span> job list, <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> run <span class="hljs-built_in">time</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">each</span> job: <br>  Job <span class="hljs-number">0</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">1</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">2</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br><br><br>** Solutions **<br><br>Execution trace:<br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">0</span> ] Run job <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">200.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">200</span> ] Run job <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">400.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">400</span> ] Run job <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">600.00</span> )<br><br>Final statistics:<br>  Job   <span class="hljs-number">0</span> <span class="hljs-comment">-- Response: 0.00  Turnaround 200.00  Wait 0.00</span><br>  Job   <span class="hljs-number">1</span> <span class="hljs-comment">-- Response: 200.00  Turnaround 400.00  Wait 200.00</span><br>  Job   <span class="hljs-number">2</span> <span class="hljs-comment">-- Response: 400.00  Turnaround 600.00  Wait 400.00</span><br><br>  Average <span class="hljs-comment">-- Response: 200.00  Turnaround 400.00  Wait 200.00</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">$ ./scheduler.py -p FIFO -l <span class="hljs-number">200</span>,<span class="hljs-number">200</span>,<span class="hljs-number">200</span> -c<br>ARG policy FIFO<br>ARG jlist <span class="hljs-number">200</span>,<span class="hljs-number">200</span>,<span class="hljs-number">200</span><br><br>Here is <span class="hljs-keyword">the</span> job list, <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> run <span class="hljs-built_in">time</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">each</span> job: <br>  Job <span class="hljs-number">0</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">1</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">2</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br><br><br>** Solutions **<br><br>Execution trace:<br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">0</span> ] Run job <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">200.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">200</span> ] Run job <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">400.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">400</span> ] Run job <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">600.00</span> )<br><br>Final statistics:<br>  Job   <span class="hljs-number">0</span> <span class="hljs-comment">-- Response: 0.00  Turnaround 200.00  Wait 0.00</span><br>  Job   <span class="hljs-number">1</span> <span class="hljs-comment">-- Response: 200.00  Turnaround 400.00  Wait 200.00</span><br>  Job   <span class="hljs-number">2</span> <span class="hljs-comment">-- Response: 400.00  Turnaround 600.00  Wait 400.00</span><br><br>  Average <span class="hljs-comment">-- Response: 200.00  Turnaround 400.00  Wait 200.00</span><br></code></pre></td></tr></table></figure>
+<p>这两个代码块分别是SJF和FIFO调度，因为三个任务长度相等且同时到达，所以它们的响应时间和周转时间相同。</p>
+<h3 id="2"><a class="markdownIt-Anchor" href="#2"></a> 2</h3>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">$ ./scheduler.py -p SJF -l <span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">300</span> -c<br>ARG policy SJF<br>ARG jlist <span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">300</span><br><br>Here is <span class="hljs-keyword">the</span> job list, <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> run <span class="hljs-built_in">time</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">each</span> job: <br>  Job <span class="hljs-number">0</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">100.0</span> )<br>  Job <span class="hljs-number">1</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">2</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">300.0</span> )<br><br><br>** Solutions **<br><br>Execution trace:<br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">0</span> ] Run job <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">100.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">100.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">100</span> ] Run job <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">300.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">300</span> ] Run job <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">300.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">600.00</span> )<br><br>Final statistics:<br>  Job   <span class="hljs-number">0</span> <span class="hljs-comment">-- Response: 0.00  Turnaround 100.00  Wait 0.00</span><br>  Job   <span class="hljs-number">1</span> <span class="hljs-comment">-- Response: 100.00  Turnaround 300.00  Wait 100.00</span><br>  Job   <span class="hljs-number">2</span> <span class="hljs-comment">-- Response: 300.00  Turnaround 600.00  Wait 300.00</span><br><br>  Average <span class="hljs-comment">-- Response: 133.33  Turnaround 333.33  Wait 133.33</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">$ ./scheduler.py -p FIFO -l <span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">300</span> -c<br>ARG policy FIFO<br>ARG jlist <span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">300</span><br><br>Here is <span class="hljs-keyword">the</span> job list, <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> run <span class="hljs-built_in">time</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">each</span> job: <br>  Job <span class="hljs-number">0</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">100.0</span> )<br>  Job <span class="hljs-number">1</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">2</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">300.0</span> )<br><br><br>** Solutions **<br><br>Execution trace:<br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">0</span> ] Run job <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">100.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">100.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">100</span> ] Run job <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">300.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">300</span> ] Run job <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">300.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">600.00</span> )<br><br>Final statistics:<br>  Job   <span class="hljs-number">0</span> <span class="hljs-comment">-- Response: 0.00  Turnaround 100.00  Wait 0.00</span><br>  Job   <span class="hljs-number">1</span> <span class="hljs-comment">-- Response: 100.00  Turnaround 300.00  Wait 100.00</span><br>  Job   <span class="hljs-number">2</span> <span class="hljs-comment">-- Response: 300.00  Turnaround 600.00  Wait 300.00</span><br><br>  Average <span class="hljs-comment">-- Response: 133.33  Turnaround 333.33  Wait 133.33</span><br></code></pre></td></tr></table></figure>
+<p>因为是按照100，200，300的顺序插入任务的，所以二者调度模式是相同的，如果将100，200，300的顺序交换，结果会产生差异。例如，</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">$ ./scheduler.py -p FIFO -l <span class="hljs-number">200</span>,<span class="hljs-number">100</span>,<span class="hljs-number">300</span> -c<br>ARG policy FIFO<br>ARG jlist <span class="hljs-number">200</span>,<span class="hljs-number">100</span>,<span class="hljs-number">300</span><br><br>Here is <span class="hljs-keyword">the</span> job list, <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> run <span class="hljs-built_in">time</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">each</span> job: <br>  Job <span class="hljs-number">0</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">1</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">100.0</span> )<br>  Job <span class="hljs-number">2</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">300.0</span> )<br><br><br>** Solutions **<br><br>Execution trace:<br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">0</span> ] Run job <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">200.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">200.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">200</span> ] Run job <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">100.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">300.00</span> )<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">300</span> ] Run job <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">300.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">600.00</span> )<br><br>Final statistics:<br>  Job   <span class="hljs-number">0</span> <span class="hljs-comment">-- Response: 0.00  Turnaround 200.00  Wait 0.00</span><br>  Job   <span class="hljs-number">1</span> <span class="hljs-comment">-- Response: 200.00  Turnaround 300.00  Wait 200.00</span><br>  Job   <span class="hljs-number">2</span> <span class="hljs-comment">-- Response: 300.00  Turnaround 600.00  Wait 300.00</span><br><br>  Average <span class="hljs-comment">-- Response: 166.67  Turnaround 366.67  Wait 166.67</span><br></code></pre></td></tr></table></figure>
+<p>响应时间和周转时间都发生了变化。</p>
+<h3 id="3"><a class="markdownIt-Anchor" href="#3"></a> 3</h3>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">$ ./scheduler.py -p RR -l <span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">300</span> -c<br>ARG policy RR<br>ARG jlist <span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">300</span><br><br>Here is <span class="hljs-keyword">the</span> job list, <span class="hljs-keyword">with</span> <span class="hljs-keyword">the</span> run <span class="hljs-built_in">time</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">each</span> job: <br>  Job <span class="hljs-number">0</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">100.0</span> )<br>  Job <span class="hljs-number">1</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">200.0</span> )<br>  Job <span class="hljs-number">2</span> ( <span class="hljs-built_in">length</span> = <span class="hljs-number">300.0</span> )<br><br><br>** Solutions **<br><br>Execution trace:<br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">0</span> ] Run job   <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span><br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">1</span> ] Run job   <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span><br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">2</span> ] Run job   <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span><br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">3</span> ] Run job   <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span><br>  [ <span class="hljs-built_in">time</span>   <span class="hljs-number">4</span> ] Run job   <span class="hljs-number">1</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span><br>  ……<br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">598</span> ] Run job   <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span><br>  [ <span class="hljs-built_in">time</span> <span class="hljs-number">599</span> ] Run job   <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> <span class="hljs-number">1.00</span> <span class="hljs-built_in">secs</span> ( DONE <span class="hljs-keyword">at</span> <span class="hljs-number">600.00</span> )<br><br>Final statistics:<br>  Job   <span class="hljs-number">0</span> <span class="hljs-comment">-- Response: 0.00  Turnaround 298.00  Wait 198.00</span><br>  Job   <span class="hljs-number">1</span> <span class="hljs-comment">-- Response: 1.00  Turnaround 499.00  Wait 299.00</span><br>  Job   <span class="hljs-number">2</span> <span class="hljs-comment">-- Response: 2.00  Turnaround 600.00  Wait 300.00</span><br><br>  Average <span class="hljs-comment">-- Response: 1.00  Turnaround 465.67  Wait 265.67</span><br></code></pre></td></tr></table></figure>
+<p>采用RR调度程序交换三者顺序也不会有影响了，牺牲了周转时间和等待时间换取了极快的响应时间。</p>
+<h3 id="4"><a class="markdownIt-Anchor" href="#4"></a> 4</h3>
+<p>当工作负载为长度自小到大升序排列时，二者产生的效果是一样的，其周转时间和等待时间一致。</p>
+<h3 id="5"><a class="markdownIt-Anchor" href="#5"></a> 5</h3>
+<p>当量子长度大于最大工作负载长度时，二者等效。</p>
+<h3 id="6"><a class="markdownIt-Anchor" href="#6"></a> 6</h3>
+<p>容易得出结论，工作负载长度增加，其必然会使响应时间增加。</p>
+<h3 id="7"><a class="markdownIt-Anchor" href="#7"></a> 7</h3>
+<p>量子长度增加，响应时间会随之增加。<br />
+当给定N个任务时，假设量子长度为m</p>
+<ol>
+<li>
+<p>当每个任务长度都大于m时，其响应时间为</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>i</mi><mo>×</mo><mi>m</mi></mrow><mi>N</mi></mfrac><mo>=</mo><mfrac><mrow><mi>m</mi><mo stretchy="false">(</mo><mi>N</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">{\sum_{i=1}^N i\times m\over N}={m(N+1)\over2} 
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.356941em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.670941em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.6897100000000003em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.981231em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.10903em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">m</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span></p>
+</li>
+<li>
+<p>当每个任务长度都小于m时，其响应时间为总任务长度除以N。</p>
+</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/ostep/">ostep</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/ostep/homework%E8%AF%A6%E8%A7%A3/">homework详解</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/20/Ostep(5)/">
+                        <span class="hidden-mobile">第5章 插叙：进程API</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
