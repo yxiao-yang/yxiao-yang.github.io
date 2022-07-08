@@ -16,20 +16,20 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="第二章 编写MBR，开始进入系统的世界  写在前面 今天是7月6日，这一章涉及了汇编语言，阅读开始变得吃力，加上书中排版密密麻麻的文字，很容易心生退意，相信在开发的过程中一定会有些许乐趣等待挖掘，借此博客督促自己加强学习。  Let&#96;s go! BIOS！ 首先说明了计算机启动后第一个运行的程序是我们常见的BIOS，然后为了说明BIOS加载的一系列问题，作者列出了实模式下内存布局的一张表用以说明">
+    <meta name="description" content="第三章 让MBR直接操作硬盘，硬件深似海  写在前面 7月7日，这一章的概念实在繁多，加上自己也没有汇编的基础，只能硬着头皮攻，加上晚上有学生会主席的竞选，心烦意乱，不过为了完成日更的目标，还是要尽力去做。面对压力时也不要被负能量击溃，我也始终保持着寻找乐趣的心态去学习、阅读。  进入正题 本章一上来讲述了许多晦涩难懂的概念，涉及到了一些汇编的知识，也讲述了一些NASM编译器的使用方法。我在初读">
 <meta property="og:type" content="article">
-<meta property="og:title" content="第二章 编写MBR，开始进入系统的世界">
-<meta property="og:url" content="http://example.com/2022/07/08/os(2)/index.html">
+<meta property="og:title" content="第三章 让MBR直接操作硬盘，硬件深似海">
+<meta property="og:url" content="http://example.com/2022/07/08/os(3)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="第二章 编写MBR，开始进入系统的世界  写在前面 今天是7月6日，这一章涉及了汇编语言，阅读开始变得吃力，加上书中排版密密麻麻的文字，很容易心生退意，相信在开发的过程中一定会有些许乐趣等待挖掘，借此博客督促自己加强学习。  Let&#96;s go! BIOS！ 首先说明了计算机启动后第一个运行的程序是我们常见的BIOS，然后为了说明BIOS加载的一系列问题，作者列出了实模式下内存布局的一张表用以说明">
+<meta property="og:description" content="第三章 让MBR直接操作硬盘，硬件深似海  写在前面 7月7日，这一章的概念实在繁多，加上自己也没有汇编的基础，只能硬着头皮攻，加上晚上有学生会主席的竞选，心烦意乱，不过为了完成日更的目标，还是要尽力去做。面对压力时也不要被负能量击溃，我也始终保持着寻找乐趣的心态去学习、阅读。  进入正题 本章一上来讲述了许多晦涩难懂的概念，涉及到了一些汇编的知识，也讲述了一些NASM编译器的使用方法。我在初读">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-07-08T07:41:50.742Z">
-<meta property="article:modified_time" content="2022-07-08T07:47:18.524Z">
+<meta property="article:published_time" content="2022-07-08T13:05:21.271Z">
+<meta property="article:modified_time" content="2022-07-08T13:05:21.437Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>第二章 编写MBR，开始进入系统的世界 - Hexo</title>
+  <title>第三章 让MBR直接操作硬盘，硬件深似海 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -175,7 +175,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="第二章 编写MBR，开始进入系统的世界">
+            <span class="h2" id="subtitle" title="第三章 让MBR直接操作硬盘，硬件深似海">
               
             </span>
 
@@ -185,8 +185,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-07-08 15:41" pubdate>
-        2022年7月8日 下午
+      <time datetime="2022-07-08 21:05" pubdate>
+        2022年7月8日 晚上
       </time>
     </span>
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      897 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      9 分钟
+      8 分钟
     </span>
   
 
@@ -234,32 +234,25 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">第二章 编写MBR，开始进入系统的世界</h1>
+            <h1 style="display: none">第三章 让MBR直接操作硬盘，硬件深似海</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：5 小时前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="第二章-编写mbr开始进入系统的世界"><a class="markdownIt-Anchor" href="#第二章-编写mbr开始进入系统的世界"></a> 第二章 编写MBR，开始进入系统的世界</h1>
+              <h1 id="第三章-让mbr直接操作硬盘硬件深似海"><a class="markdownIt-Anchor" href="#第三章-让mbr直接操作硬盘硬件深似海"></a> 第三章 让MBR直接操作硬盘，硬件深似海</h1>
 <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
-<p>今天是7月6日，这一章涉及了汇编语言，阅读开始变得吃力，加上书中排版密密麻麻的文字，很容易心生退意，相信在开发的过程中一定会有些许乐趣等待挖掘，借此博客督促自己加强学习。</p>
-<h2 id="lets-go-bios"><a class="markdownIt-Anchor" href="#lets-go-bios"></a> Let`s go! BIOS！</h2>
-<p>首先说明了计算机启动后第一个运行的程序是我们常见的BIOS，然后为了说明BIOS加载的一系列问题，作者列出了实模式下内存布局的一张表用以说明CPU提交地址后会进行一个地址映射，分配给对应的物理设备。</p>
-<p>然后就是BIOS的启动，在接电的瞬间，CPU中的cs:ip寄存器会被初始化为0xF000:0xFFF0（关于寄存器的一些概念涉及到汇编语言，这里不再赘述，我也是边读边学的），这段地址正好对应BIOS的入口地址。需要注意的是，这块地址只起到一个指引的作用，计算机执行它时需要跳转到BIOS的真正地址。</p>
-<p>在BIOS里的最后一项工作时校验启动盘0盘0道1扇区（第一个扇区）的内容，如果该扇区末尾的两个字节分别是魔数0x55和0xaa，BIOS便会跳转到物理地址0x7c00，执行MBR（主引导记录）。</p>
-<blockquote>
-<p>我还想了下魔数是什么，一开始以为是计算机固定写死的某些程序，搜了一下才知道它是像魔法一样神奇的数。。。</p>
-</blockquote>
-<h2 id="mbr"><a class="markdownIt-Anchor" href="#mbr"></a> MBR</h2>
-<p>MBR的大小是512字节，因为x86平台是小端字节序，所以为了保证最后两个字节（即510字节和511字节）为0x55和0xaa，其内容应为0xaa55。然后提到了NASM的两个关键字$和$$，它们用来表示当前行和本section的地址，起到标号的作用。</p>
-<p>终于来到了MBR的编程，这一程序目前实现了一个在屏幕上打印字符串“1 MBR”的功能，其背景色为黑色，前景色为绿色。在打印字符串之前，还包含了不少代码，其功能不想再解释。在写这篇文章的时候，我实际已经进展到了第四章，mbr文件也已经反复修改了很多次，这里的代码我就不再重写了，感兴趣的读者可以跳转到后面，我会贴出代码，上面已经标注了完整的注释。</p>
-<p>之后我们利用dd命令（用于磁盘操作的命令）将mbr.bin输出到第一章我们创建的虚拟硬盘hd60M.img，记得按照作者提示，将块大小指定为512字节，只操作1块。</p>
-<p>运行bochs，界面是我们预想的输出一串字符串，大功告成！</p>
-<h2 id="后记"><a class="markdownIt-Anchor" href="#后记"></a> 后记</h2>
-<p>这一章总体内容并不是很多，主要集中在一些概念的描述，如果没有一定的知识储备读起来会很生涩，但是到了实际操作的时候就会发现基础必不可少。总体来说有一种学到的知识马上就能用到的感觉，比之前读ostep时总感觉有一层纱布隔着的感觉有很大不同，接下来还是争取做到每天一更。</p>
+<p>7月7日，这一章的概念实在繁多，加上自己也没有汇编的基础，只能硬着头皮攻，加上晚上有学生会主席的竞选，心烦意乱，不过为了完成日更的目标，还是要尽力去做。面对压力时也不要被负能量击溃，我也始终保持着寻找乐趣的心态去学习、阅读。</p>
+<h2 id="进入正题"><a class="markdownIt-Anchor" href="#进入正题"></a> 进入正题</h2>
+<p>本章一上来讲述了许多晦涩难懂的概念，涉及到了一些汇编的知识，也讲述了一些NASM编译器的使用方法。我在初读这些知识的时候实在无心仔细研究，但是在进行到后面章节的时候发现这些前缀知识是必不可少的。我建议读者在初读的时候如果实在烦躁，可以适当跳过一些内容，等到后面进行编程的时候遇到不会的点再回过头来看，切忌在理论知识的重压下失去信心从而放弃。</p>
+<p>然后咱们还是继续主线任务，上一章节我们完成了一个简单MBR编写，并且成功运行在了bochs上，但是需要注意的是这时我们的输出是建立在软件的基础上的，我们最终要实现在显卡上执行任务，首先从修改mbr.S的输出打印部分开始。这里源码还是参考书上就可以了，感兴趣的读者可以翻阅第四章，我会在那里给出mbr.S的源码及其注释。</p>
+<p>后面介绍了bochs的调试方法，等后面遇到不懂得知识时回看也不迟。当然，512字节的MBR是没法满足为内核准备好环境的功能的，所以我们需要另一个更大的程序完成这项任务，它就是loader，加载器。所以MBR需要把loader从硬盘加载到内存中，在第二章中有提到两块可用区域，加载到那里面就ok了，我跟作者一样，也把loader加载到0x900这里。</p>
+<p>在读取硬盘扇区这一部分。建议先好好阅读一下本节的前置章节，硬盘部分，再看代码就不会再有吃力的地方了。至此，mbr.S的任务也就结束了，接下来我们写一个简单的loader来进行一个结果实现，验证一下思路是否正确就ok了。</p>
+<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
+<p>建议读者在阅读的时候不要偏离主线，作者花费了大量的篇幅去补充理论知识，但我们还是要记得自己的主线任务是os的实现，所以要秉持着理论服侍实践的想法去阅读。我虽阅读时间还很短，但能感觉到自己是真的学到并运用了一些知识，后面就要进入保护模式了，但我的夏令营集训也开始了，希望flag能完成.</p>
 
             </div>
             <hr>
@@ -289,18 +282,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/07/08/os(3)/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">第三章 让MBR直接操作硬盘，硬件深似海</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/07/08/os(1)/">
-                        <span class="hidden-mobile">第一章 部署工作环境，千里之行，始于足下</span>
+                      <a href="/2022/07/08/os(2)/">
+                        <span class="hidden-mobile">第二章 编写MBR，开始进入系统的世界</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
