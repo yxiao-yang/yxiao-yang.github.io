@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>第一章 部署工作环境，千里之行，始于足下</title>
+    <link href="/2022/07/08/os(1)/"/>
+    <url>/2022/07/08/os(1)/</url>
+    
+    <content type="html"><![CDATA[<h1 id="第一章-部署工作环境千里之行始于足下"><a class="markdownIt-Anchor" href="#第一章-部署工作环境千里之行始于足下"></a> 第一章 部署工作环境，千里之行，始于足下</h1><h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2><p>在读ostep的时候就已经萌生了自己写一个os的想法，在网上搜了一下，发现不少人都推荐读一下《操作系统真象还原》这本书，说是跟着这本书可以写一个简单的操作系统，正合我心。今天是7月5日，也是我翻开这本书的第一天，特记录一下此过程。给自己立一个flag，希望在进入8月之前能完整实现，马上又要进行数学建模国赛的集训，所以压力还是非常大，希望能顶住。</p><p>还有一点需要说明的是，本专栏不会详细记录制作系统的具体过程，书中和其他人写的博客都记载的非常清楚了，这里只做一个每章的总结，方便复习时回顾。</p><h2 id="进入正题吧"><a class="markdownIt-Anchor" href="#进入正题吧"></a> 进入正题吧</h2><p>首先介绍一下在制作os过程中要使用的<strong>编译器</strong>：<br />一个是我们已经非常熟悉的GCC，用来编译C代码，不用再详细说明了；<br />另一个是汇编语言的编译器NASM，汇编语言是我之前没有系统学习过的，但是既然涉及到底层实现，那么汇编一定是必不可少的，所以我在学习的过程中还会再配套学习它，选用的教材是王爽的《汇编语言》，突然觉得压力陡增。</p><p>然后是实验环境的搭建，因为我的主系统是Windows10，所以先在主系统上创建一个虚拟机用来模拟linux系统，这里用的不是书上写的virtualBox，而是目前比较主流的vmware workstation，然后装的ubuntu系统，这里有个小插叙值得分享一下，放在引用里了。</p><blockquote><p>因为之前做ostep的homework和csapp的lab时候就已经接触过linux系统了，当时装的也是比较大众的ubuntu系统，然后读这本书的时候因为怕自己水平不够，所以装的是和作者一样的cent os，但是装完后发现运行过程中出现了不少问题，比如无法联网、安装软件等等，发觉还是ubuntu系统好用一些，加上网上对于cent os教程也比较稀有，所以又装回了ubuntu，这就花费了我大半天的时间。。。</p></blockquote><p>为了实现自主创建操作系统，又在linux里面再装一个虚拟机Bochs，这是一个“PC兼容机模拟器和调试工具”，它貌似是用软件来模拟仿真出计算机的常用外设。</p><p>再下载完Bochs之后还要对它进行configure、make、make install三部曲，又是半天。。。<br />configure设置了一些参数，有bochs的安装目录、打开它的调试器、打开反汇编、启用io接口调试器等等，这些也是后面我们需要的功能。</p><p>最后再对安装好的bochs进行配置，这一步需要我们自己创建一个配置文件，我按照书中所写将其命名为bochsrc.disk。这个配置文件设置了一些内容，这里粘一下代码，注释已经给的很详细了。</p><figure class="highlight routeros"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-comment"># 第一步，首先设置Bochs在运行过程中能够使用的内存，单位为MB。</span><br>megs: 512<br><br><span class="hljs-comment"># 第二步，设置对应真实机器的BIOS和VGA BIOS。</span><br>romimage: <span class="hljs-attribute">file</span>=/home/podest/bochs/share/bochs/BIOS-bochs-latest<br>vgaromimage: <span class="hljs-attribute">file</span>=/home/podest/bochs/share/bochs/VGABIOS-lgpl-latest<br><br><span class="hljs-comment"># 第三步，设置Bochs所使用的磁盘，软盘的关键字为floppy。</span><br><span class="hljs-comment"># 若只有一个软盘，则使用floppya即可，若有多个，则为floppya，floppyb……</span><br><span class="hljs-comment">#floppya: 1_44=a.img, status=inserted</span><br><br><span class="hljs-comment"># 第四步，选择启动盘符。</span><br><span class="hljs-comment">#boot: floppy#默认从软盘启动</span><br>boot: disk#改为从硬盘启动，代码直接写在硬盘上，不会再有读取软盘的操作<br><br><span class="hljs-comment"># 第五步，设置日志文件的输出。</span><br>log: bochs.out<br><br><span class="hljs-comment"># 第六步，开启或关闭某些功能。</span><br><span class="hljs-comment"># 关闭鼠标，打开键盘。</span><br>mouse:<span class="hljs-attribute">enabled</span>=0<br>keyboard:<span class="hljs-attribute">keymap</span>=/home/podest/bochs/share/bochs/keymaps/x11-pc-us.map<br><br><span class="hljs-comment"># 硬盘设置</span><br>ata0: <span class="hljs-attribute">enabled</span>=1, <span class="hljs-attribute">ioaddr1</span>=0x1f0, <span class="hljs-attribute">ioaddr2</span>=0x3f0, <span class="hljs-attribute">irq</span>=14<br>ata0-master: <span class="hljs-attribute">type</span>=disk, <span class="hljs-attribute">path</span>=<span class="hljs-string">&quot;hd60M.img&quot;</span>, <span class="hljs-attribute">mode</span>=flat,cylinders=121,heads=16,spt=63<br><br><span class="hljs-comment"># 增加的bochs对gdb的支持，这样gdb便可以从远程连接到此机器的1234端口调试了</span><br><span class="hljs-comment"># gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0</span><br></code></pre></td></tr></table></figure><p>到这里bochs的配置就完成了，以后运行它就可以直接执行命令bin/bochs即可，在读取配置文件的时候输入bochsrc.disc即可。目前我们运行的时候会弹出一个窗口提示bochs启动时找不到启动盘，所以我们就需要进行下一步，创建一个虚拟硬盘。按照书中操作即可，在创建完之后再运行还是弹出窗口，这一次提示该硬盘不是启动盘。</p><p>到这里这一章就戛然而止了，作者给留了一个小悬念，下一章我猜应该首先会把该硬盘设置启动盘吧。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>操作系统</category>
+      
+      <category>真象还原</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>ostep homework(8)</title>
     <link href="/2022/06/25/Ostep(8)/"/>
     <url>/2022/06/25/Ostep(8)/</url>
