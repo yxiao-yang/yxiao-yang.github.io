@@ -16,19 +16,38 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="归档">
-<meta property="og:url" content="http://example.com/archives/2022/04/index.html">
+    <meta name="description" content="第五章 内存分页 向内核迈进  写在前面 现在是10号早上8点，外面阴雨连绵，翻看目录想必这一章又是难上加难，继续战斗吧。 补：本章主要代码部分是loader和boot.inc的修改，书中描绘是按功能来的，过程中我就不再贴代码了，否则会显得太过冗长，我会将总代码放在文末。  正文 梳理一下本章节基本内容。首先描述了通过loader获取到整个物理内存容量的基本操作，后面会经常用到。主要是通过BIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第五章 内存分页 向内核迈进">
+<meta property="og:url" content="http://example.com/2022/07/12/os(5)/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="第五章 内存分页 向内核迈进  写在前面 现在是10号早上8点，外面阴雨连绵，翻看目录想必这一章又是难上加难，继续战斗吧。 补：本章主要代码部分是loader和boot.inc的修改，书中描绘是按功能来的，过程中我就不再贴代码了，否则会显得太过冗长，我会将总代码放在文末。  正文 梳理一下本章节基本内容。首先描述了通过loader获取到整个物理内存容量的基本操作，后面会经常用到。主要是通过BIO">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-07-12T10:08:03.731Z">
+<meta property="article:modified_time" content="2022-07-12T10:08:03.883Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>归档 - Hexo</title>
+  <title>第五章 内存分页 向内核迈进 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
@@ -55,7 +74,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -156,9 +175,43 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="归档">
+            <span class="h2" id="subtitle" title="第五章 内存分页 向内核迈进">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-07-12 18:08" pubdate>
+        2022年7月12日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      724 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      7 分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -171,40 +224,102 @@
 
   <main>
     
-      <div class="container nopadding-x-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
-
-<div class="list-group">
-  <p class="h4">共计 19 篇文章</p>
-  <hr>
-  
-  
-    
       
-      <p class="h5">2022</p>
-    
-    <a href="/2022/04/03/Cn3/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">03：运输层</span>
-      <time style="float: right;">04-03</time>
-    </a>
-  
-</div>
 
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第五章 内存分页 向内核迈进</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：几秒前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="第五章-内存分页-向内核迈进"><a class="markdownIt-Anchor" href="#第五章-内存分页-向内核迈进"></a> 第五章 内存分页 向内核迈进</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>现在是10号早上8点，外面阴雨连绵，翻看目录想必这一章又是难上加难，继续战斗吧。<br />
+补：本章主要代码部分是loader和boot.inc的修改，书中描绘是按功能来的，过程中我就不再贴代码了，否则会显得太过冗长，我会将总代码放在文末。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<p>梳理一下本章节基本内容。首先描述了通过loader获取到整个物理内存容量的基本操作，后面会经常用到。主要是通过BIOS中断0x15的三个子功能实现，其中0xe820功能最强但也最为繁琐，0xe801次之，0x88最后。然后对loader进行一个修改就可以了，目前还用不到这项功能。</p>
+<blockquote>
+<p>虽然博客只写了这么几行，但是遗憾的是现在已经是11号晚上9点了。这两天一直在调试这一章的内容，但是按书上的代码运行却出现了许多错误，究其原因，问题来自于gcc的版本，如果高于gcc5就会出现各种问题，所以我尝试将gcc降级，难以接受的是我找遍了网络也没找到ubuntu22.04gcc降级的方法。一气之下我又重新下载了ubuntu16的虚拟机，又重新将之前的代码调试了一遍，真是劳心费神。</p>
+</blockquote>
+<p>其次，实现了内存分页机制，再次修改loader，同时为了匹配上loader的修改，也要对boot进行一个更新。最后，用C语言加载了一个简单的内核，并且在loader中创建一个接口跳转向内核。</p>
+<p>代码如下（过几天补全注释放出）：</p>
+<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
+<p>写到这里的时候已经是12日傍晚了，又花费了一天与loader进行搏斗，幸好最终拿到了胜利，否则再拖可能就把我胸口的火焰拖没了。这一章节内容实在繁多，期间经过了无数个调试失败，一度想要放弃，感谢老天爷在我每每将近放弃的时候让我调试成功！歇几天休息一下，调整好状态再大踏步进入第六章的学习。</p>
 
-
-
-
-              </div>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%9C%9F%E8%B1%A1%E8%BF%98%E5%8E%9F/">真象还原</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/07/09/os(4)/">
+                        <span class="hidden-mobile">第四章 进入保护模式，理论的抽象轰炸</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -312,6 +427,19 @@
 
 
 
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
 
 
   <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
@@ -333,6 +461,13 @@
 
 
 
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
 
 
 
