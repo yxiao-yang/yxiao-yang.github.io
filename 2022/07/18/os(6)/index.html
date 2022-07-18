@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="写在前面 不知不觉已经16日了，前几天出门旅游几天放松了下，回来继续学习。这章开始进入了C语言和汇编混合编程，用来丰富我们的内核。  正文 本章围绕在C语言和汇编混合编程这一块，有了前面几章的铺垫，书上概念理解起来不是很困难。但是在实际编程过程中如果按照书上代码照搬的话会有很多报错。其原因主要出现在gcc编译器的版本和64位系统无法编译。 下面贴上本章代码： print.S: 123456789">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第六章 完善内核 开启c和汇编混合编程">
+<meta property="og:url" content="http://example.com/2022/07/18/os(6)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="写在前面 不知不觉已经16日了，前几天出门旅游几天放松了下，回来继续学习。这章开始进入了C语言和汇编混合编程，用来丰富我们的内核。  正文 本章围绕在C语言和汇编混合编程这一块，有了前面几章的铺垫，书上概念理解起来不是很困难。但是在实际编程过程中如果按照书上代码照搬的话会有很多报错。其原因主要出现在gcc编译器的版本和64位系统无法编译。 下面贴上本章代码： print.S: 123456789">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-07-18T06:29:23.746Z">
+<meta property="article:modified_time" content="2022-07-18T06:29:23.928Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>第六章 完善内核 开启c和汇编混合编程 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第六章 完善内核 开启c和汇编混合编程">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-07-18 14:29" pubdate>
+        2022年7月18日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      36 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第六章 完善内核 开启c和汇编混合编程</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：几秒前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>不知不觉已经16日了，前几天出门旅游几天放松了下，回来继续学习。这章开始进入了C语言和汇编混合编程，用来丰富我们的内核。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<p>本章围绕在C语言和汇编混合编程这一块，有了前面几章的铺垫，书上概念理解起来不是很困难。但是在实际编程过程中如果按照书上代码照搬的话会有很多报错。其原因主要出现在gcc编译器的版本和64位系统无法编译。</p>
+<p>下面贴上本章代码：<br />
+print.S:</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></div></td><td class="code"><pre><code class="hljs x86asm">TI_GDT <span class="hljs-built_in">equ</span>  <span class="hljs-number">0</span><br>RPL0  <span class="hljs-built_in">equ</span>   <span class="hljs-number">0</span><br>SELECTOR_VIDEO <span class="hljs-built_in">equ</span> (<span class="hljs-number">0x0003</span>&lt;&lt;<span class="hljs-number">3</span>) + TI_GDT + RPL0<br><br><br>[<span class="hljs-meta">bits</span> <span class="hljs-number">32</span>]<br><span class="hljs-meta">section</span> .text<br><br><span class="hljs-comment">;------------------------   put_char   -----------------------------</span><br><span class="hljs-comment">;功能描述:把栈中的1个字符写入光标所在处</span><br><span class="hljs-comment">;-------------------------------------------------------------------   </span><br><span class="hljs-meta">global</span> put_char<br><span class="hljs-symbol">put_char:</span><br>   <span class="hljs-keyword">pushad</span>	   <span class="hljs-comment">;备份32位寄存器环境</span><br>   <span class="hljs-comment">;需要保证gs中为正确的视频段选择子,为保险起见,每次打印时都为gs赋值</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">ax</span>, SELECTOR_VIDEO	       <span class="hljs-comment">; 不能直接把立即数送入段寄存器</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">gs</span>, <span class="hljs-built_in">ax</span><br><br><span class="hljs-comment">;;;;;;;;;  获取当前光标位置 ;;;;;;;;;</span><br>   <span class="hljs-comment">;先获得高8位</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d4</span>  <span class="hljs-comment">;索引寄存器</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">al</span>, <span class="hljs-number">0x0e</span>	   <span class="hljs-comment">;用于提供光标位置的高8位</span><br>   <span class="hljs-keyword">out</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">al</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d5</span>  <span class="hljs-comment">;通过读写数据端口0x3d5来获得或设置光标位置 </span><br>   <span class="hljs-keyword">in</span> <span class="hljs-built_in">al</span>, <span class="hljs-built_in">dx</span>	   <span class="hljs-comment">;得到了光标位置的高8位</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-number">ah</span>, <span class="hljs-built_in">al</span><br><br>   <span class="hljs-comment">;再获取低8位</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d4</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">al</span>, <span class="hljs-number">0x0f</span><br>   <span class="hljs-keyword">out</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">al</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d5</span> <br>   <span class="hljs-keyword">in</span> <span class="hljs-built_in">al</span>, <span class="hljs-built_in">dx</span><br><br>   <span class="hljs-comment">;将光标存入bx</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">bx</span>, <span class="hljs-built_in">ax</span>	  <br>   <span class="hljs-comment">;下面这行是在栈中获取待打印的字符</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>, [<span class="hljs-built_in">esp</span> + <span class="hljs-number">36</span>]	      <span class="hljs-comment">;pushad压入4×8＝32字节,加上主调函数的返回地址4字节,故esp+36字节</span><br>   <span class="hljs-keyword">cmp</span> <span class="hljs-built_in">cl</span>, <span class="hljs-number">0xd</span>				  <span class="hljs-comment">;CR是0x0d,LF是0x0a</span><br>   <span class="hljs-keyword">jz</span> .is_carriage_return<br>   <span class="hljs-keyword">cmp</span> <span class="hljs-built_in">cl</span>, <span class="hljs-number">0xa</span><br>   <span class="hljs-keyword">jz</span> .is_line_feed<br><br>   <span class="hljs-keyword">cmp</span> <span class="hljs-built_in">cl</span>, <span class="hljs-number">0x8</span>				  <span class="hljs-comment">;BS(backspace)的asc码是8</span><br>   <span class="hljs-keyword">jz</span> .is_backspace<br>   <span class="hljs-keyword">jmp</span> .put_other	   <br><span class="hljs-comment">;;;;;;;;;;;;;;;;;;</span><br><span class="hljs-symbol"></span><br><span class="hljs-symbol"> .is_backspace:</span>		      <br><span class="hljs-comment">;;;;;;;;;;;;       backspace的一点说明	     ;;;;;;;;;;</span><br><span class="hljs-comment">; 当为backspace时,本质上只要将光标移向前一个显存位置即可.后面再输入的字符自然会覆盖此处的字符</span><br><span class="hljs-comment">; 但有可能在键入backspace后并不再键入新的字符,这时在光标已经向前移动到待删除的字符位置,但字符还在原处,</span><br><span class="hljs-comment">; 这就显得好怪异,所以此处添加了空格或空字符0</span><br>   <span class="hljs-keyword">dec</span> <span class="hljs-built_in">bx</span><br>   <span class="hljs-keyword">shl</span> <span class="hljs-built_in">bx</span>,<span class="hljs-number">1</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">byte</span> [<span class="hljs-built_in">gs</span>:<span class="hljs-built_in">bx</span>], <span class="hljs-number">0x20</span>		  <span class="hljs-comment">;将待删除的字节补为0或空格皆可</span><br>   <span class="hljs-keyword">inc</span> <span class="hljs-built_in">bx</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">byte</span> [<span class="hljs-built_in">gs</span>:<span class="hljs-built_in">bx</span>], <span class="hljs-number">0x07</span><br>   <span class="hljs-keyword">shr</span> <span class="hljs-built_in">bx</span>,<span class="hljs-number">1</span><br>   <span class="hljs-keyword">jmp</span> .set_cursor<br><span class="hljs-comment">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span><br><span class="hljs-symbol"></span><br><span class="hljs-symbol"> .put_other:</span><br>   <span class="hljs-keyword">shl</span> <span class="hljs-built_in">bx</span>, <span class="hljs-number">1</span>				  <span class="hljs-comment">; 光标位置是用2字节表示,将光标值乘2,表示对应显存中的偏移字节</span><br>   <span class="hljs-keyword">mov</span> [<span class="hljs-built_in">gs</span>:<span class="hljs-built_in">bx</span>], <span class="hljs-built_in">cl</span>			  <span class="hljs-comment">; ascii字符本身</span><br>   <span class="hljs-keyword">inc</span> <span class="hljs-built_in">bx</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">byte</span> [<span class="hljs-built_in">gs</span>:<span class="hljs-built_in">bx</span>],<span class="hljs-number">0x07</span>		  <span class="hljs-comment">; 字符属性</span><br>   <span class="hljs-keyword">shr</span> <span class="hljs-built_in">bx</span>, <span class="hljs-number">1</span>				  <span class="hljs-comment">; 恢复老的光标值</span><br>   <span class="hljs-keyword">inc</span> <span class="hljs-built_in">bx</span>				  <span class="hljs-comment">; 下一个光标值</span><br>   <span class="hljs-keyword">cmp</span> <span class="hljs-built_in">bx</span>, <span class="hljs-number">2000</span>		   <br>   <span class="hljs-keyword">jl</span> .set_cursor			  <span class="hljs-comment">; 若光标值小于2000,表示未写到显存的最后,则去设置新的光标值</span><br>					  <span class="hljs-comment">; 若超出屏幕字符数大小(2000)则换行处理</span><br><span class="hljs-symbol"> .is_line_feed:</span>				  <span class="hljs-comment">; 是换行符LF(\n)</span><br><span class="hljs-symbol"> .is_carriage_return:</span>			  <span class="hljs-comment">; 是回车符CR(\r)</span><br>					  <span class="hljs-comment">; 如果是CR(\r),只要把光标移到行首就行了。</span><br>   <span class="hljs-keyword">xor</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">dx</span>				  <span class="hljs-comment">; dx是被除数的高16位,清0.</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">ax</span>, <span class="hljs-built_in">bx</span>				  <span class="hljs-comment">; ax是被除数的低16位.</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">si</span>, <span class="hljs-number">80</span>				  <span class="hljs-comment">; 由于是效仿linux，linux中\n便表示下一行的行首，所以本系统中，</span><br>   <span class="hljs-keyword">div</span> <span class="hljs-built_in">si</span>				  <span class="hljs-comment">; 把\n和\r都处理为linux中\n的意思，也就是下一行的行首。</span><br>   <span class="hljs-keyword">sub</span> <span class="hljs-built_in">bx</span>, <span class="hljs-built_in">dx</span>				  <span class="hljs-comment">; 光标值减去除80的余数便是取整</span><br>					  <span class="hljs-comment">; 以上4行处理\r的代码</span><br><span class="hljs-symbol"></span><br><span class="hljs-symbol"> .is_carriage_return_end:</span>                 <span class="hljs-comment">; 回车符CR处理结束</span><br>   <span class="hljs-keyword">add</span> <span class="hljs-built_in">bx</span>, <span class="hljs-number">80</span><br>   <span class="hljs-keyword">cmp</span> <span class="hljs-built_in">bx</span>, <span class="hljs-number">2000</span><br><span class="hljs-symbol"> .is_line_feed_end:</span>			  <span class="hljs-comment">; 若是LF(\n),将光标移+80便可。  </span><br>   <span class="hljs-keyword">jl</span> .set_cursor<br><br><span class="hljs-comment">;屏幕行范围是0~24,滚屏的原理是将屏幕的1~24行搬运到0~23行,再将第24行用空格填充</span><br><span class="hljs-symbol"> .roll_screen:</span>				  <span class="hljs-comment">; 若超出屏幕大小，开始滚屏</span><br>   <span class="hljs-keyword">cld</span>  <br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>, <span class="hljs-number">960</span>				  <span class="hljs-comment">; 一共有2000-80=1920个字符要搬运,共1920*2=3840字节.一次搬4字节,共3840/4=960次 </span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">esi</span>, <span class="hljs-number">0xc00b80a0</span>			  <span class="hljs-comment">; 第1行行首</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">edi</span>, <span class="hljs-number">0xc00b8000</span>			  <span class="hljs-comment">; 第0行行首</span><br>   <span class="hljs-keyword">rep</span> <span class="hljs-keyword">movsd</span>				  <br><br><span class="hljs-comment">;;;;;;;将最后一行填充为空白</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebx</span>, <span class="hljs-number">3840</span>			  <span class="hljs-comment">; 最后一行首字符的第一个字节偏移= 1920 * 2</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>, <span class="hljs-number">80</span>				  <span class="hljs-comment">;一行是80字符(160字节),每次清理1字符(2字节),一行需要移动80次</span><br><span class="hljs-symbol"> .cls:</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">word</span> [<span class="hljs-built_in">gs</span>:<span class="hljs-built_in">ebx</span>], <span class="hljs-number">0x0720</span>		  <span class="hljs-comment">;0x0720是黑底白字的空格键</span><br>   <span class="hljs-keyword">add</span> <span class="hljs-built_in">ebx</span>, <span class="hljs-number">2</span><br>   <span class="hljs-keyword">loop</span> .cls <br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">bx</span>,<span class="hljs-number">1920</span>				  <span class="hljs-comment">;将光标值重置为1920,最后一行的首字符.</span><br><span class="hljs-symbol"></span><br><span class="hljs-symbol"> .set_cursor:</span>   <br>					  <span class="hljs-comment">;将光标设为bx值</span><br><span class="hljs-comment">;;;;;;; 1 先设置高8位 ;;;;;;;;</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d4</span>			  <span class="hljs-comment">;索引寄存器</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">al</span>, <span class="hljs-number">0x0e</span>				  <span class="hljs-comment">;用于提供光标位置的高8位</span><br>   <span class="hljs-keyword">out</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">al</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d5</span>			  <span class="hljs-comment">;通过读写数据端口0x3d5来获得或设置光标位置 </span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">al</span>, <span class="hljs-number">bh</span><br>   <span class="hljs-keyword">out</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">al</span><br><br><span class="hljs-comment">;;;;;;; 2 再设置低8位 ;;;;;;;;;</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d4</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">al</span>, <span class="hljs-number">0x0f</span><br>   <span class="hljs-keyword">out</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">al</span><br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">dx</span>, <span class="hljs-number">0x03d5</span> <br>   <span class="hljs-keyword">mov</span> <span class="hljs-built_in">al</span>, <span class="hljs-built_in">bl</span><br>   <span class="hljs-keyword">out</span> <span class="hljs-built_in">dx</span>, <span class="hljs-built_in">al</span><br><span class="hljs-symbol"> .put_char_done:</span> <br>   <span class="hljs-keyword">popad</span><br>   <span class="hljs-keyword">ret</span><br></code></pre></td></tr></table></figure>
+<p>main.c:</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs scss"><span class="hljs-selector-id">#include</span> &quot;print<span class="hljs-selector-class">.h</span>&quot;<br>void <span class="hljs-selector-tag">main</span>(void)<br>&#123;<br>	<span class="hljs-built_in">put_char</span>(&#x27;K&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;e&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;r&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;n&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;e&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;l&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;\n&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;<span class="hljs-number">1</span>&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;<span class="hljs-number">2</span>&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;\b&#x27;);<br>	<span class="hljs-built_in">put_char</span>(&#x27;<span class="hljs-number">3</span>&#x27;);<br>	<span class="hljs-built_in">while</span>(<span class="hljs-number">1</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>stdint.h:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> __LIB_STDINT_H</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __LIB_STDINT_H</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-type">signed</span> <span class="hljs-type">char</span> <span class="hljs-type">int8_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">signed</span> <span class="hljs-type">short</span> <span class="hljs-type">int</span> <span class="hljs-type">int16_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">signed</span> <span class="hljs-type">int</span> <span class="hljs-type">int32_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">signed</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-type">int</span> <span class="hljs-type">int64_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> <span class="hljs-type">uint8_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> <span class="hljs-type">int</span> <span class="hljs-type">uint16_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-type">uint32_t</span>;<br><span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-type">int</span> <span class="hljs-type">uint64_t</span>;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br></code></pre></td></tr></table></figure>
+<p>print.h:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> __LIB_KERNEL_PRINT_H</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __LIB_KERNEL_PRINT_H</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;stdint.h&quot;</span></span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">put_char</span><span class="hljs-params">(<span class="hljs-type">uint8_t</span> char_asci)</span></span>;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br></code></pre></td></tr></table></figure>
+<p>以上就是本章全部的代码，下面我再把编译链接的语句也贴上，直接复制到终端就行了：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs gradle">nasm -o boot<span class="hljs-regexp">/mbr.bin boot/m</span>br.S<br>dd <span class="hljs-keyword">if</span>=<span class="hljs-regexp">/home/</span>podest<span class="hljs-regexp">/bochs/</span>boot<span class="hljs-regexp">/mbr.bin of=/</span>home<span class="hljs-regexp">/podest/</span>bochs/hd60M.img bs=<span class="hljs-number">512</span> <span class="hljs-keyword">count</span>=<span class="hljs-number">1</span> seek=<span class="hljs-number">0</span> conv=notrunc<br>nasm -o boot<span class="hljs-regexp">/loader.bin boot/</span>loader.S<br>dd <span class="hljs-keyword">if</span>=<span class="hljs-regexp">/home/</span>podest<span class="hljs-regexp">/bochs/</span>boot<span class="hljs-regexp">/loader.bin of=/</span>home<span class="hljs-regexp">/podest/</span>bochs/hd60M.img bs=<span class="hljs-number">512</span> <span class="hljs-keyword">count</span>=<span class="hljs-number">3</span> seek=<span class="hljs-number">2</span> conv=notrunc<br>nasm -f elf -o lib<span class="hljs-regexp">/kernel/</span><span class="hljs-keyword">print</span>.o lib<span class="hljs-regexp">/kernel/</span><span class="hljs-keyword">print</span>.S<br>gcc -m32 -I  lib<span class="hljs-regexp">/kernel/</span> -c -o kernel<span class="hljs-regexp">/main.o kernel/m</span>ain.c<br>ld -m elf_i386 -Ttext <span class="hljs-number">0</span>xc0001500 -e main -o kernel<span class="hljs-regexp">/kernel.bin kernel/m</span>ain.o  lib<span class="hljs-regexp">/kernel/</span><span class="hljs-keyword">print</span>.o<br>dd <span class="hljs-keyword">if</span>=<span class="hljs-regexp">/home/</span>podest<span class="hljs-regexp">/bochs/</span>kernel<span class="hljs-regexp">/kernel.bin of=/</span>home<span class="hljs-regexp">/podest/</span>bochs/hd60M.img bs=<span class="hljs-number">512</span> <span class="hljs-keyword">count</span>=<span class="hljs-number">200</span> seek=<span class="hljs-number">9</span> conv=notrunc<br>bin/bochs -f bochsrc.disk<br></code></pre></td></tr></table></figure>
+<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
+<p>本来想着在17日晚上就把这一章结束的，但是17日bochs一直在崩溃退出，原因也是出在代码上面，又参考了别人的代码才勉强完成。在调试的过程中也深知自己对于汇编的掌握还需加强。也开始再重新回看之前几章的内容，这一过程相比第一次读更令我受益匪浅。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%9C%9F%E8%B1%A1%E8%BF%98%E5%8E%9F/">真象还原</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/07/12/os(5)/">
+                        <span class="hidden-mobile">第五章 内存分页 向内核迈进</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
