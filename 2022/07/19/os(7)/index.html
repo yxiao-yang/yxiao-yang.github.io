@@ -16,15 +16,15 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="写在前面 落笔前已经完成了这一章节的内容，本章难度不大但要编写的代码比较多，中断处理是os的必需内容，所以还是简单介绍下。  正文 我把代码和头文件分别介绍一下：  主体代码  kernel.S 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455">
+    <meta name="description" content="第七章 实现中断处理 柳暗花明又一村  写在前面 落笔前已经完成了这一章节的内容，本章难度不大但要编写的代码比较多，中断处理是os的必需内容，所以还是简单介绍下。  正文 我把代码和头文件分别介绍一下：  主体代码  kernel.S 123456789101112131415161718192021222324252627282930313233343536373839404142434445">
 <meta property="og:type" content="article">
 <meta property="og:title" content="第七章 实现中断处理 柳暗花明又一村">
 <meta property="og:url" content="http://example.com/2022/07/19/os(7)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="写在前面 落笔前已经完成了这一章节的内容，本章难度不大但要编写的代码比较多，中断处理是os的必需内容，所以还是简单介绍下。  正文 我把代码和头文件分别介绍一下：  主体代码  kernel.S 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455">
+<meta property="og:description" content="第七章 实现中断处理 柳暗花明又一村  写在前面 落笔前已经完成了这一章节的内容，本章难度不大但要编写的代码比较多，中断处理是os的必需内容，所以还是简单介绍下。  正文 我把代码和头文件分别介绍一下：  主体代码  kernel.S 123456789101112131415161718192021222324252627282930313233343536373839404142434445">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-07-19T02:06:16.543Z">
-<meta property="article:modified_time" content="2022-07-19T02:06:16.749Z">
+<meta property="article:modified_time" content="2022-07-19T11:59:05.979Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -238,12 +238,13 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：4 小时前
+                  本文最后更新于：5 分钟前
                 
               </p>
             
             <div class="markdown-body">
-              <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+              <h1 id="第七章-实现中断处理-柳暗花明又一村"><a class="markdownIt-Anchor" href="#第七章-实现中断处理-柳暗花明又一村"></a> 第七章 实现中断处理 柳暗花明又一村</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
 <p>落笔前已经完成了这一章节的内容，本章难度不大但要编写的代码比较多，中断处理是os的必需内容，所以还是简单介绍下。</p>
 <h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
 <p>我把代码和头文件分别介绍一下：</p>
@@ -276,7 +277,7 @@ pic_init() ; 初始化8259A芯片<br />
 之所以这样是因为对端口操作属于I/O操作，非常慢，一旦用户程序调用他们，可能会等很长时间，所以在函数调用方面就要尽可能快来追求更短的总时间。</p>
 <h4 id="globalh"><a class="markdownIt-Anchor" href="#globalh"></a> global.h</h4>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> __KERNEL_GLOBAL_H</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> __KERNEL_GLOBAL_H</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;stdint.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 RPL0  0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 RPL1  1</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 RPL2  2</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 RPL3  3</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TI_GDT 0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> TI_LDT 1</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SELECTOR_K_CODE	   ((1 &lt;&lt; 3) + (TI_GDT &lt;&lt; 2) + RPL0)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SELECTOR_K_DATA	   ((2 &lt;&lt; 3) + (TI_GDT &lt;&lt; 2) + RPL0)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SELECTOR_K_STACK   SELECTOR_K_DATA </span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SELECTOR_K_GS	   ((3 &lt;&lt; 3) + (TI_GDT &lt;&lt; 2) + RPL0)</span><br><br><br><span class="hljs-comment">//--------------   IDT描述符属性  ------------</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_P	 1 </span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_DPL0   0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_DPL3   3</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_32_TYPE     0xE   <span class="hljs-comment">// 32位的门</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_16_TYPE     0x6   <span class="hljs-comment">// 16位的门，不用，定义它只为和32位门区分</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_ATTR_DPL0  ((IDT_DESC_P &lt;&lt; 7) + (IDT_DESC_DPL0 &lt;&lt; 5) + IDT_DESC_32_TYPE)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span>	 IDT_DESC_ATTR_DPL3  ((IDT_DESC_P &lt;&lt; 7) + (IDT_DESC_DPL3 &lt;&lt; 5) + IDT_DESC_32_TYPE)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br></code></pre></td></tr></table></figure>
-<h3 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h3>
+<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
 <p>不知不觉已经走过了将近一半的路程，回过头看实在艰辛，不过想想自己在这几天收获的东西真是很多。下一章节不准备向下进行了，我想把这半程的过程重新整理一下，并且把代码托管到github上。收拾一下行囊，再出发！</p>
 
             </div>
@@ -306,6 +307,12 @@ pic_init() ; 初始化8259A芯片<br />
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2022/07/19/os(a)/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第一到七章流程整理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
