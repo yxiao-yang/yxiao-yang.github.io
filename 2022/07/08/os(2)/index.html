@@ -24,7 +24,7 @@
 <meta property="og:description" content="第二章 编写MBR，开始进入系统的世界  写在前面 今天是7月6日，这一章涉及了汇编语言，阅读开始变得吃力，加上书中排版密密麻麻的文字，很容易心生退意，相信在开发的过程中一定会有些许乐趣等待挖掘，借此博客督促自己加强学习。  Let&#96;s go! BIOS！ 首先说明了计算机启动后第一个运行的程序是我们常见的BIOS，然后为了说明BIOS加载的一系列问题，作者列出了实模式下内存布局的一张表用以说明">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-07-08T07:41:50.742Z">
-<meta property="article:modified_time" content="2022-07-09T02:33:34.908Z">
+<meta property="article:modified_time" content="2022-07-19T02:50:52.899Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      2.1k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      9 分钟
+      18 分钟
     </span>
   
 
@@ -238,7 +238,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：10 天前
+                  本文最后更新于：9 分钟前
                 
               </p>
             
@@ -255,7 +255,8 @@
 </blockquote>
 <h2 id="mbr"><a class="markdownIt-Anchor" href="#mbr"></a> MBR</h2>
 <p>MBR的大小是512字节，因为x86平台是小端字节序，所以为了保证最后两个字节（即510字节和511字节）为0x55和0xaa，其内容应为0xaa55。然后提到了NASM的两个关键字$和$$，它们用来表示当前行和本section的地址，起到标号的作用。</p>
-<p>终于来到了MBR的编程，这一程序目前实现了一个在屏幕上打印字符串“1 MBR”的功能，其背景色为黑色，前景色为绿色。在打印字符串之前，还包含了不少代码，其功能不想再解释。在写这篇文章的时候，我实际已经进展到了第四章，mbr文件也已经反复修改了很多次，这里的代码我就不再重写了，感兴趣的读者可以跳转到下一章节，我会贴出代码，上面已经标注了完整的注释。</p>
+<p>终于来到了MBR的编程，这一程序目前实现了一个在屏幕上打印字符串“1 MBR”的功能，其背景色为黑色，前景色为绿色。在打印字符串之前，还包含了不少代码，其功能不再解释。</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></div></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-comment">; mbr.S</span><br><br><span class="hljs-comment">; 主引导程序</span><br><span class="hljs-comment">; --------------------------------------------------</span><br><br>SECTION MBR vstart=<span class="hljs-number">0x7c00</span> <span class="hljs-comment">; 把起始地址编译为 0x7c00</span><br>    mov ax, cs     <span class="hljs-comment">; cs 代码段寄存器</span><br>    mov ds, ax     <span class="hljs-comment">; dx 数据段寄存器</span><br>    mov es, ax     <span class="hljs-comment">; es 附加段寄存器</span><br>    mov ss, ax     <span class="hljs-comment">; ss 堆栈段寄存器</span><br>    mov fs, ax     <span class="hljs-comment">; fs 80386 后添加的寄存器，无全称</span><br>    mov <span class="hljs-built_in">sp</span>, <span class="hljs-number">0x7c00</span> <span class="hljs-comment">; sp 堆栈指针寄存器</span><br><br><span class="hljs-comment">; 清屏</span><br><span class="hljs-comment">; --------------------------------------------------</span><br><span class="hljs-comment">; INT 0x10    功能号: 0x06    功能描述：上卷窗口</span><br><span class="hljs-comment">; --------------------------------------------------</span><br><span class="hljs-comment">; 输入：</span><br><span class="hljs-comment">; AH 功能号 = 0x06</span><br><span class="hljs-comment">; AL = 上卷的行数(如果为0，表示全部)</span><br><span class="hljs-comment">; BH = 上卷行属性</span><br><span class="hljs-comment">; (CL, CH) = 窗口左上角的 (X, Y) 位置</span><br><span class="hljs-comment">; (DL, DH) = 窗口右下角的 (X, Y) 位置</span><br><span class="hljs-comment">; 无返回值:</span><br>    mov ax, <span class="hljs-number">0x600</span><br>    mov <span class="hljs-keyword">bx, </span><span class="hljs-number">0x700</span><br>    mov cx, <span class="hljs-number">0</span><br>    mov dx, <span class="hljs-number">0x184f</span> <span class="hljs-comment">; 右下角: (80, 25)</span><br>                   <span class="hljs-comment">; VGA 文本模式种，一行只能容纳 80 个字符，共 25 行</span><br>                   <span class="hljs-comment">; 下标从 0 开始，所以 0x18=24, 0x4f=79</span><br>        <br>    int <span class="hljs-number">0x10</span>       <span class="hljs-comment">; int 0x10</span><br><br><span class="hljs-comment">;;;;;;;;;;;;;下面这三行代码获取光标位置;;;;;;;;;;;;;;;;</span><br><br><span class="hljs-comment">; .get_cursor 获取当前光标位置，在光标处打印字符</span><br>    mov ah, <span class="hljs-number">3</span>      <span class="hljs-comment">; 3 号子功能</span><br>    mov <span class="hljs-keyword">bh, </span><span class="hljs-number">0</span>      <span class="hljs-comment">; 待获取光标的页号</span><br><br>    int <span class="hljs-number">0x10</span>       <span class="hljs-comment">; 输出：</span><br>                   <span class="hljs-comment">; ch = 光标开始行，cl = 光标结束行</span><br>                   <span class="hljs-comment">; dh = 光标所在行号，dl = 光标所在列号</span><br><br><span class="hljs-comment">; 打印字符串</span><br>    mov ax, message<br>    mov <span class="hljs-keyword">bp, </span>ax     <span class="hljs-comment">; es:bp 为串首地址</span><br>    <br>    mov cx, <span class="hljs-number">5</span>      <span class="hljs-comment">; cx 为串长度，不包括结束符 &#x27;\0&#x27;</span><br>    mov ax, <span class="hljs-number">0x1301</span> <span class="hljs-comment">; 13 号子功能</span><br>                   <span class="hljs-comment">; ah = 13</span><br>                   <span class="hljs-comment">; al = 01: 写字符方式，显式字符串，光标跟随移动</span><br>    mov <span class="hljs-keyword">bx, </span><span class="hljs-number">0x2</span>    <span class="hljs-comment">; bh = 0，要显示的页号</span><br>                   <span class="hljs-comment">; bl = 02，字符属性，黑底绿字</span><br>    <br>    int <span class="hljs-number">0x10</span><br><span class="hljs-comment">;;;;;;;;;;;;;;;;;;;;;;打印字符串结束;;;;;;;;;;;;;;;;</span><br><span class="hljs-keyword">jmp </span>$<span class="hljs-comment">;     程序悬停在此</span><br><br>message db <span class="hljs-string">&quot;1 MBR&quot;</span><br>times <span class="hljs-number">510</span>-($-$$)   db <span class="hljs-number">0</span><br>db <span class="hljs-number">0x55</span>,<span class="hljs-number">0xaa</span><br><br></code></pre></td></tr></table></figure>
 <p>之后我们利用dd命令（用于磁盘操作的命令）将mbr.bin输出到第一章我们创建的虚拟硬盘hd60M.img，记得按照作者提示，将块大小指定为512字节，只操作1块。</p>
 <p>运行bochs，界面是我们预想的输出一串字符串，大功告成！</p>
 <h2 id="后记"><a class="markdownIt-Anchor" href="#后记"></a> 后记</h2>
