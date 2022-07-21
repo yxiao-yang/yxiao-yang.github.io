@@ -24,7 +24,7 @@
 <meta property="og:description" content="写在前面 这一章节我将把从第一章到第七章的内容串联起来，缕清思路。  正文  第一章 略  第二章 在电脑未开机前，BIOS就被事先写入到内存的0xF0000~0xFFFFF中。此区域为ROM。MBR被加载到磁盘的0盘0道1扇区（CHS方式），CHS 方式中扇区的编号是从1开始的。 在计算机启动之后，cs：ip寄存器会被强制置为0xF000:0xFFF0，由于在实模式下的段基址要乘以16，也就是">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-07-19T12:04:04.479Z">
-<meta property="article:modified_time" content="2022-07-19T12:04:04.643Z">
+<meta property="article:modified_time" content="2022-07-21T08:20:12.919Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.6k 字
+      2.8k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      23 分钟
+      24 分钟
     </span>
   
 
@@ -238,7 +238,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：25 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -336,6 +336,12 @@ bochs模拟最后程序死循环，说明死循环段被成功加载到虚拟地
 <h3 id="第六章"><a class="markdownIt-Anchor" href="#第六章"></a> 第六章</h3>
 <p>通过c语言和汇编混合编程的方式实现打印函数，其中会使用到内联汇编的知识。具体实现没有什么问题，看看书就能理解了。</p>
 <h3 id="第七章"><a class="markdownIt-Anchor" href="#第七章"></a> 第七章</h3>
+<p>这一章的任务是实现中断，具体过程如下：<br />
+1.外设发出中断信号给8259A芯片。<br />
+2.8259A芯片处理信号，并向CPU发送中断向量号。<br />
+3.CPU根据中断向量号，在IDT表中找到对应的中断门描述符，从获取中断门描述符获取对应的中断处理程序所在代码段的选择子和偏移地址，开始执行中断处理程序。<br />
+4.中断处理程序执行结束，CPU返回原程序。<br />
+在最后一节要修改kernel.S来改进中断处理程序，并调快时钟。</p>
 
             </div>
             <hr>
