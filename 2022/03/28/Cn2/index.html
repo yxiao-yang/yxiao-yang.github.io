@@ -23,27 +23,27 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="写在前面  纸上得来终觉浅，绝知此事要躬行。   一、应用层协议原理 研发网络应用程序的核心是写出能够运行在不同的端系统和通过网络彼此通信的程序。因此研发新应用时需要编写将在多台端系统上运行的软件。  1.1 网络应用程序体系结构 应用程序体系结构（application architecture）明显不同于网络体系结构。网络体系结构是固定的，而应用程序体系结构由应用程序研发者设计。 应用程序体">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/cn2.1.png">
-<meta property="og:image" content="http://example.com/img/cn2.2.png">
-<meta property="og:image" content="http://example.com/img/cn2.3.png">
-<meta property="og:image" content="http://example.com/img/cn2.4.png">
-<meta property="og:image" content="http://example.com/img/cn2.5.png">
-<meta property="og:image" content="http://example.com/img/cn2.6.png">
-<meta property="og:image" content="http://example.com/img/cn2.7.png">
-<meta property="og:image" content="http://example.com/img/cn2.8.png">
-<meta property="og:image" content="http://example.com/img/cn2.9.png">
-<meta property="og:image" content="http://example.com/img/cn2.10.png">
-<meta property="og:image" content="http://example.com/img/cn2.11.png">
-<meta property="og:image" content="http://example.com/img/cn2.12.png">
-<meta property="og:image" content="http://example.com/img/cn2.13.png">
-<meta property="og:image" content="http://example.com/img/cn2.14.png">
-<meta property="og:image" content="http://example.com/img/cn2.15.png">
-<meta property="og:image" content="http://example.com/img/cn2.16.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.1.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.2.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.3.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.4.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.5.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.6.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.7.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.8.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.9.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.10.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.11.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.12.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.13.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.14.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.15.png">
+<meta property="og:image" content="http://example.com/img/cn/cn2.16.png">
 <meta property="article:published_time" content="2022-03-28T09:46:37.524Z">
-<meta property="article:modified_time" content="2022-04-03T10:51:50.360Z">
+<meta property="article:modified_time" content="2022-07-23T01:38:18.195Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/cn2.1.png">
+<meta name="twitter:image" content="http://example.com/img/cn/cn2.1.png">
   
   
   <title>02：应用层 - Hexo</title>
@@ -255,7 +255,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：4 个月前
+                  本文最后更新于：1 分钟前
                 
               </p>
             
@@ -271,11 +271,11 @@
 应用程序体系结构目前有两种主流体系结构：<strong>客户-服务器体系结构</strong>或<strong>对等（P2P）体系结构</strong>。</p>
 <h3 id="111-客户-服务器体系结构"><a class="markdownIt-Anchor" href="#111-客户-服务器体系结构"></a> 1.1.1 客户-服务器体系结构</h3>
 <p>在客户-服务器体系结构中，有一个总是打开的主机称为<strong>服务器</strong>，它服务于来自许多其他称为<strong>客户</strong>的主机的请求。客户相互之间<strong>不直接通信</strong>。另一方面，该服务器具有固定的、周知的地址，该地址称为<strong>IP地址</strong>。</p>
-<p><img src="/img/cn2.1.png" srcset="/img/loading.gif" lazyload alt="客户-服务器体系结构" /></p>
+<p><img src="/img/cn/cn2.1.png" srcset="/img/loading.gif" lazyload alt="客户-服务器体系结构" /></p>
 <p>在一个客户-服务器应用中，常常会出现一台单独的服务器主机跟不上它所有客户请求的情况。为此，配备大量主机的<strong>数据中心</strong>常被用于创建强大的虚拟服务器。如谷歌在全球拥有30~50个数据中心。一个数据中心能够有数十万台服务器，它们必须要供电和维护。</p>
 <h3 id="112-p2p体系结构"><a class="markdownIt-Anchor" href="#112-p2p体系结构"></a> 1.1.2 P2P体系结构</h3>
 <p>在一个P2P体系结构中，对位于数据中心的专用服务器有最小的（或者没有）依赖。应用程序在间断连接的主机对之间使用直接通信，这些主机对被称为<strong>对等方</strong>。因为这些对等方通信不必通过专门的服务器，该体系结构被称为对等方到对等方的。<br />
-<img src="/img/cn2.2.png" srcset="/img/loading.gif" lazyload alt="P2P体系结构" /></p>
+<img src="/img/cn/cn2.2.png" srcset="/img/loading.gif" lazyload alt="P2P体系结构" /></p>
 <p>P2P最引人入胜的特性之一时自扩展性（self-scalability）。例如，在一个P2P共享文件中，尽管每个对等方都由于请求文件产生工作量，但每个对等方通过向其他对等方分发文件也为系统增加服务能力。P2P体系结构也是成本有效的，因为它们通常不需要庞大的服务器基础设施和服务器带宽。</p>
 <p>未来P2P应用面临三个主要挑战：<br />
 1 ISP友好。<br />
@@ -295,7 +295,7 @@
 <p>从一个进程向另一个进程发送的报文必须通过下面的网络。进程通过一个称为<strong>套接字</strong>（socket）的软件接口向网络发送报文和从网络接收报文。</p>
 <p>类比说明，进程类比为房子，套接字类比为门。一个进程向另一个房子发送报文就要将报文从门送出去，到另一个房子时再从门进去。</p>
 <p><strong>套接字</strong>是同一台主机内应用层与运输层之间的接口。由于该套接字是建立网络应用程序的可编程接口，因此套接字也称为应用程序和网络之间的<strong>应用程序编程接口</strong>（API）。应用程序开发者可以控制套接字在应用端的一切，但是对套接字在运输层端几乎没有控制权（仅限于①选择运输层协议；②也许能设定几个参数，如最大缓存和最大报文长度等）。<br />
-<img src="/img/cn2.3.png" srcset="/img/loading.gif" lazyload alt="应用程序、套接字和下面的运输层协议" /></p>
+<img src="/img/cn/cn2.3.png" srcset="/img/loading.gif" lazyload alt="应用程序、套接字和下面的运输层协议" /></p>
 <h3 id="123-进程寻址"><a class="markdownIt-Anchor" href="#123-进程寻址"></a> 1.2.3 进程寻址</h3>
 <p>在一台主机上运行的进程为了向在另一台主机上运行的进程发送分组，接收进程需要有一个<strong>地址</strong>。为了标识该接收进程，需要定义两种信息：<br />
 ——主机的地址；<br />
@@ -355,7 +355,7 @@
 <p>Web<strong>浏览器</strong>实现了HTTP的客户端，所以被称为浏览器或客户；<br />
 Web<strong>服务器</strong>实现了HTTP的服务器端，它用于存储Web对象，每个对象由URL寻址。</p>
 <p>HTTP定义了Web客户向Web服务器请求Web页面的方式，以及服务器向客户传送Web页面的方式。当用户请求一个Web页面时，浏览器向服务器发出对该页面中所包含对象的HTTP请求报文，服务器接收到请求并用包含这些对象的HTTP响应报文进行响应。<br />
-<img src="/img/cn2.4.png" srcset="/img/loading.gif" lazyload alt="HTTP的请求-响应行为" /></p>
+<img src="/img/cn/cn2.4.png" srcset="/img/loading.gif" lazyload alt="HTTP的请求-响应行为" /></p>
 <p>HTTP使用<strong>TCP</strong>作为它的支撑运输协议。HTTP客户首先发起一个与服务器的TCP连接。一旦连接建立，该浏览器和服务器进程就可以通过套接字接口访问TCP。一旦客户向它的套接字接口发送了一个请求报文，该报文就脱离了客户控制并进入TCP的控制。</p>
 <p>HTTP是一个<strong>无状态协议</strong>（stateless protrol），即不保存关于客户的任何信息。Web是一个<strong>客户-服务器体系结构</strong>。</p>
 <h2 id="22-非持续连接和持续连接"><a class="markdownIt-Anchor" href="#22-非持续连接和持续连接"></a> 2.2 非持续连接和持续连接</h2>
@@ -384,7 +384,7 @@ Web<strong>服务器</strong>实现了HTTP的服务器端，它用于存储Web�
 <li>客户向服务器返回确认</li>
 </ol>
 <p>三次握手中前两个部分占用了一个RTT。完成前两个部分后，客户结合三次握手的第三部分向该TCP连接发送一个HTTP请求报文，一旦该请求报文到达服务器，服务器就在该TCP连接上发送HTML文件。该HTTP请求/响应占用了一个RTT。因此，总的响应时间就是<strong>两个RTT加上服务器传输HTML文件的时间</strong>。<br />
-<img src="/img/cn2.5.png" srcset="/img/loading.gif" lazyload alt="三次握手过程" /></p>
+<img src="/img/cn/cn2.5.png" srcset="/img/loading.gif" lazyload alt="三次握手过程" /></p>
 <h3 id="222-采用持续连接的http"><a class="markdownIt-Anchor" href="#222-采用持续连接的http"></a> 2.2.2 采用持续连接的HTTP</h3>
 <p>非持续连接有两个缺点：</p>
 <ol>
@@ -416,7 +416,7 @@ Accept-language: fr</p>
 <strong>User-agent</strong>，用来指明用户代理，即向服务器发送请求的浏览器的类型。<br />
 <strong>Accept-language</strong>，表示用户想得到该对象的法语版本（如果服务器中有），否则发送默认版本。</p>
 <p>在首部行后有一个“<strong>实体体</strong>”（entire body）。使用GET方法时实体体为空，在使用<strong>POST方法</strong>时使用。例如当用户在搜索引擎搜索关键词时，实体体包含的就是用户在表单字段的输入值。</p>
-<p><img src="/img/cn2.6.png" srcset="/img/loading.gif" lazyload alt="一个HTTP请求报文的通用格式" /></p>
+<p><img src="/img/cn/cn2.6.png" srcset="/img/loading.gif" lazyload alt="一个HTTP请求报文的通用格式" /></p>
 <p>用表单生成的请求报文不是必须使用<strong>POST方法</strong>，HTML表单经常使用GET方法，并在所请求的URL中包括输入的数据。<a target="_blank" rel="noopener" href="http://xn--www-uc0ep96b.somesite.com/animalsearch?monkeys&amp;bananas%E3%80%82">例如www.somesite.com/animalsearch?monkeys&amp;bananas。</a></p>
 <p><strong>HEAD方法</strong>类似于GET方法，当服务器收到使用HEAD方法的请求时，将会用一个HTTP报文进行响应，但不返回对象。应用程序开发者经常使用HEAD方法进行调试跟踪。</p>
 <p><strong>PUT方法</strong>常与Web发行工具联合使用，它允许用户上传对象到指定的Web服务器上指定的路径（目录）。同时，它也被那些需要向Web服务器上传对象的应用程序使用。</p>
@@ -444,7 +444,7 @@ Content-Type: text/html<br />
 <strong>Content-Length</strong> 指示了被发送对象中的字节数；<br />
 <strong>Content-Type</strong> 指示了实体体中的对象是HTML文本。</p>
 <p>3 <strong>实体体</strong>：报文的主要部分（data data data…）。</p>
-<p><img src="/img/cn2.7.png" srcset="/img/loading.gif" lazyload alt="一个HTTP响应报文的通用格式" /></p>
+<p><img src="/img/cn/cn2.7.png" srcset="/img/loading.gif" lazyload alt="一个HTTP响应报文的通用格式" /></p>
 <h2 id="24-用户与服务器的交互cookie"><a class="markdownIt-Anchor" href="#24-用户与服务器的交互cookie"></a> 2.4 用户与服务器的交互：cookie</h2>
 <p>cookie在[RFC 6265]中定义，它允许站点对用户进行跟踪。</p>
 <p>cookie技术有4个组件：</p>
@@ -454,7 +454,7 @@ Content-Type: text/html<br />
 <li>在用户端系统中保留有一个cookie文件，由用户的浏览器进行管理；</li>
 <li>位于Web站点的一个后端数据库。</li>
 </ol>
-<p><img src="/img/cn2.8.png" srcset="/img/loading.gif" lazyload alt="cookie跟踪用户状态" /></p>
+<p><img src="/img/cn/cn2.8.png" srcset="/img/loading.gif" lazyload alt="cookie跟踪用户状态" /></p>
 <p>cookie可以用于<strong>标识</strong>一个用户。用户首次访问一个站点时，可能需要提供一个用户标识。在后继会话中，浏览器向服务器传递一个cookie首部，从而向该服务器标识了用户。因此cookie可以在无状态的HTTP之上建立一个用户<strong>会话层</strong>。</p>
 <h2 id="25-web缓存"><a class="markdownIt-Anchor" href="#25-web缓存"></a> 2.5 Web缓存</h2>
 <p><strong>Web缓存器</strong>（Web cache）也叫<strong>代理服务器</strong>（proxy server），它是能够代表初始Web服务器来满足HTTP请求的网络实体。Web缓存器有自己的磁盘<strong>存储空间</strong>，并在存储空间中保存最近请求过的对象的<strong>副本</strong>。</p>
@@ -556,7 +556,7 @@ Subject: Searching for the meaning of life</p>
 <h2 id="45-邮件访问协议"><a class="markdownIt-Anchor" href="#45-邮件访问协议"></a> 4.5 邮件访问协议</h2>
 <p>目前用户是通过在用户端系统上运行的客户程序来阅读电子邮件。用户通常在本地PC上运行一个<strong>用户代理程序</strong>，它访问存储在总是保持开机的<strong>共享邮件服务器</strong>（由用户的ISP维护）上的邮箱。</p>
 <p>为了接收方能够通过<strong>用户代理</strong>获得<strong>某ISP</strong>上的<strong>邮件服务器</strong>上的邮件，目前有一些流行的邮件访问协议，包括<strong>第三版的邮局协议</strong>（POP3）、<strong>因特网邮件访问协议</strong>（IMAP）和<strong>HTTP</strong>。</p>
-<p><img src="/img/cn2.9.png" srcset="/img/loading.gif" lazyload alt="电子邮件协议及其通信实体" /></p>
+<p><img src="/img/cn/cn2.9.png" srcset="/img/loading.gif" lazyload alt="电子邮件协议及其通信实体" /></p>
 <h3 id="451-pop3"><a class="markdownIt-Anchor" href="#451-pop3"></a> 4.5.1 POP3</h3>
 <p>POP3是一个<strong>极为简单、功能相当有限</strong>的邮件访问协议，由RFC1939定义。随着建立TCP连接，POP3按照三个阶段进行工作：</p>
 <ol>
@@ -621,9 +621,9 @@ Subject: Searching for the meaning of life</p>
 <li><strong>权威DNS服务器</strong><br />
 在因特网上具有<strong>公共可访问主机</strong>（如Web服务器和邮件服务器）的组织（机构）必须提供公共可访问的<strong>DNS记录</strong>，这些记录将这些主机的名字映射为IP地址。这个组织（机构）能够选择实现<strong>自己的</strong>权威DNS服务器收藏这些DNS记录，也可以选择将这些记录存储在<strong>第三方的</strong>权威DNS服务器中。</li>
 </ul>
-<p><img src="/img/cn2.10.png" srcset="/img/loading.gif" lazyload alt="DNS服务器的部分层次结构" /></p>
+<p><img src="/img/cn/cn2.10.png" srcset="/img/loading.gif" lazyload alt="DNS服务器的部分层次结构" /></p>
 <p>除了在层次结构中的三种DNS服务器，还有一类，叫做<strong>本地DNS服务器</strong>，它起到一个<strong>代理</strong>的作用。对于某居民区ISP，本地DNS服务器通常与主机相隔很近。</p>
-<p><img src="/img/cn2.11.png" srcset="/img/loading.gif" lazyload alt="各种DNS服务器的交互" /></p>
+<p><img src="/img/cn/cn2.11.png" srcset="/img/loading.gif" lazyload alt="各种DNS服务器的交互" /></p>
 <p>主机、服务器之间的查询有两种形式：</p>
 <ul>
 <li><strong>递归查询</strong>。在该模式下DNS 服务器接收到客户机请求，必须使用一个<strong>准确的查询结果</strong>回复客户机。如果DNS 服务器本地没有存储查询DNS 信息，那么该服务器会询问其他服务器，并将返回的查询结果提交给客户机。客户机和服务器之间的查询是递归查询。<br />
@@ -640,7 +640,7 @@ Subject: Searching for the meaning of life</p>
 <p>关于RR的详细内容以后再补。</p>
 <h3 id="531-dns报文"><a class="markdownIt-Anchor" href="#531-dns报文"></a> 5.3.1 DNS报文</h3>
 <p>DNS报文中各字段的语义如下：</p>
-<p><img src="/img/cn2.12.png" srcset="/img/loading.gif" lazyload alt="DNS报文格式" /></p>
+<p><img src="/img/cn/cn2.12.png" srcset="/img/loading.gif" lazyload alt="DNS报文格式" /></p>
 <ul>
 <li>前12个字节是<strong>首部区域</strong>。<br />
 <strong>1</strong> <strong>标识符</strong>是一个<em>16比特的数</em>。用于标识该查询，它会被复制到回答报文中，以便让客户用它来匹配发送的请求和接收到的回答。<br />
@@ -692,12 +692,12 @@ Subject: Searching for the meaning of life</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mo>≥</mo><mi>m</mi><mi>a</mi><mi>x</mi><mo stretchy="false">{</mo><mfrac><mi>F</mi><msub><mi>u</mi><mi>s</mi></msub></mfrac><mo separator="true">,</mo><mfrac><mi>F</mi><msub><mi>d</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mfrac><mo separator="true">,</mo><mfrac><mrow><mi>N</mi><mi>F</mi></mrow><mrow><msub><mi>u</mi><mi>s</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>u</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">D \ge max \{  \frac {F}{u_s}, \frac {F}{d_{min}}, \frac {NF}{u_s+\sum_{i=1}^N u_i}\}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.13597em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.5312710000000003em;vertical-align:-1.170941em;"></span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">x</span><span class="mopen">{</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.36033em;"><span style="top:-2.3139999999999996em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8360000000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.36033em;"><span style="top:-2.3139999999999996em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8360000000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.36033em;"><span style="top:-2.128769em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.981231em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.10903em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.170941em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">}</span></span></span></span></span></p>
 <p>二者分发时间对比如下图，</p>
-<p><img src="/img/cn2.13.png" srcset="/img/loading.gif" lazyload alt="P2P和客户-服务器体系结构的分发时间" /></p>
+<p><img src="/img/cn/cn2.13.png" srcset="/img/loading.gif" lazyload alt="P2P和客户-服务器体系结构的分发时间" /></p>
 <h3 id="612-bittorrent"><a class="markdownIt-Anchor" href="#612-bittorrent"></a> 6.1.2 BitTorrent</h3>
 <p>BitTorrent是一种用于文件分发的流行<strong>P2P协议</strong>。在BitTorrent中，参与一个特定文件分发的所有对等方的集合被称为一个<strong>洪流</strong>（torrent）。在一个洪流中的对等方彼此下载等长度的<strong>文件块</strong>（chunk），一般块长度为256KB。当一个对等方首次加入一个洪流时，它没有块。随着时间流逝，它累积了越来越多的块，当它<strong>下载</strong>块时，也为其他对等方<strong>上载</strong>了多个块。<strong>任何对等方可能在任何时候仅具有块的子集就离开洪流，并可以重新加入洪流。</strong></p>
 <p>每个洪流有一个基础设施结点，称为<strong>追踪器</strong>（tracker）。当一个对等方加入该洪流中时，它向追踪器注册自己，并周期性地通知追踪器它仍然在该洪流中。以这种方式，追踪器跟踪正参与在洪流中的对等方。</p>
 <p>当一个新的对等方A加入该洪流时，追踪器随机地从参与对等方的集合中选择对等方的一个子集，并将这些对等方的IP地址发给A。A会尝试与它们<strong>创建并行的TCP连接</strong>，所有成功与A创建连接的对等方称为**“邻近对等方**”。随着时间流逝，它们中有些可能离开，而其余的对等方可能加入，因此，<strong>一个对等方的邻近对等方将随时间波动。</strong><br />
-<img src="/img/cn2.14.png" srcset="/img/loading.gif" lazyload alt="BitTorrent分发文件" /></p>
+<img src="/img/cn/cn2.14.png" srcset="/img/loading.gif" lazyload alt="BitTorrent分发文件" /></p>
 <p>在任何给定的时间，每个对等方将具有来自该文件的块子集，并且不同对等方具有不同的子集。A周期性地询问  每个邻近对等方具有的块列表，之后A可以对它还没有的块发出请求（TCP）。</p>
 <p>A将做出两个重要决定：-请求哪些块？-为哪些邻近对等方发送块？</p>
 <ul>
@@ -709,13 +709,13 @@ Subject: Searching for the meaning of life</p>
 <p>详细内容以后需要再补</p>
 <h1 id="七-tcp套接字编程"><a class="markdownIt-Anchor" href="#七-tcp套接字编程"></a> 七、TCP套接字编程</h1>
 <h2 id="71-udp套接字编程"><a class="markdownIt-Anchor" href="#71-udp套接字编程"></a> 7.1 UDP套接字编程</h2>
-<p><img src="/img/cn2.15.png" srcset="/img/loading.gif" lazyload alt="UDP 客户 / 服务器程序使用的套接字函数" /></p>
+<p><img src="/img/cn/cn2.15.png" srcset="/img/loading.gif" lazyload alt="UDP 客户 / 服务器程序使用的套接字函数" /></p>
 <p>以下代码演示客户如何使用UDP套接字向服务器发送消息：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">## UDPClient.py</span><br><span class="hljs-comment"># socket模块形成了在Python中所有网络通信的基础</span><br><span class="hljs-keyword">from</span> socket <span class="hljs-keyword">import</span> *<br><span class="hljs-comment"># 提供服务器的IP地址或主机名</span><br>serverName = <span class="hljs-string">&#x27;hostname&#x27;</span><br><span class="hljs-comment"># 置入端口号</span><br>serverPort = <span class="hljs-number">12000</span><br><span class="hljs-comment"># 创建客户的套接字，第一个参数指示了地址簇，第二个参数指示它是一个UDP套接字</span><br>clientSocket = socket(AF_INET, SOCK_DGRAM)<br><span class="hljs-comment"># 提示用户输入报文</span><br>message = raw_input(<span class="hljs-string">&#x27;Input lowercase sentence:&#x27;</span>)<br><span class="hljs-comment"># 经一个UDP套接字发送报文</span><br>clientSocket.sendto(message,(serverName, serverPort))<br><span class="hljs-comment"># 将服务器传回的报文置入到变量中</span><br>modifiedMessage, serverAddress = clientSocket, recvfrom(<span class="hljs-number">2048</span>)<br><span class="hljs-comment"># 打印输出报文</span><br><span class="hljs-built_in">print</span> modifiedMessage<br><span class="hljs-comment"># 关闭套接字，关闭进程</span><br>clientSocket.close()<br></code></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">## UDPServer.py</span><br><span class="hljs-comment"># socket模块形成了在Python中所有网络通信的基础</span><br><span class="hljs-keyword">from</span> socket <span class="hljs-keyword">import</span> *<br><span class="hljs-comment"># 置入端口号</span><br>serverPort = <span class="hljs-number">12000</span><br><span class="hljs-comment"># 创建服务器的套接字，第一个参数指示了地址簇，第二个参数指示它是一个UDP套接字</span><br>serverSocket = socket(AF_INET, SOCK_DGRAM)<br><span class="hljs-comment"># 将端口号与套接字绑定在一起</span><br>serverSocket.bind((<span class="hljs-string">&quot;, serverPort))</span><br><span class="hljs-string">print &quot;</span>The server <span class="hljs-keyword">is</span> ready to receive<span class="hljs-string">&quot;</span><br><span class="hljs-string"># 该循环允许UDPServer无限期地接收并处理来自客户的分组</span><br><span class="hljs-string">while true:</span><br><span class="hljs-string">	# 将分组数据和客户地址置入</span><br><span class="hljs-string">	message, clientAddress = serverSocket.recvfrom(2048)</span><br><span class="hljs-string">	# 将数据小写转换为大写</span><br><span class="hljs-string">	modifiedMessage = message.upper()</span><br><span class="hljs-string">	# 将所得分组发送给服务器的套接字</span><br><span class="hljs-string">	serverSocket.sendto(modifiedMessage, clientAddress)</span><br></code></pre></td></tr></table></figure>
 <h2 id="72-tcp套接字编程"><a class="markdownIt-Anchor" href="#72-tcp套接字编程"></a> 7.2 TCP套接字编程</h2>
 <p>TCP是一个面向连接的协议。在客户和服务器能够开始互相发送数据之前，它们先要握手和创建一个TCP连接（客户套接字和服务器套接字）。</p>
-<p><img src="/img/cn2.16.png" srcset="/img/loading.gif" lazyload alt="TCP 客户 / 服务器程序使用的套接字函数" /></p>
+<p><img src="/img/cn/cn2.16.png" srcset="/img/loading.gif" lazyload alt="TCP 客户 / 服务器程序使用的套接字函数" /></p>
 <p>以下代码演示客户如何使用TCP套接字向服务器发送消息：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> socket <span class="hljs-keyword">import</span> *<br>serverName = <span class="hljs-string">&#x27;servername&#x27;</span><br>serverPort = <span class="hljs-number">12000</span><br><span class="hljs-comment"># 创建客户的套接字，第一个参数指示了地址簇，第二个参数指示它是一个TCP套接字</span><br>clientSocket = socket(AF_INET, SOCK_STREAM)<br><span class="hljs-comment"># 执行三次握手，并创建起一条TCP连接</span><br>clientSocket.connect((serverName, serverPort))<br><span class="hljs-comment"># 提示用户输入报文</span><br>sentence = raw_input(<span class="hljs-string">&#x27;Input lowercase sentence&#x27;</span>)<br><span class="hljs-comment"># 通过套接字进入TCP连接发送报文</span><br>clientSocket.send(sentence)<br><span class="hljs-comment"># 将服务器传回的报文置入到变量中</span><br>modifiedSentence = clientSocket.recv(<span class="hljs-number">1024</span>)<br><span class="hljs-built_in">print</span> <span class="hljs-string">&#x27;From Server:&#x27;</span>, modifiedSentence<br>clientSocket.close()<br></code></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">## TCPServer.py</span><br><span class="hljs-keyword">from</span> socket <span class="hljs-keyword">import</span> *<br>serverPort = <span class="hljs-number">12000</span><br><span class="hljs-comment"># 创建服务器的套接字，第一个参数指示了地址簇，第二个参数指示它是一个UDP套接字</span><br>serverSocket = socket(AF_INET, SOCK_DGRAM)<br><span class="hljs-comment"># 将端口号与套接字绑定在一起</span><br>serverSocket.bind((<span class="hljs-string">&quot;, serverPort))</span><br><span class="hljs-string"># 等待并聆听某个客户敲门，参数定义了请求连接的最大数（至少为1）</span><br><span class="hljs-string">serverSocket.listen(1)</span><br><span class="hljs-string">print &quot;</span>The server <span class="hljs-keyword">is</span> ready to receive<span class="hljs-string">&quot;</span><br><span class="hljs-string"># 该循环允许TCPServer无限期地接收并处理来自客户的分组</span><br><span class="hljs-string">while true:</span><br><span class="hljs-string">	# 创建一个新套接字，由这个特定用户专用</span><br><span class="hljs-string">	connectionSocket, addr = serverSocket.accept()</span><br><span class="hljs-string">	# 将分组数据和客户地址置入</span><br><span class="hljs-string">	sentence = connectionSocket.recv(1024)</span><br><span class="hljs-string">	# 将数据小写转换为大写</span><br><span class="hljs-string">	capitalizedSentence = sentence.upper()</span><br><span class="hljs-string">	# 将所得分组发送给服务器的套接字</span><br><span class="hljs-string">	connectionSocket.send(capitalizedSentence)</span><br><span class="hljs-string">	connectionSocket.close()</span><br></code></pre></td></tr></table></figure>
