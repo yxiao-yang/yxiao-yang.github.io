@@ -5,10 +5,31 @@
   
   <entry>
     <title>Wireshark Lab 1：Getting Started详解</title>
+    <link href="/2022/08/11/Wireshark-Lab(2)/"/>
+    <url>/2022/08/11/Wireshark-Lab(2)/</url>
+    
+    <content type="html"><![CDATA[<h1 id="wireshark-lab-2http详解"><a class="markdownIt-Anchor" href="#wireshark-lab-2http详解"></a> Wireshark Lab 2：HTTP详解</h1><h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2><p>上一个lab初次接触了wireshark，这一节应该就是对http进行一些抓包加深一下学习。</p><h2 id="1-the-basic-http-getresponse-interaction"><a class="markdownIt-Anchor" href="#1-the-basic-http-getresponse-interaction"></a> 1. The Basic HTTP GET/response interaction</h2><p>按照文档中的步骤一步步执行就行，下面放个抓包完成的截图。</p><p>![图为wireshark界面](D:\博客\xiaoyang\node_modules\hexo-theme-fluid\source\img\wireshark lab\2.1.png)</p><h3 id="11-is-your-browser-running-http-version-10-or-11-what-version-of-http-is-the"><a class="markdownIt-Anchor" href="#11-is-your-browser-running-http-version-10-or-11-what-version-of-http-is-the"></a> 1.1 Is your browser running HTTP version 1.0 or 1.1?  What version of HTTP is the</h3><p>server running?</p><p>浏览器和服务器的HTTP版本都是1.1。</p><h3 id="12-what-languages-if-any-does-your-browser-indicate-that-it-can-accept-to-the"><a class="markdownIt-Anchor" href="#12-what-languages-if-any-does-your-browser-indicate-that-it-can-accept-to-the"></a> 1.2 What languages (if any) does your browser indicate that it can accept to the</h3><p>server?</p><p>Accept-Language：zh-CN,zh。</p><h3 id="13-what-is-the-ip-address-of-your-computer-of-the-gaiacsumassedu-server"><a class="markdownIt-Anchor" href="#13-what-is-the-ip-address-of-your-computer-of-the-gaiacsumassedu-server"></a> 1.3 What is the IP address of your computer?  Of the <a href="http://gaia.cs.umass.edu">gaia.cs.umass.edu</a> server?</h3><p>计算机的IP地址是192.168.31.101，服务器的IP地址是128.119.245.12。</p><h3 id="14-what-is-the-status-code-returned-from-the-server-to-your-browser"><a class="markdownIt-Anchor" href="#14-what-is-the-status-code-returned-from-the-server-to-your-browser"></a> 1.4 What is the status code returned from the server to your browser?</h3><p>状态码 Status Code: 200</p><h3 id="15-when-was-the-html-file-that-you-are-retrieving-last-modified-at-the-server"><a class="markdownIt-Anchor" href="#15-when-was-the-html-file-that-you-are-retrieving-last-modified-at-the-server"></a> 1.5 When was the HTML file that you are retrieving last modified at the server?</h3><p>问的是文件上次修改的时间 Last-Modified: Thu, 11 Aug 2022 05:59:01 GMT。</p><h3 id="16-how-many-bytes-of-content-are-being-returned-to-your-browser"><a class="markdownIt-Anchor" href="#16-how-many-bytes-of-content-are-being-returned-to-your-browser"></a> 1.6 How many bytes of content are being returned to your browser?</h3><p>返回的字节长度 Content length: 128</p><h3 id="17-by-inspecting-the-raw-data-in-the-packet-content-window-do-you-see-any-headers-within-the-data-that-are-not-displayed-in-the-packet-listing-window-if-so-name-one"><a class="markdownIt-Anchor" href="#17-by-inspecting-the-raw-data-in-the-packet-content-window-do-you-see-any-headers-within-the-data-that-are-not-displayed-in-the-packet-listing-window-if-so-name-one"></a> 1.7 By inspecting the raw data in the packet content window, do you see any headers within the data that are not displayed in the packet-listing window?  If so, name one.</h3>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机网络</category>
+      
+      <category>自顶向下方法 - Wireshark Lab</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Wireshark Lab 1：Getting Started详解</title>
     <link href="/2022/08/11/Wireshark-Lab(1)/"/>
     <url>/2022/08/11/Wireshark-Lab(1)/</url>
     
-    <content type="html"><![CDATA[<h1 id="wireshark-lab-1getting-started详解"><a class="markdownIt-Anchor" href="#wireshark-lab-1getting-started详解"></a> Wireshark Lab 1：Getting Started详解</h1><h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2><p>在半年前其实我就已经精读过这本书的前三章了，现在想再拿起来把这本书的lab做一下，毕竟实践出真知。lab的文档书上也给了链接，这里就不贴出来了。刚看了一下这第一个lab，大概就是下载下来wireshark，简单了解一下使用方法这样，那就开始吧。</p><h2 id="实验步骤"><a class="markdownIt-Anchor" href="#实验步骤"></a> 实验步骤</h2><p>先去官网下载下来电脑对应版本的wireshark，我在安装的时候只改了安装路径，剩下的都是默认设置，其中有个npcap也需要安装。安装完启动应该为如下界面。</p><p>![图为wireshark启动界面](D:\博客\xiaoyang\node_modules\hexo-theme-fluid\source\img\wireshark lab\1.1.png)</p><p>然后按照文档的要求，打开示 例网站，然后就可以在捕获里面抓取这个包了。捕捉成功界面如下图。</p><p>![图为wireshark界面](D:\博客\xiaoyang\node_modules\hexo-theme-fluid\source\img\wireshark lab\1.2.png)</p><h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2><p>到这里就结束了，这一章是做了一个准备工作，咱们下个lab见。</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="wireshark-lab-1getting-started详解"><a class="markdownIt-Anchor" href="#wireshark-lab-1getting-started详解"></a> Wireshark Lab 1：Getting Started详解</h1><h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2><p>在半年前其实我就已经精读过这本书的前三章了，现在想再拿起来把这本书的lab做一下，毕竟实践出真知。lab的文档书上也给了链接，这里就不贴出来了。刚看了一下这第一个lab，大概就是下载下来wireshark，简单了解一下使用方法这样，那就开始吧。顺带说下，这个lab我没用虚拟机，就是在win10下操作的。</p><h2 id="实验步骤"><a class="markdownIt-Anchor" href="#实验步骤"></a> 实验步骤</h2><p>先去官网下载下来电脑对应版本的wireshark，我在安装的时候只改了安装路径，剩下的都是默认设置，其中有个npcap也需要安装。安装完启动应该为如下界面。</p><p>![图为wireshark启动界面](D:\博客\xiaoyang\node_modules\hexo-theme-fluid\source\img\wireshark lab\1.1.png)</p><p>然后按照文档的要求，打开示 例网站，然后就可以在捕获里面抓取这个包了。捕捉成功界面如下图。</p><p>![图为wireshark界面](D:\博客\xiaoyang\node_modules\hexo-theme-fluid\source\img\wireshark lab\1.2.png)</p><h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2><p>到这里就结束了，这一章是做了一个准备工作，咱们下个lab见。</p>]]></content>
     
     
     <categories>
