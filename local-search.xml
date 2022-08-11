@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>git上传文件的基本方法</title>
+    <link href="/2022/08/11/git/"/>
+    <url>/2022/08/11/git/</url>
+    
+    <content type="html"><![CDATA[<h1 id="git上传文件的基本方法"><a class="markdownIt-Anchor" href="#git上传文件的基本方法"></a> git上传文件的基本方法</h1><h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2><p>最近刚刚做了一个tiny-os，在上传github时候还是按照最简单的拖动文件做的，但是显示大于25mb的文件没法上传，而且一次只能上传最多100个文件，所以就被迫学一下git上传的命令行方法。因为我这个博客也是通过git去上传的，所以git已经关联了ssh密钥，这里就不再详述了。</p><h2 id="主要步骤"><a class="markdownIt-Anchor" href="#主要步骤"></a> 主要步骤</h2><p><strong>第一步</strong>，需要在github中新建一个存储库，这个在网页里操作。</p><p><strong>第二步</strong>，在要上传的文件夹里右键打开git bash，初始化git：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><pre><code class="hljs git">git init<br></code></pre></td></tr></table></figure><p>相当于这个目录变成Git可以管理的仓库，而且是一个空的仓库（empty Git repository）。会发现当前目录下多了一个.git的目录，这个目录是Git来跟踪管理版本库的，没事千万不要手动修改这个目录里面的文件。这个目录默认是隐藏的，用 <strong>ls -ah</strong> 命令就可以看见。</p><p><strong>第三步</strong>，添加文件到仓库：</p><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">git <span class="hljs-keyword">add</span> .<br>git <span class="hljs-keyword">commit</span> -m &quot;first commit&quot;<br></code></pre></td></tr></table></figure><p>这里add后面的.指的是全部文件，如有需要可以添加指定文件。</p><p>第二行引号里的是注释，在github里会有体现。</p><p>如果是第一次提交的话，这里会提示要先配置好你在git上的用户名和邮箱，输入命令：</p><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stylus">git config <span class="hljs-attr">--global</span> user<span class="hljs-selector-class">.email</span> <span class="hljs-string">&quot;邮箱&quot;</span> <br>git config <span class="hljs-attr">--global</span> user<span class="hljs-selector-class">.name</span> <span class="hljs-string">&quot;名字&quot;</span> <br></code></pre></td></tr></table></figure><p><strong>第四步</strong>，连接存储库地址：</p><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">git remote <span class="hljs-keyword">add </span><span class="hljs-keyword">origin </span>地址<br></code></pre></td></tr></table></figure><p>这里地址是一开始在github里建的存储库的url地址。</p><p><strong>第五步</strong>，上传代码：</p><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">git <span class="hljs-built_in">push</span> -u <span class="hljs-built_in">origin</span> main<br></code></pre></td></tr></table></figure><p>大功告成。</p><h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2><p>这是最基本的git方法，后续遇到报错或新功能我会再来这里更新。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>软件教程</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>第十五章 终章 呈现系统交互界面(下)</title>
     <link href="/2022/08/09/os(15-3)/"/>
     <url>/2022/08/09/os(15-3)/</url>
