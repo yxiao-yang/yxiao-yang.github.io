@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>git报错及解决方法</title>
+    <link href="/2022/08/11/git_false/"/>
+    <url>/2022/08/11/git_false/</url>
+    
+    <content type="html"><![CDATA[<h1 id="git报错及解决办法"><a class="markdownIt-Anchor" href="#git报错及解决办法"></a> git报错及解决办法</h1><h2 id="1-openssl-ssl_read-connection-was-reset-errno-10054"><a class="markdownIt-Anchor" href="#1-openssl-ssl_read-connection-was-reset-errno-10054"></a> 1 OpenSSL SSL_read: Connection was reset, errno 10054</h2><p>这是服务器的<a href="https://so.csdn.net/so/search?q=SSL&amp;spm=1001.2101.3001.7020">SSL</a>证书没有经过第三方机构的签署，所以报错。</p><p>造成这个错误很有可能是网络不稳定，连接超时导致的，如果再次尝试后依然报错，输入以下命令解除ssl验证：</p><figure class="highlight stylus"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><pre><code class="hljs stylus">git config <span class="hljs-attr">--global</span> http<span class="hljs-selector-class">.sslVerify</span> <span class="hljs-string">&quot;false&quot;</span><br></code></pre></td></tr></table></figure><p>再次上传即可。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>软件教程</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Wireshark Lab 2：HTTP详解</title>
     <link href="/2022/08/11/Wireshark-Lab(2)/"/>
     <url>/2022/08/11/Wireshark-Lab(2)/</url>
