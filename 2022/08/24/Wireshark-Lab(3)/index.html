@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://example.com/img/wireshark-lab/3.11.png">
 <meta property="og:image" content="http://example.com/img/wireshark-lab/3.12.png">
 <meta property="article:published_time" content="2022-08-24T12:05:54.348Z">
-<meta property="article:modified_time" content="2022-08-29T07:44:53.315Z">
+<meta property="article:modified_time" content="2022-08-29T07:53:27.015Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/wireshark-lab/3.1.png">
@@ -251,7 +251,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：3 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -265,7 +265,7 @@
 <p>图中可以看到其IP地址为39.156.66.14。</p>
 <h3 id="12-run-nslookup-to-determine-the-authoritative-dns-servers-for-a-university-in-europe"><a class="markdownIt-Anchor" href="#12-run-nslookup-to-determine-the-authoritative-dns-servers-for-a-university-in-europe"></a> 1.2 Run nslookup to determine the authoritative DNS servers for a university in Europe.</h3>
 <p><img src="/img/wireshark-lab/3.2.png" srcset="/img/loading.gif" lazyload alt="图为cmd界面" /></p>
-<p>这里查询的剑桥大学的权威DNS服务器，其网址为**<code>NS cam.ac.uk</code>**。</p>
+<p>这里查询的剑桥大学的权威DNS服务器，其网址为<code>NS cam.ac.uk</code>。</p>
 <p>可以看到图中有6个权威DNS服务器，但是是缓存。</p>
 <h3 id="13-run-nslookup-so-that-one-of-the-dns-servers-obtained-in-question-2-is-queried-for-the-mail-servers-for-yahoo-mail-what-is-its-ip-address"><a class="markdownIt-Anchor" href="#13-run-nslookup-so-that-one-of-the-dns-servers-obtained-in-question-2-is-queried-for-the-mail-servers-for-yahoo-mail-what-is-its-ip-address"></a> 1.3 Run nslookup so that one of the DNS servers obtained in Question 2 is queried for the mail servers for Yahoo! mail.   What is its IP address?</h3>
 <p><img src="/img/wireshark-lab/3.3.png" srcset="/img/loading.gif" lazyload alt="图为cmd界面" /></p>
@@ -302,7 +302,7 @@
 <p>没有发送新的IP地址了。</p>
 <h3 id="q2"><a class="markdownIt-Anchor" href="#q2"></a> Q2</h3>
 <h4 id="准备工作-2"><a class="markdownIt-Anchor" href="#准备工作-2"></a> 准备工作</h4>
-<p>还是先用**<code>ipconfig /flushdns</code><strong>清一下缓存，然后开始抓包，在cmd里面输入</strong><code>nslookup mit.edu</code>**就能看到如下界面了。</p>
+<p>还是先用<code>ipconfig /flushdns</code>清一下缓存，然后开始抓包，在cmd里面输入<code>nslookup mit.edu</code>就能看到如下界面了。</p>
 <p><img src="/img/wireshark-lab/3.10.png" srcset="/img/loading.gif" lazyload alt="图为wireshark界面" /></p>
 <h4 id="38-what-is-the-destination-port-for-the-dns-query-message-what-is-the-source-port-of-dns-response-message"><a class="markdownIt-Anchor" href="#38-what-is-the-destination-port-for-the-dns-query-message-what-is-the-source-port-of-dns-response-message"></a> 3.8 What is the destination port for the DNS query message? What is the source port of DNS response message?</h4>
 <p>destination port是53，source port是59604。</p>
@@ -316,7 +316,7 @@
 <p>略</p>
 <h3 id="q3"><a class="markdownIt-Anchor" href="#q3"></a> Q3</h3>
 <h4 id="准备工作-3"><a class="markdownIt-Anchor" href="#准备工作-3"></a> 准备工作</h4>
-<p>跟Q2一致，只不过把**<code>nslookup mit.edu</code><strong>换成</strong><code>nslookup –type=NS mit.edu</code>**。</p>
+<p>跟Q2一致，只不过把<code>nslookup mit.edu</code>换成<code>nslookup –type=NS mit.edu</code>。</p>
 <p><img src="/img/wireshark-lab/3.11.png" srcset="/img/loading.gif" lazyload alt="图为cmd界面" /></p>
 <p><img src="/img/wireshark-lab/3.12.png" srcset="/img/loading.gif" lazyload alt="图为wireshark界面" /></p>
 <h4 id="313-to-what-ip-address-is-the-dns-query-message-sent-is-this-the-ip-address-of-your-default-local-dns-server"><a class="markdownIt-Anchor" href="#313-to-what-ip-address-is-the-dns-query-message-sent-is-this-the-ip-address-of-your-default-local-dns-server"></a> 3.13 To what IP address is the DNS query message sent? Is this the IP address of your default local DNS server?</h4>
@@ -324,11 +324,11 @@
 <h4 id="314-examine-the-dns-query-message-what-type-of-dns-query-is-it-does-the-query-message-contain-any-answers"><a class="markdownIt-Anchor" href="#314-examine-the-dns-query-message-what-type-of-dns-query-is-it-does-the-query-message-contain-any-answers"></a> 3.14 Examine the DNS query message. What “Type” of DNS query is it? Does the query message contain any “answers”?</h4>
 <p>Type是NS，不包括。</p>
 <h4 id="315-examine-the-dns-response-message-what-mit-nameservers-does-the-response-message-provide-does-this-response-message-also-provide-the-ip-addresses-of-the-mit-namesers"><a class="markdownIt-Anchor" href="#315-examine-the-dns-response-message-what-mit-nameservers-does-the-response-message-provide-does-this-response-message-also-provide-the-ip-addresses-of-the-mit-namesers"></a> 3.15 Examine the DNS response message. What MIT nameservers does the response message provide? Does this response message also provide the IP addresses of the MIT namesers?</h4>
-<p>响应信息有**<code>NS mit.edu NS asia2.akam.net NS ns1-173.akam.net NS ns1-37.akam.net NS asia1.akam.net NS use2.akam.net NS usw2.akam.net NS use5.akam.net NS eur5.akam.net</code>**,不包括IP地址。</p>
+<p>响应信息有<code>NS mit.edu NS asia2.akam.net NS ns1-173.akam.net NS ns1-37.akam.net NS asia1.akam.net NS use2.akam.net NS usw2.akam.net NS use5.akam.net NS eur5.akam.net</code>,不包括IP地址。</p>
 <h4 id="316-provide-a-screenshot"><a class="markdownIt-Anchor" href="#316-provide-a-screenshot"></a> 3.16 Provide a screenshot.</h4>
 <p>略</p>
 <h3 id="q4"><a class="markdownIt-Anchor" href="#q4"></a> Q4</h3>
-<p>这里给的**<code>nslookup www.aiit.or.kr bitsy.mit.edu</code>**我一直报超时，挂了梯子也是，看了下题目和之前是一样的，偷个懒略过了。</p>
+<p>这里给的<code>nslookup www.aiit.or.kr bitsy.mit.edu</code>我一直报超时，挂了梯子也是，看了下题目和之前是一样的，偷个懒略过了。</p>
 
             </div>
             <hr>
