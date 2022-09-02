@@ -16,20 +16,24 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="git报错及解决办法  1 OpenSSL SSL_read: Connection was reset, errno 10054 这是服务器的SSL证书没有经过第三方机构的签署，所以报错。 造成这个错误很有可能是网络不稳定，连接超时导致的，如果再次尝试后依然报错，输入以下命令解除ssl验证： 1git config --global http.sslVerify &quot;false&amp;quo">
+    <meta name="description" content="Bomblab详解  写在前面 现在已经是9月了，距离完成上一个lab已经过去了将近四个月的时间，之所以暂停了这么长时间，主要还是因为之前在读到第三章的时候没有汇编和硬件的基础，实在晦涩难懂。所以在这期间，我读了许多操作系统和汇编的书和资料，完成了一个小型os的搭建，算是对汇编和底层有了一个初步的了解。这时再翻开这本书，发现读起来通畅很多了。  实验环境 这次的实验环境和上次有了些许变化，在搭建">
 <meta property="og:type" content="article">
-<meta property="og:title" content="git报错及解决方法">
-<meta property="og:url" content="http://example.com/2022/08/11/git_false/index.html">
+<meta property="og:title" content="2 Bomblab详解">
+<meta property="og:url" content="http://example.com/2022/09/02/csapp2/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="git报错及解决办法  1 OpenSSL SSL_read: Connection was reset, errno 10054 这是服务器的SSL证书没有经过第三方机构的签署，所以报错。 造成这个错误很有可能是网络不稳定，连接超时导致的，如果再次尝试后依然报错，输入以下命令解除ssl验证： 1git config --global http.sslVerify &quot;false&amp;quo">
+<meta property="og:description" content="Bomblab详解  写在前面 现在已经是9月了，距离完成上一个lab已经过去了将近四个月的时间，之所以暂停了这么长时间，主要还是因为之前在读到第三章的时候没有汇编和硬件的基础，实在晦涩难懂。所以在这期间，我读了许多操作系统和汇编的书和资料，完成了一个小型os的搭建，算是对汇编和底层有了一个初步的了解。这时再翻开这本书，发现读起来通畅很多了。  实验环境 这次的实验环境和上次有了些许变化，在搭建">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-08-11T14:14:02.377Z">
-<meta property="article:modified_time" content="2022-08-15T03:01:45.069Z">
+<meta property="og:image" content="http://example.com/img/csapp/2.1.png">
+<meta property="og:image" content="http://example.com/img/csapp/2.2.png">
+<meta property="og:image" content="http://example.com/img/csapp/2.3.png">
+<meta property="article:published_time" content="2022-09-02T07:54:40.196Z">
+<meta property="article:modified_time" content="2022-09-02T09:15:42.570Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/csapp/2.1.png">
   
   
-  <title>git报错及解决方法 - Hexo</title>
+  <title>2 Bomblab详解 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -175,7 +179,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="git报错及解决方法">
+            <span class="h2" id="subtitle" title="2 Bomblab详解">
               
             </span>
 
@@ -185,8 +189,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-08-11 22:14" pubdate>
-        2022年8月11日 晚上
+      <time datetime="2022-09-02 15:54" pubdate>
+        2022年9月2日 下午
       </time>
     </span>
   
@@ -196,7 +200,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      313 字
+      1.4k 字
     </span>
   
 
@@ -205,7 +209,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      3 分钟
+      12 分钟
     </span>
   
 
@@ -234,24 +238,42 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">git报错及解决方法</h1>
+            <h1 style="display: none">2 Bomblab详解</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：18 天前
+                  本文最后更新于：1 分钟前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="git报错及解决办法"><a class="markdownIt-Anchor" href="#git报错及解决办法"></a> git报错及解决办法</h1>
-<h2 id="1-openssl-ssl_read-connection-was-reset-errno-10054"><a class="markdownIt-Anchor" href="#1-openssl-ssl_read-connection-was-reset-errno-10054"></a> 1 OpenSSL SSL_read: Connection was reset, errno 10054</h2>
-<p>这是服务器的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=SSL&amp;spm=1001.2101.3001.7020">SSL</a>证书没有经过第三方机构的签署，所以报错。</p>
-<p>造成这个错误很有可能是网络不稳定，连接超时导致的，如果再次尝试后依然报错，输入以下命令解除ssl验证：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><pre><code class="hljs stylus">git config <span class="hljs-attr">--global</span> http<span class="hljs-selector-class">.sslVerify</span> <span class="hljs-string">&quot;false&quot;</span><br></code></pre></td></tr></table></figure>
-<p>再次上传即可。</p>
-<h2 id="2-error-rpc-failed-curl-92-http2-stream-0-was-not-closed-cleanly-cancel-err-8"><a class="markdownIt-Anchor" href="#2-error-rpc-failed-curl-92-http2-stream-0-was-not-closed-cleanly-cancel-err-8"></a> 2 error: RPC failed; curl 92 HTTP/2 stream 0 was not closed cleanly: CANCEL (err 8)</h2>
-<p>增加git缓冲区大小：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs lua">git <span class="hljs-built_in">config</span> <span class="hljs-comment">--global http.postBuffer 524288000</span><br></code></pre></td></tr></table></figure>
+              <h1 id="bomblab详解"><a class="markdownIt-Anchor" href="#bomblab详解"></a> Bomblab详解</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>现在已经是9月了，距离完成上一个lab已经过去了将近四个月的时间，之所以暂停了这么长时间，主要还是因为之前在读到第三章的时候没有汇编和硬件的基础，实在晦涩难懂。所以在这期间，我读了许多操作系统和汇编的书和资料，完成了一个小型os的搭建，算是对汇编和底层有了一个初步的了解。这时再翻开这本书，发现读起来通畅很多了。</p>
+<h2 id="实验环境"><a class="markdownIt-Anchor" href="#实验环境"></a> 实验环境</h2>
+<p>这次的实验环境和上次有了些许变化，在搭建os的过程中由于种种原因把ubuntu22.04换回了16.04。</p>
+<h2 id="准备工作"><a class="markdownIt-Anchor" href="#准备工作"></a> 准备工作</h2>
+<p>首先还是去官网下载lab所需的hand-out文件：<a target="_blank" rel="noopener" href="http://csapp.cs.cmu.edu/3e/labs.html">csapp lab</a></p>
+<p>我们把下载下来的安装包解压，然后进入bomb文件夹的目录，输入<code>gdb bomb</code>启动gdb调试器，然后输入<code>r</code>运行</p>
+<p><img src="/img/csapp/2.1.png" srcset="/img/loading.gif" lazyload alt="图为命令行界面" /></p>
+<p>能看到作者给我们的一段话<code>Welcome to my fiendish little bomb. You have 6 phases with which to blow yourself up. Have a nice day!</code></p>
+<p>那么现在我们就需要寻找这6个phases了，这是就需要对文件进行反汇编了，输入命令<code>objdump -d bomb &gt; bomb.asm</code>生成bomb.asm，我们要完成的6个phases就在这里了。</p>
+<h2 id="实验内容"><a class="markdownIt-Anchor" href="#实验内容"></a> 实验内容</h2>
+<h3 id="phase1"><a class="markdownIt-Anchor" href="#phase1"></a> Phase1</h3>
+<p>我们进入bomb.asm，往下拉就能看到phase1的段落了。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">0000000000400ee0</span> &lt;phase_1&gt;:<br>  <span class="hljs-attribute">400ee0</span>:	<span class="hljs-number">48</span> <span class="hljs-number">83</span> ec <span class="hljs-number">08</span>          	sub    $<span class="hljs-number">0</span>x8,%rsp<br>  <span class="hljs-attribute">400ee4</span>:	be <span class="hljs-number">00</span> <span class="hljs-number">24</span> <span class="hljs-number">40</span> <span class="hljs-number">00</span>       	mov    $<span class="hljs-number">0</span>x402400,%esi<br>  <span class="hljs-attribute">400ee9</span>:	e8 <span class="hljs-number">4</span>a <span class="hljs-number">04</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span>       	callq  <span class="hljs-number">401338</span> &lt;strings_not_equal&gt;<br>  <span class="hljs-attribute">400eee</span>:	<span class="hljs-number">85</span> c0                	test   %eax,%eax<br>  <span class="hljs-attribute">400ef0</span>:	<span class="hljs-number">74</span> <span class="hljs-number">05</span>                	je     <span class="hljs-number">400</span>ef7 &lt;phase_1+<span class="hljs-number">0</span>x17&gt;<br>  <span class="hljs-attribute">400ef2</span>:	e8 <span class="hljs-number">43</span> <span class="hljs-number">05</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span>       	callq  <span class="hljs-number">40143</span>a &lt;explode_bomb&gt;<br>  <span class="hljs-attribute">400ef7</span>:	<span class="hljs-number">48</span> <span class="hljs-number">83</span> c4 <span class="hljs-number">08</span>          	add    $<span class="hljs-number">0</span>x8,%rsp<br>  <span class="hljs-attribute">400efb</span>:	c3                   	retq  <br></code></pre></td></tr></table></figure>
+<p>这里我们对这几行代码进行下分析：</p>
+<p>第一行将寄存器rsp的值减少0x8，可以理解为将栈指针减少了0x8。</p>
+<p>第二行将地址0x402400的值传入寄存器esi，esi在x86机器上可以看成是变量。</p>
+<p>第三行是跳转到地址0x401338，看后面的文字可以猜测是判断字符串是否相等。</p>
+<p>第四行用test指令检测寄存器eax的值，紧跟着第五行就用了跳转指令je，能够得出结论，如果eax里的值为0，则略过第六行直接跳转到第七行。</p>
+<p>再看第六行，跳转到地址0x40143a，后面文字写的很清楚，bomb。到这里我们就知道了，如果我们输入的字符串与内置好的字符串不一致，则eax就会被置为1，就会将炸弹引爆，否则就能跳过炸弹。按理来说应该观察下地址0x401338处的代码，但我们有理由怀疑第二行传入寄存器esi的地址应该就是内置字符串的位置了。</p>
+<p>第七行，栈指针rsp将第一行减去的0x8再加回来，归还初始状态。</p>
+<p>按照我们分析的内容，在地址0x400ee9处设置一个断点，这里是刚刚执行完对寄存器esi的赋值</p>
+<p><img src="/img/csapp/2.2.png" srcset="/img/loading.gif" lazyload alt="图为命令行界面" /></p>
+<p>能够看到此时寄存器esi的值为一串字符串<code>Border relations with Canada have never been better.</code>嘿嘿，重新运行gdb，输入这段字符串试一下吧</p>
+<p><img src="/img/csapp/2.3.png" srcset="/img/loading.gif" lazyload alt="图为命令行界面" /></p>
+<p>拆除成功！</p>
 
             </div>
             <hr>
@@ -261,7 +283,9 @@
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/%E8%BD%AF%E4%BB%B6%E6%95%99%E7%A8%8B/">软件教程</a>
+                      <a class="hover-with-bg" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">计算机系统</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/csapp/">csapp</a>
                     
                   </div>
                 
@@ -279,18 +303,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/08/24/Wireshark-Lab(3)/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Wireshark Lab 3：DNS详解</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/08/11/Wireshark-Lab(2)/">
-                        <span class="hidden-mobile">Wireshark Lab 2：HTTP详解</span>
+                      <a href="/2022/08/24/Wireshark-Lab(3)/">
+                        <span class="hidden-mobile">Wireshark Lab 3：DNS详解</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
