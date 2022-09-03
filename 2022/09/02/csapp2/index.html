@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://example.com/img/csapp/2.7.png">
 <meta property="og:image" content="http://example.com/img/csapp/2.8.png">
 <meta property="article:published_time" content="2022-09-02T07:54:40.196Z">
-<meta property="article:modified_time" content="2022-09-03T06:12:29.091Z">
+<meta property="article:modified_time" content="2022-09-03T06:16:19.472Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/csapp/2.1.png">
@@ -247,7 +247,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：几秒前
+                  本文最后更新于：4 分钟前
                 
               </p>
             
@@ -304,7 +304,7 @@
 <p><img src="/img/csapp/2.6.png" srcset="/img/loading.gif" lazyload alt="图为命令行界面" /></p>
 <p>所以答案应该是两个int型数据。</p>
 <p>第6行跳转到sscanf库函数，读取字符串。</p>
-<p>第7、8、9行将<code>%eax</code>和0x1进行比较，如果二者不相等引爆炸弹，二者相等即<code>%eax</code>为1越过炸弹跳转到第10行。</p>
+<p>第7、8、9行将<code>%eax</code>和0x1进行比较，<code>%eax</code>大于1越过炸弹跳转到第10行。</p>
 <p>第10、11行将<code>%rsp+0x8</code>和0x7进行比较，如果前者小于等于7，能避开炸弹。</p>
 <p>第12~27行和switch语句结构相似，先给<code>%eax</code>赋一个初值<code>%rsp+0x8</code>，然后间接跳转到地址0x402470处的跳转表，这里没有给出跳转表，不过结合后面的语句可以猜测其过程如下：以<code>%rax</code>为索引跳转到对应的case，在case中将<code>%eax</code>进行赋值，然后再让<code>%eax</code>和<code>%rsp+0xc</code>进行比较，如果相等则拆弹成功。推断输入的两个int型数据为索引和其对应值，因此答案不唯一，应该有7个。</p>
 <p>我们从索引为1入手，通过查询索引表找到其对应的值。</p>
