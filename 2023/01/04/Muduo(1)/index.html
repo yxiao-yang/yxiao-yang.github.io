@@ -23,10 +23,12 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="Muduo库源码剖析(1) Reactor架构三大核心模块  写在前面 好久不见，距离上次更新过去两个月了，一直在忙各种各样的事，搁置了很长时间。服务器的实现先暂且告一段落，因为我想一味地去抄袭别人的代码起到的作用可能会很有限，所以还是想自己去实现一下。正好这段时间也读了APUE、UNP等等的材料，所以觉得准备的也差不多了。先从陈硕老师赫赫有名的Muduo网络库开始学习吧。 本文介绍一下Mudu">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/muduo/1.1.jpg">
 <meta property="article:published_time" content="2023-01-04T06:44:19.632Z">
-<meta property="article:modified_time" content="2023-01-06T10:22:08.194Z">
+<meta property="article:modified_time" content="2023-01-06T14:06:30.882Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/muduo/1.1.jpg">
   
   
   <title>Muduo库源码剖析(1) Reactor架构三大核心模块 - Hexo</title>
@@ -196,7 +198,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.4k 字
+      7.4k 字
     </span>
   
 
@@ -205,7 +207,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      37 分钟
+      62 分钟
     </span>
   
 
@@ -238,7 +240,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：3 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -269,6 +271,26 @@
 <p><strong>负责监听文件描述符事件是否触发</strong>以及<strong>返回发生事件的文件描述符以及具体事件</strong>的模块就是Poller。所以<strong>一个Poller对象对应一个事件监听器</strong>。在<code>multi-reactor</code>模型（多线程）中，有多少reactor就有多少Poller。</p>
 <p><code>muduo</code>提供了<code>epoll</code>和<code>poll</code>两种IO多路复用方法来实现事件监听。不过默认是使用<code>epoll</code>来实现，也可以通过选项选择<code>poll</code>。</p>
 <p>这个<code>Poller</code>是个<strong>抽象虚类</strong>，由<code>EpollPoller</code>和<code>PollPoller</code>继承实现，与监听文件描述符和返回监听结果的具体方法也基本上是在这两个派生类中实现。<code>EpollPoller</code>就是封装了用<code>epoll</code>方法实现的与事件监听有关的各种方法，<code>PollPoller</code>就是封装了<code>poll</code>方法实现的与事件监听有关的各种方法。</p>
+<h4 id="32-pollerepollpoller的一些成员变量"><a class="markdownIt-Anchor" href="#32-pollerepollpoller的一些成员变量"></a> 3.2  Poller/EpollPoller的一些成员变量</h4>
+<p><code>Poller</code>类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">protected</span>:<br> <span class="hljs-keyword">typedef</span> std::map&lt;<span class="hljs-type">int</span>, Channel*&gt; ChannelMap;<br><br> <span class="hljs-comment">// channels是std::unordered_map&lt;int, Channel*&gt;类型，</span><br> <span class="hljs-comment">// 负责记录 文件描述符 ---&gt; Channel的映射，也帮忙保管所有注册在你这个Poller上的Channel。</span><br> ChannelMap channels_;<br><br><span class="hljs-keyword">private</span>:<br> <span class="hljs-comment">// 所属的EventLoop对象</span><br> EventLoop* ownerLoop_;<br></code></pre></td></tr></table></figure>
+<p><code>EpollPoller</code>类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">private</span>:<br>  <span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> kInitEventListSize = <span class="hljs-number">16</span>;<br><br>  <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">char</span>* <span class="hljs-title">operationToString</span><span class="hljs-params">(<span class="hljs-type">int</span> op)</span></span>;<br><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">fillActiveChannels</span><span class="hljs-params">(<span class="hljs-type">int</span> numEvents,</span></span><br><span class="hljs-params"><span class="hljs-function">                          ChannelList* activeChannels)</span> <span class="hljs-type">const</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">update</span><span class="hljs-params">(<span class="hljs-type">int</span> operation, Channel* channel)</span></span>;<br><br>  <span class="hljs-keyword">typedef</span> std::vector&lt;<span class="hljs-keyword">struct</span> epoll_event&gt; EventList;<br><br>  <span class="hljs-comment">// 用epoll_create方法返回的epoll句柄，这个是常识。</span><br>  <span class="hljs-type">int</span> epollfd_;<br><br>  EventList events_;<br></code></pre></td></tr></table></figure>
+<h4 id="33-epollpoller类一些重要的成员方法"><a class="markdownIt-Anchor" href="#33-epollpoller类一些重要的成员方法"></a> 3.3 EpollPoller类一些重要的成员方法</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-built_in">EPollPoller</span>(EventLoop* loop);<br>  ~<span class="hljs-built_in">EPollPoller</span>() <span class="hljs-keyword">override</span>;<br><br>  <span class="hljs-comment">// 这个函数是Poller的核心。</span><br>  <span class="hljs-comment">// 该方法通过epoll_wait获取这个事件监听器上发生事件的fd及其对应发生的事件。</span><br>  <span class="hljs-comment">// 由于每个fd都是由一个Channel封装的，通过哈希表channels_可以根据fd找到封装这个fd的Channel。</span><br>  <span class="hljs-comment">// 将事件监听器监听到该fd发生的事件写进这个Channel中的revents成员变量中。</span><br>  <span class="hljs-comment">// 然后把这个Channel装进activeChannels中（它是一个vector&lt;Channel*&gt;）。</span><br>  <span class="hljs-comment">// 当外界调用完poll之后就能拿到事件监听器的监听结果（activeChannels_）。</span><br>  <span class="hljs-comment">// activeChannels就是事件监听器监听到的发生事件的fd，以及每个fd都发生了什么事件。</span><br>  <span class="hljs-function">Timestamp <span class="hljs-title">poll</span><span class="hljs-params">(<span class="hljs-type">int</span> timeoutMs, ChannelList* activeChannels)</span> <span class="hljs-keyword">override</span></span>;<br><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">updateChannel</span><span class="hljs-params">(Channel* channel)</span> <span class="hljs-keyword">override</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">removeChannel</span><span class="hljs-params">(Channel* channel)</span> <span class="hljs-keyword">override</span></span>;<br></code></pre></td></tr></table></figure>
+<h3 id="4-eventloop类"><a class="markdownIt-Anchor" href="#4-eventloop类"></a> 4 EventLoop类</h3>
+<h4 id="41-eventloop类简介"><a class="markdownIt-Anchor" href="#41-eventloop类简介"></a> 4.1 EventLoop类简介</h4>
+<p>刚才的<code>Poller</code>是封装了和事件监听有关的方法和成员，调用一次<code>Poller::poll</code>方法它就能给你返回事件监听器的监听结果（发生事件的fd及其发生的事件）。作为一个网络服务器，需要有<strong>持续监听、持续获取监听结果、持续处理监听结果对应的事件</strong>的能力，也就是我们需要<strong>循环</strong>的去调用<code>Poller:poll</code>方法获取实际发生事件的<code>Channel</code>集合，然后调用这些<code>Channel</code>里面保管的不同类型事件的处理函数（调用<code>Channel::HandleEvent</code>方法）。</p>
+<p><code>EventLoop</code>就是负责实现**“循环”<strong>，负责驱动</strong>“循环”**的重要模块！！<code>Channel</code>和<code>Poller</code>其实相当于<code>EventLoop</code>的手下，<code>EventLoop</code>整合封装了二者并向上提供了更方便的接口来使用。</p>
+<h4 id="42-eventloop重要方法loop"><a class="markdownIt-Anchor" href="#42-eventloop重要方法loop"></a> 4.2 EventLoop重要方法loop()</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">EventLoop::loop</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>  <span class="hljs-built_in">assert</span>(!looping_);<br>  <span class="hljs-built_in">assertInLoopThread</span>();<br>  looping_ = <span class="hljs-literal">true</span>;<br>  quit_ = <span class="hljs-literal">false</span>;  <span class="hljs-comment">// <span class="hljs-doctag">FIXME:</span> what if someone calls quit() before loop() ?</span><br>  LOG_TRACE &lt;&lt; <span class="hljs-string">&quot;EventLoop &quot;</span> &lt;&lt; <span class="hljs-keyword">this</span> &lt;&lt; <span class="hljs-string">&quot; start looping&quot;</span>;<br><br>  <span class="hljs-keyword">while</span> (!quit_)<br>  &#123;<br>    activeChannels_.<span class="hljs-built_in">clear</span>();<br>    pollReturnTime_ = poller_-&gt;<span class="hljs-built_in">poll</span>(kPollTimeMs, &amp;activeChannels_);<br>    ++iteration_;<br>    <span class="hljs-keyword">if</span> (Logger::<span class="hljs-built_in">logLevel</span>() &lt;= Logger::TRACE)<br>    &#123;<br>      <span class="hljs-built_in">printActiveChannels</span>();<br>    &#125;<br>    <span class="hljs-comment">// TODO sort channel by priority</span><br>    eventHandling_ = <span class="hljs-literal">true</span>;<br>    <span class="hljs-keyword">for</span> (Channel* channel : activeChannels_)<br>    &#123;<br>      currentActiveChannel_ = channel;<br>      currentActiveChannel_-&gt;<span class="hljs-built_in">handleEvent</span>(pollReturnTime_);<br>    &#125;<br>    currentActiveChannel_ = <span class="hljs-literal">NULL</span>;<br>    eventHandling_ = <span class="hljs-literal">false</span>;<br>    <span class="hljs-built_in">doPendingFunctors</span>();<br>  &#125;<br><br>  LOG_TRACE &lt;&lt; <span class="hljs-string">&quot;EventLoop &quot;</span> &lt;&lt; <span class="hljs-keyword">this</span> &lt;&lt; <span class="hljs-string">&quot; stop looping&quot;</span>;<br>  looping_ = <span class="hljs-literal">false</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>每个<code>EventLoop</code>对象都唯一绑定了一个线程，这个线程其实就在一直执行这个函数里面的<code>while</code>循环，这个<code>while</code>循环的大致逻辑比较简单。就是调用<code>Poller::poll</code>方法获取事件监听器上的监听结果。接下来在loop里面就会调用监听结果中每一个Channel的处理函数<code>HandlerEvent( )</code>。每一个<code>Channel</code>的处理函数会根据<code>Channel</code>类中封装的实际发生的事件，执行<code>Channel</code>类中封装的各事件处理函数。</p>
+<h3 id="5-全局概览poller-channel和eventloop在整个reactor通信架构中的角色"><a class="markdownIt-Anchor" href="#5-全局概览poller-channel和eventloop在整个reactor通信架构中的角色"></a> 5 全局概览Poller、Channel和EventLoop在整个Reactor通信架构中的角色</h3>
+<p><code>EventLoop</code>起到一个驱动循环的功能，<code>Poller</code>负责从事件监听器上获取监听结果。而<code>Channel</code>类则在其中起到了将fd及其相关属性封装的作用，将fd及其感兴趣事件和发生的事件以及不同事件对应的回调函数封装在一起，这样在各个模块中传递更加方便。</p>
+<p><img src="/img/muduo/1.1.jpg" srcset="/img/loading.gif" lazyload alt="图为Reactor架构图（图源知乎）" /></p>
+<p>上面图中，每一个<code>EventLoop</code>都绑定了一个线程（一对一绑定），这种运行模式是<code>Muduo</code>库的特色！！充份利用了多核cpu的能力，每一个核的线程负责循环监听一组文件描述符的集合。这就是书中一直在强调的<strong>One Loop Per Thread</strong>。</p>
+<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
+<p>本篇解读了Reactor模式的三大核心模块，也大致缕清了<strong>Muduo库</strong>的大体脉络，后面要在去深挖一些其他的主要类。革命尚未成功，同志仍需努力！</p>
 
             </div>
             <hr>
