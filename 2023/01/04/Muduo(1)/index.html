@@ -1,0 +1,498 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/app.png">
+  <link rel="icon" href="/img/app.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Muduo库源码剖析(1) Reactor架构三大核心模块  写在前面 好久不见，距离上次更新过去两个月了，一直在忙各种各样的事，搁置了很长时间。服务器的实现先暂且告一段落，因为我想一味地去抄袭别人的代码起到的作用可能会很有限，所以还是想自己去实现一下。正好这段时间也读了APUE、UNP等等的材料，所以觉得准备的也差不多了。先从陈硕老师赫赫有名的Muduo网络库开始学习吧。 本文介绍一下Mudu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Muduo库源码剖析(1) Reactor架构三大核心模块">
+<meta property="og:url" content="http://example.com/2023/01/04/Muduo(1)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Muduo库源码剖析(1) Reactor架构三大核心模块  写在前面 好久不见，距离上次更新过去两个月了，一直在忙各种各样的事，搁置了很长时间。服务器的实现先暂且告一段落，因为我想一味地去抄袭别人的代码起到的作用可能会很有限，所以还是想自己去实现一下。正好这段时间也读了APUE、UNP等等的材料，所以觉得准备的也差不多了。先从陈硕老师赫赫有名的Muduo网络库开始学习吧。 本文介绍一下Mudu">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-04T06:44:19.632Z">
+<meta property="article:modified_time" content="2023-01-06T10:22:08.194Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Muduo库源码剖析(1) Reactor架构三大核心模块 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Muduo库源码剖析(1) Reactor架构三大核心模块">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-01-04 14:44" pubdate>
+        2023年1月4日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      37 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Muduo库源码剖析(1) Reactor架构三大核心模块</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="muduo库源码剖析1-reactor架构三大核心模块"><a class="markdownIt-Anchor" href="#muduo库源码剖析1-reactor架构三大核心模块"></a> Muduo库源码剖析(1) Reactor架构三大核心模块</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>好久不见，距离上次更新过去两个月了，一直在忙各种各样的事，搁置了很长时间。服务器的实现先暂且告一段落，因为我想一味地去抄袭别人的代码起到的作用可能会很有限，所以还是想自己去实现一下。正好这段时间也读了<code>APUE</code>、<code>UNP</code>等等的材料，所以觉得准备的也差不多了。先从陈硕老师赫赫有名的<code>Muduo</code>网络库开始学习吧。</p>
+<p>本文介绍一下<code>Muduo</code>库所采用的Reactor架构的三大核心模块。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<h3 id="1-reactor模式简介"><a class="markdownIt-Anchor" href="#1-reactor模式简介"></a> 1 Reactor模式简介</h3>
+<p>Reactor模式也叫反应器模式，大多数IO相关组件如Netty、Redis在使用的IO模式，用于需要<strong>并发</strong>处理<strong>多个客户端</strong>的服务器。</p>
+<p>Reactor模式就是基于建立连接与具体服务之间线程分离的模式。在Reactor模式中，会有一个线程负责与所有客户端建立连接，这个线程通常称之为 <code>Reactor</code>。然后在建立连接之后，Reactor 线程 会使用其它线程（可以有多个）来处理与每一个客户端之间的数据传输，这个（些）线程通常称之为 <code>Handler</code>。</p>
+<p>由于服务端需要与多个客户端通信，它的通信是一对多的关系，所以它需要使用 Reactor 模式。对客户端，它只需要与服务端通信，它的通信是一对一的关系，所以它不需要使用 Reactor 模式。也就是说，对客户端来讲，它不需要进行建立连接与传输数据之间的线程分离。</p>
+<p><code>Muduo</code>库有三个核心组件支撑一个Reactor实现<strong>持续</strong>的<strong>监听</strong>一组fd，并根据每个fd上发生的事件<strong>调用</strong>相应的处理函数。这三个组件分别是<code>Channel</code>类、<code>Poller/EpollPoller</code>类以及<code>EventLoop</code>类。</p>
+<h3 id="2-channel类"><a class="markdownIt-Anchor" href="#2-channel类"></a> 2 Channel类</h3>
+<h4 id="21-channel类简介"><a class="markdownIt-Anchor" href="#21-channel类简介"></a> 2.1 Channel类简介</h4>
+<p>在TCP网络编程中，想要IO多路复用监听某个fd，就要把这个fd和该fd感兴趣的事件通过<code>epoll_ctl</code><strong>注册</strong>到IO多路复用模块（也叫<strong>事件监听器</strong>）上。当事件监听器监听到该fd发生了某个事件。事件监听器返回<strong>发生事件的fd集合</strong>以及<strong>每个fd都发生了什么事件</strong>。</p>
+<p><code>Channel</code>类则封装了<strong>一个fd</strong>和<strong>该fd感兴趣的事件</strong>以及事件监听器监听到的<strong>该fd实际发生的事件</strong>。同时Channel类还提供了<strong>设置</strong>该fd的感兴趣事件，以及将该fd及其感兴趣事件<strong>注册</strong>到事件监听器或从事件监听器上<strong>移除</strong>，以及<strong>保存</strong>了该fd的每种事件对应的处理函数。</p>
+<p>每个<code>Channel</code>对象自始至终只属于一个<code>EventLoop</code>，因此每个<code>Channel</code>对象都只属于一个IO线程，自始至终只负责一个文件描述符(fd)的IO事件分发，但它不拥有这个fd，也不会在析构时关闭这个fd。</p>
+<p>用户不直接使用<code>Channel</code>，即不继承<code>Channel</code>，而会用到更上层的封装，如<code>TcpConnection</code>。</p>
+<p><code>Channel</code>的生命期由其owner class负责管理。</p>
+<h4 id="22-channel类一些重要的成员变量"><a class="markdownIt-Anchor" href="#22-channel类一些重要的成员变量"></a> 2.2 Channel类一些重要的成员变量</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">private</span>:<br> <span class="hljs-function"><span class="hljs-type">static</span> string <span class="hljs-title">eventsToString</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">int</span> ev)</span></span>;<br><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">update</span><span class="hljs-params">()</span></span>;		<span class="hljs-comment">// 本质上就是调用epoll_ctl()</span><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">handleEventWithGuard</span><span class="hljs-params">(Timestamp receiveTime)</span></span>;<br><br> <span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> kNoneEvent;<br> <span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> kReadEvent;<br> <span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> kWriteEvent;<br><br> EventLoop* loop_;		<span class="hljs-comment">// 该fd属于哪个EventLoop对象</span><br> <span class="hljs-type">const</span> <span class="hljs-type">int</span>  fd_;		<span class="hljs-comment">// 照看的文件描述符(fd)</span><br> <span class="hljs-type">int</span>        events_;	<span class="hljs-comment">// fd感兴趣的事件类型集合</span><br> <span class="hljs-type">int</span>        revents_;  <span class="hljs-comment">// 事件监听器实际监听到该fd发生的事件类型集合</span><br> <span class="hljs-type">int</span>        index_; 	<span class="hljs-comment">// used by Poller.</span><br>   					<span class="hljs-comment">// Poller使用。</span><br> <span class="hljs-type">bool</span>       logHup_;<br><br> std::weak_ptr&lt;<span class="hljs-type">void</span>&gt; tie_;<br> <span class="hljs-type">bool</span> tied_;<br> <span class="hljs-type">bool</span> eventHandling_;<br> <span class="hljs-type">bool</span> addedToLoop_;<br><br> <span class="hljs-comment">// 这些是std::function类型，代表着这个Channel为这个文件描述符保存的各事件类型发生时的处理函数。</span><br> <span class="hljs-comment">// 比如这个fd发生了可读事件，需要执行可读事件处理函数，这时候Channel类都替你保管好了这些可调用函数。</span><br> ReadEventCallback readCallback_;<br> EventCallback writeCallback_;<br> EventCallback closeCallback_;<br> EventCallback errorCallback_;<br></code></pre></td></tr></table></figure>
+<h4 id="23-channel类一些重要的成员方法"><a class="markdownIt-Anchor" href="#23-channel类一些重要的成员方法"></a> 2.3 Channel类一些重要的成员方法</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">public</span>:<br> <span class="hljs-keyword">typedef</span> std::function&lt;<span class="hljs-type">void</span>()&gt; EventCallback;<br> <span class="hljs-keyword">typedef</span> std::function&lt;<span class="hljs-type">void</span>(Timestamp)&gt; ReadEventCallback;<br><br> <span class="hljs-built_in">Channel</span>(EventLoop* loop, <span class="hljs-type">int</span> fd);<br> ~<span class="hljs-built_in">Channel</span>();<br> <br> <span class="hljs-comment">// handleEvent让每个发生了事件的Channel调用自己保管的事件处理函数。</span><br> <span class="hljs-comment">// 每个Channel会根据自己文件描述符实际发生的事件（revents_变量）和感兴趣的事件（events_变量）</span><br> <span class="hljs-comment">// 选择调用read_callback_和/或write_callback_和/或close_callback_和/或error_callback_。</span><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">handleEvent</span><span class="hljs-params">(Timestamp receiveTime)</span></span>;<br><br> <span class="hljs-comment">// 向Channel对象注册各类事件的处理函数</span><br> <span class="hljs-comment">// 一个文件描述符会发生可读、可写、关闭、错误事件。</span><br> <span class="hljs-comment">// 当发生这些事件后，就需要调用相应的处理函数来处理。</span><br> <span class="hljs-comment">// 外部通过调用下面这四个函数可以将事件处理函数放进Channel类中，当需要调用的时候就可以直接拿出来调用了。</span><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setReadCallback</span><span class="hljs-params">(ReadEventCallback cb)</span></span><br><span class="hljs-function"> </span>&#123; readCallback_ = std::<span class="hljs-built_in">move</span>(cb); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setWriteCallback</span><span class="hljs-params">(EventCallback cb)</span></span><br><span class="hljs-function"> </span>&#123; writeCallback_ = std::<span class="hljs-built_in">move</span>(cb); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setCloseCallback</span><span class="hljs-params">(EventCallback cb)</span></span><br><span class="hljs-function"> </span>&#123; closeCallback_ = std::<span class="hljs-built_in">move</span>(cb); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setErrorCallback</span><span class="hljs-params">(EventCallback cb)</span></span><br><span class="hljs-function"> </span>&#123; errorCallback_ = std::<span class="hljs-built_in">move</span>(cb); &#125;<br><br> <span class="hljs-comment">/// Tie this channel to the owner object managed by shared_ptr,</span><br> <span class="hljs-comment">/// prevent the owner object being destroyed in handleEvent.</span><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">tie</span><span class="hljs-params">(<span class="hljs-type">const</span> std::shared_ptr&lt;<span class="hljs-type">void</span>&gt;&amp;)</span></span>;<br><br> <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">fd</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> fd_; &#125;<br> <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">events</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> events_; &#125;<br><br> <span class="hljs-comment">// 当事件监听器监听到某个文件描述符发生了什么事件，通过这个函数可以将这个文件描述符实际发生的事件封装进这个Channel中。</span><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">set_revents</span><span class="hljs-params">(<span class="hljs-type">int</span> revt)</span> </span>&#123; revents_ = revt; &#125;<br><br> <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isNoneEvent</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> events_ == kNoneEvent; &#125;<br><br> <span class="hljs-comment">// 将Channel中的文件描述符及其感兴趣事件注册事件监听器上或从事件监听器上移除</span><br> <span class="hljs-comment">// 外部通过下面几个函数来告知Channel你所监管的文件描述符都对哪些事件类型感兴趣，</span><br> <span class="hljs-comment">// 并把这个文件描述符及其感兴趣事件注册到事件监听器（IO多路复用模块）上。</span><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">enableReading</span><span class="hljs-params">()</span> </span>&#123; events_ |= kReadEvent; <span class="hljs-built_in">update</span>(); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">disableReading</span><span class="hljs-params">()</span> </span>&#123; events_ &amp;= ~kReadEvent; <span class="hljs-built_in">update</span>(); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">enableWriting</span><span class="hljs-params">()</span> </span>&#123; events_ |= kWriteEvent; <span class="hljs-built_in">update</span>(); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">disableWriting</span><span class="hljs-params">()</span> </span>&#123; events_ &amp;= ~kWriteEvent; <span class="hljs-built_in">update</span>(); &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">disableAll</span><span class="hljs-params">()</span> </span>&#123; events_ = kNoneEvent; <span class="hljs-built_in">update</span>(); &#125;<br><br> <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isWriting</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> events_ &amp; kWriteEvent; &#125;<br> <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isReading</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> events_ &amp; kReadEvent; &#125;<br><br> <span class="hljs-comment">// for Poller</span><br> <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">index</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> index_; &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">set_index</span><span class="hljs-params">(<span class="hljs-type">int</span> idx)</span> </span>&#123; index_ = idx; &#125;<br><br> <span class="hljs-comment">// for debug</span><br> <span class="hljs-function">string <span class="hljs-title">reventsToString</span><span class="hljs-params">()</span> <span class="hljs-type">const</span></span>;<br> <span class="hljs-function">string <span class="hljs-title">eventsToString</span><span class="hljs-params">()</span> <span class="hljs-type">const</span></span>;<br><br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">doNotLogHup</span><span class="hljs-params">()</span> </span>&#123; logHup_ = <span class="hljs-literal">false</span>; &#125;<br><br> <span class="hljs-function">EventLoop* <span class="hljs-title">ownerLoop</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> loop_; &#125;<br> <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">remove</span><span class="hljs-params">()</span></span>;<br></code></pre></td></tr></table></figure>
+<h3 id="3-pollerepollpoller类"><a class="markdownIt-Anchor" href="#3-pollerepollpoller类"></a> 3 Poller/EpollPoller类</h3>
+<h4 id="31-pollerepollpoller简介"><a class="markdownIt-Anchor" href="#31-pollerepollpoller简介"></a> 3.1 Poller/EpollPoller简介</h4>
+<p><strong>负责监听文件描述符事件是否触发</strong>以及<strong>返回发生事件的文件描述符以及具体事件</strong>的模块就是Poller。所以<strong>一个Poller对象对应一个事件监听器</strong>。在<code>multi-reactor</code>模型（多线程）中，有多少reactor就有多少Poller。</p>
+<p><code>muduo</code>提供了<code>epoll</code>和<code>poll</code>两种IO多路复用方法来实现事件监听。不过默认是使用<code>epoll</code>来实现，也可以通过选项选择<code>poll</code>。</p>
+<p>这个<code>Poller</code>是个<strong>抽象虚类</strong>，由<code>EpollPoller</code>和<code>PollPoller</code>继承实现，与监听文件描述符和返回监听结果的具体方法也基本上是在这两个派生类中实现。<code>EpollPoller</code>就是封装了用<code>epoll</code>方法实现的与事件监听有关的各种方法，<code>PollPoller</code>就是封装了<code>poll</code>方法实现的与事件监听有关的各种方法。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-Muduo%E7%BD%91%E7%BB%9C%E5%BA%93/">源码剖析 - Muduo网络库</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/10/30/WebServer(1)/">
+                        <span class="hidden-mobile">WebServer(1) 从打造最简单的echo服务器开始征途</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
