@@ -16,20 +16,20 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Muduo库源码剖析(2)  写在前面 上一篇分析了Muduo库依托的Reactor模式的三大核心类，今天继续剖析其余的主要类的源码！">
+    <meta name="description" content="Muduo库源码剖析(2) 其余主要类  写在前面 上一篇分析了Muduo库依托的Reactor模式的三大核心类，今天继续剖析其余的主要类的源码！  正文  1 Acceptor类  1.1 Acceptor类简介 Accetpor封装了服务器监听套接字fd以及相关处理方法。Acceptor类内部其实没有贡献什么核心的处理函数，主要是对其他类的方法调用进行封装。  1.2 Acceptor类私有">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Muduo库源码剖析(2)">
+<meta property="og:title" content="Muduo库源码剖析(2) 其余主要类">
 <meta property="og:url" content="http://example.com/2023/01/07/Muduo(2)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Muduo库源码剖析(2)  写在前面 上一篇分析了Muduo库依托的Reactor模式的三大核心类，今天继续剖析其余的主要类的源码！">
+<meta property="og:description" content="Muduo库源码剖析(2) 其余主要类  写在前面 上一篇分析了Muduo库依托的Reactor模式的三大核心类，今天继续剖析其余的主要类的源码！  正文  1 Acceptor类  1.1 Acceptor类简介 Accetpor封装了服务器监听套接字fd以及相关处理方法。Acceptor类内部其实没有贡献什么核心的处理函数，主要是对其他类的方法调用进行封装。  1.2 Acceptor类私有">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-01-07T02:33:15.144Z">
-<meta property="article:modified_time" content="2023-01-07T02:54:29.767Z">
+<meta property="article:modified_time" content="2023-01-07T07:59:28.604Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>Muduo库源码剖析(2) - Hexo</title>
+  <title>Muduo库源码剖析(2) 其余主要类 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -175,7 +175,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Muduo库源码剖析(2)">
+            <span class="h2" id="subtitle" title="Muduo库源码剖析(2) 其余主要类">
               
             </span>
 
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      64 字
+      2.1k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1 分钟
+      18 分钟
     </span>
   
 
@@ -234,18 +234,35 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Muduo库源码剖析(2)</h1>
+            <h1 style="display: none">Muduo库源码剖析(2) 其余主要类</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：几秒前
+                  本文最后更新于：7 小时前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="muduo库源码剖析2"><a class="markdownIt-Anchor" href="#muduo库源码剖析2"></a> Muduo库源码剖析(2)</h1>
+              <h1 id="muduo库源码剖析2-其余主要类"><a class="markdownIt-Anchor" href="#muduo库源码剖析2-其余主要类"></a> Muduo库源码剖析(2) 其余主要类</h1>
 <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
 <p>上一篇分析了Muduo库依托的Reactor模式的三大核心类，今天继续剖析其余的主要类的源码！</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<h3 id="1-acceptor类"><a class="markdownIt-Anchor" href="#1-acceptor类"></a> 1 Acceptor类</h3>
+<h4 id="11-acceptor类简介"><a class="markdownIt-Anchor" href="#11-acceptor类简介"></a> 1.1 Acceptor类简介</h4>
+<p><strong>Accetpor</strong>封装了服务器监听套接字fd以及相关处理方法。Acceptor类内部其实没有贡献什么核心的处理函数，主要是对其他类的方法调用进行封装。</p>
+<h4 id="12-acceptor类私有变量和方法"><a class="markdownIt-Anchor" href="#12-acceptor类私有变量和方法"></a> 1.2 Acceptor类私有变量和方法</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">private</span>:<br>  <span class="hljs-comment">// 接受新连接，并且以负载均衡的选择方式选择一个subEventLoop，并把这个新连接分发到这个subEventLoop上。</span><br>  <span class="hljs-comment">// 这个方法是要注册到acceptChannel_上的， 同时handleRead()方法内部还调用了成员变量newConnectionCallback_保存的函数。   // 当main EventLoop监听到acceptChannel_上发生了可读事件时（新用户连接事件），就是调用这个handleRead( )方法。</span><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">handleRead</span><span class="hljs-params">()</span></span>;<br><br>  <span class="hljs-comment">// 监听套接字的fd由哪个EventLoop负责循环监听以及处理相应事件，其实这个EventLoop就是main EventLoop。</span><br>  EventLoop* loop_;<br><br>  <span class="hljs-comment">// 服务器监听套接字的文件描述符</span><br>  Socket acceptSocket_;	<br><br>  <span class="hljs-comment">// 这是个Channel类，把acceptSocket_及其感兴趣事件和事件对应的处理函数都封装进去。</span><br>  Channel acceptChannel_;<br><br>  <span class="hljs-comment">// TcpServer构造函数中将`TcpServer::newConnection( )`函数注册给了这个成员变量。</span><br>  <span class="hljs-comment">// 其功能是公平的选择一个subEventLoop，并把已经接受的连接分发给这个subEventLoop。</span><br>  NewConnectionCallback newConnectionCallback_;<br><br>  <span class="hljs-type">bool</span> listenning_;<br>  <span class="hljs-type">int</span> idleFd_;<br></code></pre></td></tr></table></figure>
+<h4 id="13-acceptor类公有方法"><a class="markdownIt-Anchor" href="#13-acceptor类公有方法"></a> 1.3 Acceptor类公有方法</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-keyword">typedef</span> std::function&lt;<span class="hljs-type">void</span> (<span class="hljs-type">int</span> sockfd, <span class="hljs-type">const</span> InetAddress&amp;)&gt; NewConnectionCallback;<br><br>  <span class="hljs-built_in">Acceptor</span>(EventLoop* loop, <span class="hljs-type">const</span> InetAddress&amp; listenAddr, <span class="hljs-type">bool</span> reuseport);<br>  ~<span class="hljs-built_in">Acceptor</span>();<br><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setNewConnectionCallback</span><span class="hljs-params">(<span class="hljs-type">const</span> NewConnectionCallback&amp; cb)</span></span><br><span class="hljs-function">  </span>&#123; newConnectionCallback_ = cb; &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">listenning</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> listenning_; &#125;<br><br>  <span class="hljs-comment">// 该函数底层调用了linux的函数listen()，</span><br>  <span class="hljs-comment">// 开启对acceptSocket_的监听同时将acceptChannel及其感兴趣事件（可读事件）注册到main EventLoop的事件监听器上。</span><br>  <span class="hljs-comment">// 换言之就是让main EventLoop事件监听器去监听`acceptSocket_`</span><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">listen</span><span class="hljs-params">()</span></span>;<br></code></pre></td></tr></table></figure>
+<h3 id="2-socket类"><a class="markdownIt-Anchor" href="#2-socket类"></a> 2 Socket类</h3>
+<h4 id="21-socket类简介"><a class="markdownIt-Anchor" href="#21-socket类简介"></a> 2.1 Socket类简介</h4>
+<p>封装Sockets描述符，负责关闭连接。</p>
+<h4 id="22-socket类变量和方法"><a class="markdownIt-Anchor" href="#22-socket类变量和方法"></a> 2.2 Socket类变量和方法</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">public</span>:<br>  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Socket</span><span class="hljs-params">(<span class="hljs-type">int</span> sockfd)</span></span><br><span class="hljs-function">    : sockfd_(sockfd)</span><br><span class="hljs-function">  &#123;</span> &#125;<br><br>  <span class="hljs-comment">// Socket(Socket&amp;&amp;) // move constructor in C++11</span><br>  ~<span class="hljs-built_in">Socket</span>();<br><br>  <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">fd</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> sockfd_; &#125;<br>  <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">getTcpInfo</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> tcp_info*)</span> <span class="hljs-type">const</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">getTcpInfoString</span><span class="hljs-params">(<span class="hljs-type">char</span>* buf, <span class="hljs-type">int</span> len)</span> <span class="hljs-type">const</span></span>;<br><br>  <span class="hljs-comment">// 调用bind绑定服务器IP端口</span><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">bindAddress</span><span class="hljs-params">(<span class="hljs-type">const</span> InetAddress&amp; localaddr)</span></span>;<br>  <span class="hljs-comment">// 调用listen监听套接字</span><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">listen</span><span class="hljs-params">()</span></span>;<br>  <span class="hljs-comment">// 调用accept接受新客户连接请求</span><br>  <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">accept</span><span class="hljs-params">(InetAddress* peeraddr)</span></span>;<br>  <span class="hljs-comment">// 调用shutdown关闭服务端写通道</span><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">shutdownWrite</span><span class="hljs-params">()</span></span>;<br><br>  <span class="hljs-comment">// 下面四个函数都是调用setsockopt设置socket选项</span><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setTcpNoDelay</span><span class="hljs-params">(<span class="hljs-type">bool</span> on)</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setReuseAddr</span><span class="hljs-params">(<span class="hljs-type">bool</span> on)</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setReusePort</span><span class="hljs-params">(<span class="hljs-type">bool</span> on)</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setKeepAlive</span><span class="hljs-params">(<span class="hljs-type">bool</span> on)</span></span>;<br><br> <span class="hljs-keyword">private</span>:<br>  <span class="hljs-comment">// 服务器监听套接字文件描述符</span><br>  <span class="hljs-type">const</span> <span class="hljs-type">int</span> sockfd_;<br></code></pre></td></tr></table></figure>
+<h3 id="3-buffer类"><a class="markdownIt-Anchor" href="#3-buffer类"></a> 3 Buffer类</h3>
+<h4 id="31-buffer类简介"><a class="markdownIt-Anchor" href="#31-buffer类简介"></a> 3.1 Buffer类简介</h4>
+<p>Buffer类其实是封装了一个用户缓冲区，以及向这个缓冲区写数据读数据等一系列控制方法。</p>
+<h4 id="32-buffer类成员变量和方法"><a class="markdownIt-Anchor" href="#32-buffer类成员变量和方法"></a> 3.2 Buffer类成员变量和方法</h4>
 
             </div>
             <hr>
