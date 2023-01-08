@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/muduo/1.1.jpg">
 <meta property="article:published_time" content="2023-01-04T06:44:19.632Z">
-<meta property="article:modified_time" content="2023-01-07T05:25:12.605Z">
+<meta property="article:modified_time" content="2023-01-08T03:46:16.030Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/muduo/1.1.jpg">
@@ -240,7 +240,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：10 小时前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -257,8 +257,8 @@
 <p><code>Muduo</code>库有三个核心组件支撑一个Reactor实现<strong>持续</strong>的<strong>监听</strong>一组fd，并根据每个fd上发生的事件<strong>调用</strong>相应的处理函数。这三个组件分别是<code>Channel</code>类、<code>Poller/EpollPoller</code>类以及<code>EventLoop</code>类。</p>
 <h3 id="2-channel类"><a class="markdownIt-Anchor" href="#2-channel类"></a> 2 Channel类</h3>
 <h4 id="21-channel类简介"><a class="markdownIt-Anchor" href="#21-channel类简介"></a> 2.1 Channel类简介</h4>
-<p>在TCP网络编程中，想要IO多路复用监听某个fd，就要把这个fd和该fd感兴趣的事件通过<code>epoll_ctl</code><strong>注册</strong>到IO多路复用模块（也叫<strong>事件监听器</strong>）上。当事件监听器监听到该fd发生了某个事件。事件监听器返回<strong>发生事件的fd集合</strong>以及<strong>每个fd都发生了什么事件</strong>。</p>
-<p><strong>Channel</strong>类则封装了<strong>一个fd</strong>和<strong>该fd感兴趣的事件</strong>以及事件监听器监听到的<strong>该fd实际发生的事件</strong>。同时Channel类还提供了<strong>设置</strong>该fd的感兴趣事件，以及将该fd及其感兴趣事件<strong>注册</strong>到事件监听器或从事件监听器上<strong>移除</strong>，以及<strong>保存</strong>了该fd的每种事件对应的处理函数。</p>
+<p>在TCP网络编程中，想要IO多路复用监听某个fd，就要把这个fd和该fd感兴趣的事件通过<code>epoll_ctl</code>注册到IO多路复用模块（也叫<strong>事件监听器</strong>）上。当事件监听器监听到该fd发生了某个事件。事件监听器返回<strong>发生事件的fd集合</strong>以及<strong>每个fd都发生了什么事件</strong>。</p>
+<p><strong>Channel</strong>类则封装了一个fd和该fd感兴趣的事件以及事件监听器监听到的该fd实际发生的事件。同时Channel类还提供了设置该fd的感兴趣事件，以及将该fd及其感兴趣事件注册到事件监听器或从事件监听器上移除，以及保存了该fd的每种事件对应的处理函数。</p>
 <p>每个<strong>Channel</strong>对象自始至终只属于一个<strong>EventLoop</strong>，因此每个<strong>Channel</strong>对象都只属于一个IO线程，自始至终只负责一个文件描述符(fd)的IO事件分发，但它不拥有这个fd，也不会在析构时关闭这个fd。</p>
 <p>用户不直接使用<strong>Channel</strong>，即不继承<strong>Channel</strong>，而会用到更上层的封装，如<strong>TcpConnection</strong>。</p>
 <p><strong>Channel</strong>的生命期由其owner class负责管理。</p>
