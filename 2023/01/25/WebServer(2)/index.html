@@ -16,19 +16,38 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="归档">
-<meta property="og:url" content="http://example.com/archives/2022/index.html">
+    <meta name="description" content="WebServer(2) 重整旗鼓再战服务端编程  写在前面 距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP&#x2F;IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C++基础也在这一段时间迎来了大幅度提升，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebServer(2) 重整旗鼓再战服务端编程">
+<meta property="og:url" content="http://example.com/2023/01/25/WebServer(2)/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="WebServer(2) 重整旗鼓再战服务端编程  写在前面 距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP&#x2F;IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C++基础也在这一段时间迎来了大幅度提升，">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-25T07:01:19.144Z">
+<meta property="article:modified_time" content="2023-01-25T08:06:48.176Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>归档 - Hexo</title>
+  <title>WebServer(2) 重整旗鼓再战服务端编程 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
@@ -55,7 +74,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -151,14 +170,48 @@
 </nav>
 
     <div class="banner" id="banner" parallax=true
-         style="background: url('/img/default.png') no-repeat center center;
+         style="background: url('/img/bg2.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="归档">
+            <span class="h2" id="subtitle" title="WebServer(2) 重整旗鼓再战服务端编程">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-01-25 15:01" pubdate>
+        2023年1月25日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      586 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      5 分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -171,100 +224,106 @@
 
   <main>
     
-      <div class="container nopadding-x-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
-
-<div class="list-group">
-  <p class="h4">共计 47 篇文章</p>
-  <hr>
-  
-  
-    
       
-      <p class="h5">2022</p>
-    
-    <a href="/2022/10/30/WebServer(1)/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">WebServer(1) 从打造最简单的echo服务器开始征途</span>
-      <time style="float: right;">10-30</time>
-    </a>
-  
-    
-    <a href="/2022/10/25/C%20sharp1/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">Winform 通过计时器实现图片缩放功能</span>
-      <time style="float: right;">10-25</time>
-    </a>
-  
-    
-    <a href="/2022/09/21/JSON(2)/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">JSON库(2) 函数重构，解析数字</span>
-      <time style="float: right;">09-21</time>
-    </a>
-  
-    
-    <a href="/2022/09/08/JSON(1)/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">JSON库(1) 初识JSON库，建立TDD</span>
-      <time style="float: right;">09-08</time>
-    </a>
-  
-    
-    <a href="/2022/09/02/csapp2/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">2 Bomblab详解</span>
-      <time style="float: right;">09-02</time>
-    </a>
-  
-    
-    <a href="/2022/08/24/Wireshark-Lab(3)/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">Wireshark Lab 3：DNS详解</span>
-      <time style="float: right;">08-24</time>
-    </a>
-  
-    
-    <a href="/2022/08/11/git_false/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">git报错及解决方法</span>
-      <time style="float: right;">08-11</time>
-    </a>
-  
-    
-    <a href="/2022/08/11/Wireshark-Lab(2)/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">Wireshark Lab 2：HTTP详解</span>
-      <time style="float: right;">08-11</time>
-    </a>
-  
-    
-    <a href="/2022/08/11/Wireshark-Lab(1)/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">Wireshark Lab 1：Getting Started详解</span>
-      <time style="float: right;">08-11</time>
-    </a>
-  
-    
-    <a href="/2022/08/11/git/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">git上传文件的基本方法</span>
-      <time style="float: right;">08-11</time>
-    </a>
-  
-</div>
 
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">WebServer(2) 重整旗鼓再战服务端编程</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：1 小时前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="webserver2-重整旗鼓再战服务端编程"><a class="markdownIt-Anchor" href="#webserver2-重整旗鼓再战服务端编程"></a> WebServer(2) 重整旗鼓再战服务端编程</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP/IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C++基础也在这一段时间迎来了大幅度提升，现在重启本专栏，希望能通过自己完整实现一个高性能高并发的WebServer。同时，在本项目构建过程中，我会尝试使用git做版本管理，应用Google-Style代码规范格式，用cmake编译。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<h3 id="1-动笔之前缕清思路"><a class="markdownIt-Anchor" href="#1-动笔之前缕清思路"></a> 1 动笔之前，缕清思路</h3>
+<p>动手敲代码前，先把要完成的核心组件罗列出来，构思出一个大致的骨架。</p>
+<blockquote>
+<p>1 Channel类：在事件触发时可调用回调函数，做基类用。</p>
+<p>2 Epoller类：关于Epoll的一切都封装在这个类里面，Channel每次获得新连接，就调用Epoller的Update() 把自己放进去。</p>
+<p>3 EventLoop类：核心部分，命令一直都在循环在Epoll_wait 执行任务。</p>
+<p>4 EchoServer类：回声服务器，最基础的Server。</p>
+<p>5 TcpServer类：直接提供给用户使用，掌管整个服务器。</p>
+<p>6 Acceptor类：负责新连接接收。</p>
+<p>7 TcpConnection类：</p>
+<p>8 线程池</p>
+</blockquote>
+<h4 id="2-channelh"><a class="markdownIt-Anchor" href="#2-channelh"></a> 2 Channel.h</h4>
 
-  <nav aria-label="navigation">
-    <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/2022/page/2/#board">2</a><a class="page-number" href="/archives/2022/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/archives/2022/page/5/#board">5</a><a class="extend next" rel="next" href="/archives/2022/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
-    </span>
-  </nav>
-
-
-
-
-              </div>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/">项目实战</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%89%93%E9%80%A0WebServer/">从零开始打造WebServer</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/07/Muduo(2)/">
+                        <span class="hidden-mobile">Muduo库源码剖析(2) 其余主要类</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -372,6 +431,19 @@
 
 
 
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
 
 
   <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
@@ -393,6 +465,13 @@
 
 
 
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
 
 
 
