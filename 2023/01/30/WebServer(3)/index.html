@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/app.png">
+  <link rel="icon" href="/img/app.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="WebServer(3) Poller类  写在前面 源码链接：  1 基类Poller的设计 我们编写网络编程代码的时候少不了使用IO复用系列函数，而muduo也为我们提供了对此的封装。muduo 有 Poller 和 EPollPoller 类分别对应着epoll和poll。而我们使用的接口是Poller，muduo 以 Poller 为虚基类，派生出 Poller 和 EPollPolle">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebServer(3) Poller类">
+<meta property="og:url" content="http://example.com/2023/01/30/WebServer(3)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="WebServer(3) Poller类  写在前面 源码链接：  1 基类Poller的设计 我们编写网络编程代码的时候少不了使用IO复用系列函数，而muduo也为我们提供了对此的封装。muduo 有 Poller 和 EPollPoller 类分别对应着epoll和poll。而我们使用的接口是Poller，muduo 以 Poller 为虚基类，派生出 Poller 和 EPollPolle">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-30T10:40:18.532Z">
+<meta property="article:modified_time" content="2023-01-31T07:10:01.051Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>WebServer(3) Poller类 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="WebServer(3) Poller类">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-01-30 18:40" pubdate>
+        2023年1月30日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      51 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">WebServer(3) Poller类</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="webserver3-poller类"><a class="markdownIt-Anchor" href="#webserver3-poller类"></a> WebServer(3) Poller类</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>源码链接：</p>
+<h3 id="1-基类poller的设计"><a class="markdownIt-Anchor" href="#1-基类poller的设计"></a> 1 基类Poller的设计</h3>
+<p>我们编写网络编程代码的时候少不了使用IO复用系列函数，而muduo也为我们提供了对此的封装。muduo 有 Poller 和 EPollPoller 类分别对应着<code>epoll</code>和<code>poll</code>。而我们使用的接口是<code>Poller</code>，muduo 以 Poller 为虚基类，派生出 Poller 和 EPollPoller 两个子类，用不同的形式实现 IO 复用。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Poller</span> : noncopyable &#123;<br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-keyword">using</span> ChannelList = std::vector&lt;Channel*&gt;;<br><br>    <span class="hljs-built_in">Poller</span>(EventLoop *Loop);<br>    <span class="hljs-keyword">virtual</span> ~<span class="hljs-built_in">Poller</span>() = <span class="hljs-keyword">default</span>;<br><br>    <span class="hljs-comment">// 需要交给派生类实现的接口</span><br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> Timestamp <span class="hljs-title">Poll</span><span class="hljs-params">(<span class="hljs-type">int</span> timeoutMs, ChannelList *activeChannels)</span> </span>= <span class="hljs-number">0</span>;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">UpdateChannel</span><span class="hljs-params">(Channel *channel)</span> </span>= <span class="hljs-number">0</span>;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">RemoveChannel</span><span class="hljs-params">(Channel *channel)</span> </span>= <span class="hljs-number">0</span>;<br><br>    <span class="hljs-comment">// 判断 channel是否注册到 poller当中</span><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">HasChannel</span><span class="hljs-params">(Channel *channel)</span> <span class="hljs-type">const</span></span>;<br><br>    <span class="hljs-comment">// EventLoop可以通过该接口获取默认的IO复用实现方式(默认epoll)</span><br>    <span class="hljs-comment">/** </span><br><span class="hljs-comment">     * 它的实现并不在 Poller.cc 文件中</span><br><span class="hljs-comment">     * 如果要实现则可以预料会其会包含EPollPoller PollPoller</span><br><span class="hljs-comment">     * 那么外面就会在基类引用派生类的头文件，这个抽象的设计就不好</span><br><span class="hljs-comment">     * 所以外面会单独创建一个 DefaultPoller.cc 的文件去实现</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-type">static</span> Poller* <span class="hljs-title">NewDefaultPoller</span><span class="hljs-params">(EventLoop *Loop)</span></span>;<br><br>  <span class="hljs-keyword">protected</span>:  <br>    <span class="hljs-keyword">using</span> ChannelMap = std::unordered_map&lt;<span class="hljs-type">int</span>, Channel*&gt;;<br>    <span class="hljs-comment">// 储存 channel 的映射，（sockfd -&gt; channel*）</span><br>    ChannelMap channels_;<br><br>  <span class="hljs-keyword">private</span>:<br>    EventLoop *ownerLoop_; <span class="hljs-comment">// 定义Poller所属的事件循环EventLoop</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>ChannelMap</code> <code>channels_</code> 需要存储从 fd -&gt; channel 的映射</li>
+<li><code>ownerLoop_</code> 定义 Poller 所属的事件循环 EventLoop</li>
+</ul>
+<p>重写方法靠派生类实现，这里我们可以专注一下 <code>NewDefaultPoller</code> 方法。</p>
+<p>在 muduo 中可以使用此方法获取不同的实例，并且这个方法是在单独的一个 <code>DefaultPoller.cc</code> 文件内实现的。正常情况下，我们可能会在 <code>Poller.cc</code> 文件中完成该成员函数的实现。但是这并不是一个好的设计，因为 Poller 是一个基类。如果在 <code>Poller.cc</code> 文件内实现则势必会在 <code>Poller.cc</code>包含 <code>EPollPoller.h</code> 等头文件。在一个基类中包含其派生类的头文件，这个设计可以说是很诡异的，这并不是一个好的抽象。</p>
+<p>因此，我们专门设置了另一个<code>DefaultPoller.cc</code> 文件，在其中包含了 <code>Poller.h</code> 和 <code>EPollPoller.h</code> 的头文件。这样就让 <code>Poller.h</code> 文件显得正常了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">Poller* <span class="hljs-title">Poller::NewDefaultPoller</span><span class="hljs-params">(EventLoop *loop)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span> (::<span class="hljs-built_in">getenv</span>(<span class="hljs-string">&quot;MUDUO_USE_POLL&quot;</span>)) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>; <span class="hljs-comment">// 生成poll实例</span><br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">EPollPoller</span>(loop); <span class="hljs-comment">// 生成epoll实例</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="2-epollpoller类设计"><a class="markdownIt-Anchor" href="#2-epollpoller类设计"></a> 2 EPollPoller类设计</h3>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">EPollPoller</span> : <span class="hljs-keyword">public</span> Poller &#123;<br>    <span class="hljs-keyword">using</span> EventList = std::vector&lt;epoll_event&gt;;<br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">EPollPoller</span>(EventLoop *Loop);<br>    ~<span class="hljs-built_in">EPollPoller</span>() <span class="hljs-keyword">override</span>;<br><br>    <span class="hljs-comment">// 重写基类Poller的抽象方法</span><br>    <span class="hljs-function">Timestamp <span class="hljs-title">Poll</span><span class="hljs-params">(<span class="hljs-type">int</span> timeoutMs, ChannelList *activeChannels)</span> <span class="hljs-keyword">override</span></span>;<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">UpdateChannel</span><span class="hljs-params">(Channel *channel)</span> <span class="hljs-keyword">override</span></span>;<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">RemoveChannel</span><span class="hljs-params">(Channel *channel)</span> <span class="hljs-keyword">override</span></span>;<br><br>  <span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// 默认监听事件数量</span><br>    <span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> kInitEventListSize = <span class="hljs-number">16</span>; <br><br>    <span class="hljs-comment">// 填写活跃的连接</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">FillActiveChannels</span><span class="hljs-params">(<span class="hljs-type">int</span> numEvents, ChannelList *activeChannels)</span> <span class="hljs-type">const</span></span>;<br><br>    <span class="hljs-comment">// 更新channel通道，本质是调用了epoll_ctl</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Update</span><span class="hljs-params">(<span class="hljs-type">int</span> operation, Channel *channel)</span></span>;<br><br>    <span class="hljs-type">int</span> epollfd_;       <span class="hljs-comment">// epoll_create在内核创建空间返回的fd</span><br>    EventList events_;  <span class="hljs-comment">// 用于存放epoll_wait返回的所有发生的事件的文件描述符</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>kInitEventListSize</code> 默认监听事件的数量</li>
+<li><code>epollfd_</code> 我们使用 epoll_create 创建的指向 epoll 对象的文件描述符（句柄）</li>
+<li><code>EventList events_</code> 返回事件的数组</li>
+</ul>
+<p>可以看到，EPollPoller类继承了Poller类，并打算重写这些核心方法。</p>
+<h3 id="3-成员函数"><a class="markdownIt-Anchor" href="#3-成员函数"></a> 3 成员函数</h3>
+<h4 id="31-返回发生事件的-poll-方法"><a class="markdownIt-Anchor" href="#31-返回发生事件的-poll-方法"></a> 3.1 返回发生事件的 poll 方法</h4>
+<p>该方法内部调用 epoll_wait 获取发生的事件，并找到这些事件对应的 Channel 并将这些活跃的 Channel 填充入 activeChannels 中，最后返回一个时间戳。<br />
+通过 <code>numEvents</code> 的值判断事件情况</p>
+<ul>
+<li><code>numEvents &gt; 0</code> 事件发生，需要调用 <code>FillActiveChannels</code> 填充活跃的 Channel。</li>
+<li><code>numEvents == 0</code> 事件超时了，打印日志。（可以设置定时器操作）</li>
+<li>其他情况则是出错，打印 <code>LOG_ERROR</code>日志</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">Timestamp <span class="hljs-title">EPollPoller::Poll</span><span class="hljs-params">(<span class="hljs-type">int</span> timeoutMs, ChannelList *activeChannels)</span> </span>&#123;<br>    <span class="hljs-comment">// 高并发情况经常被调用，影响效率，使用debug模式可以手动关闭</span><br>    <span class="hljs-type">size_t</span> numEvents = ::<span class="hljs-built_in">epoll_wait</span>(epollfd_, &amp;(*events_.<span class="hljs-built_in">begin</span>()), <br>                        <span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">int</span>&gt;(events_.<span class="hljs-built_in">size</span>()), timeoutMs);<br>    <span class="hljs-type">int</span> saveErrno = errno;<br>    <span class="hljs-function">Timestamp <span class="hljs-title">now</span><span class="hljs-params">(Timestamp::now())</span></span>;<br><br>    <span class="hljs-comment">// 有事件产生</span><br>    <span class="hljs-keyword">if</span> (numEvents &gt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-built_in">FillActiveChannels</span>(numEvents, activeChannels); <span class="hljs-comment">// 填充活跃的channels</span><br>        <span class="hljs-comment">// 对events_进行扩容操作</span><br>        <span class="hljs-keyword">if</span> (numEvents == events_.<span class="hljs-built_in">size</span>()) &#123;<br>            events_.<span class="hljs-built_in">resize</span>(events_.<span class="hljs-built_in">size</span>() * <span class="hljs-number">2</span>);<br>        &#125;<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (numEvents == <span class="hljs-number">0</span>) &#123; <span class="hljs-comment">// 超时</span><br>        LOG_DEBUG &lt;&lt; <span class="hljs-string">&quot;timeout!&quot;</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// 出错</span><br>        <span class="hljs-comment">// 不是终端错误</span><br>        <span class="hljs-keyword">if</span> (saveErrno != EINTR) &#123;<br>            errno = saveErrno;<br>            LOG_ERROR &lt;&lt; <span class="hljs-string">&quot;EPollPoller::poll() failed&quot;</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> now;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="32-填写活跃的连接-fillactivechannels"><a class="markdownIt-Anchor" href="#32-填写活跃的连接-fillactivechannels"></a> 3.2 填写活跃的连接 FillActiveChannels</h4>
+<p>通过 epoll_wait 返回的 events 数组内部有指向 channel 的指针，我们可以通过此指针在 EPollPoller 模块获取对 channel 进行操作。<br />
+我们需要更新 channel 的返回事件的设置，并且将此 channel 装入 activeChannels。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">EPollPoller::FillActiveChannels</span><span class="hljs-params">(<span class="hljs-type">int</span> numEvents, ChannelList *activeChannels)</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; numEvents; ++i) &#123;<br>        <span class="hljs-comment">// void* =&gt; Channel*</span><br>        Channel *channel = <span class="hljs-built_in">static_cast</span>&lt;Channel*&gt;(events_[i].data.ptr);<br>        channel-&gt;<span class="hljs-built_in">Set_revents</span>(events_[i].events);<br>        activeChannels-&gt;<span class="hljs-built_in">push_back</span>(channel);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="33-更新channel在epoll上的状态"><a class="markdownIt-Anchor" href="#33-更新channel在epoll上的状态"></a> 3.3 更新channel在epoll上的状态</h4>
+<p>我们获取 channel 在 EPollPoller 上的状态，根据状态进行不同操作。最后调用 Update 私有方法。</p>
+<ul>
+<li>如果此 channel 还没有被添加到 epoll 上或者是之前已经从 epoll 上注销<code>index == kNew || index == kDeleted</code>，那么此 channel 接下来会进行添加操作。
+<ul>
+<li>如果是未添加状态<code>kNew</code>，则需要在 map 上增加此 channel</li>
+<li>如果是已删除状态<code>kDeleted</code>，则直接往后执行</li>
+<li>设置 channel 状态为 <code>kAdded</code> ，然后调用 <code>Update(EPOLL_CTL_ADD, channel);</code></li>
+</ul>
+</li>
+<li>如果已经在 poller 上注册的状态，则要进行删除或修改操作，需要判断此 channel 是否还有监视的事情（是否还要事件要等着处理）
+<ul>
+<li>如果没有则直接删除，调用 <code>Update(EPOLL_CTL_DEL, channel);</code> 并重新设置状态为 <code>kDeleted</code></li>
+<li>如果还有要监视的事情，则说明要进行修改（MOD）操作，调用 <code>update(EPOLL_CTL_MOD, channel);</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">EPollPoller::UpdateChannel</span><span class="hljs-params">(Channel *channel)</span> </span>&#123;<br>    <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span>__FUNCTION__</span><br>    <span class="hljs-comment">// 获取参数channel在epoll的状态</span><br>    <span class="hljs-type">const</span> <span class="hljs-type">int</span> index = channel-&gt;<span class="hljs-built_in">index</span>();<br><br>    <span class="hljs-comment">// 未添加状态和已删除状态都有可能会被再次添加到epoll中</span><br>    <span class="hljs-keyword">if</span> (index == kNew || index == kDeleted) &#123;<br>        <span class="hljs-comment">// 添加到键值对 </span><br>        <span class="hljs-keyword">if</span> (index == kNew) &#123;<br>            <span class="hljs-type">int</span> fd = channel-&gt;<span class="hljs-built_in">fd</span>();<br>            channels_[fd] = channel; <br>        &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// index == kAdd</span><br>        &#125;<br>        <span class="hljs-comment">// 修改channel的状态，此时是已添加状态</span><br>        channel-&gt;<span class="hljs-built_in">set_index</span>(kAdded);<br>        <span class="hljs-comment">// 向epoll对象加入channel</span><br>        <span class="hljs-built_in">Update</span>(EPOLL_CTL_ADD, channel);<br>    &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// channel已经在poller上注册过</span><br>        <span class="hljs-comment">// 没有感兴趣事件说明可以从epoll对象中删除该channel了</span><br>        <span class="hljs-keyword">if</span> (channel-&gt;<span class="hljs-built_in">IsNoneEvent</span>()) &#123;<br>            <span class="hljs-built_in">Update</span>(EPOLL_CTL_DEL, channel);<br>            channel-&gt;<span class="hljs-built_in">set_index</span>(kDeleted);<br>        &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// 还有事件说明之前的事件删除，但是被修改了</span><br>            <span class="hljs-built_in">Update</span>(EPOLL_CTL_MOD, channel);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>接着往下看 Update 操作，其本质是调用 <code>epoll_ctl</code> 函数，而里面的操作由之前的 <code>UpdateChannel</code> 所指定。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">EPollPoller::Update</span><span class="hljs-params">(<span class="hljs-type">int</span> operation, Channel *channel)</span> </span>&#123;<br>    epoll_event event;<br>    ::<span class="hljs-built_in">memset</span>(&amp;event, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(event));<br>    <br>    <span class="hljs-type">int</span> fd = channel-&gt;<span class="hljs-built_in">fd</span>();<br>    event.events = channel-&gt;<span class="hljs-built_in">events</span>();<br>    event.data.fd = fd;<br>    event.data.ptr = channel;<br><br>    <span class="hljs-keyword">if</span> (::<span class="hljs-built_in">epoll_ctl</span>(epollfd_, operation, fd, &amp;event) &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">if</span> (operation == EPOLL_CTL_DEL) &#123;<br>            LOG_ERROR &lt;&lt; <span class="hljs-string">&quot;epoll_ctl() del error:&quot;</span> &lt;&lt; errno;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            LOG_FATAL &lt;&lt; <span class="hljs-string">&quot;epoll_ctl add/mod error:&quot;</span> &lt;&lt; errno;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="34-从-epoll-中移除监视的channel"><a class="markdownIt-Anchor" href="#34-从-epoll-中移除监视的channel"></a> 3.4 从 epoll 中移除监视的channel</h4>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">EPollPoller::RemoveChannel</span><span class="hljs-params">(Channel *channel)</span> </span>&#123;<br>    <span class="hljs-comment">// 从Map中删除</span><br>    <span class="hljs-type">int</span> fd = channel-&gt;<span class="hljs-built_in">fd</span>();<br>    channels_.<span class="hljs-built_in">erase</span>(fd); <br><br>    <span class="hljs-type">int</span> index = channel-&gt;<span class="hljs-built_in">index</span>();<br>    <span class="hljs-keyword">if</span> (index == kAdded) &#123; <span class="hljs-comment">// 如果此fd已经被添加到Poller中，则还需从epoll对象中删除</span><br>        <span class="hljs-built_in">Update</span>(EPOLL_CTL_DEL, channel);<br>    &#125;<br><br>    <span class="hljs-comment">// 重新设置channel的状态为未被Poller注册</span><br>    channel-&gt;<span class="hljs-built_in">set_index</span>(kNew);<br>&#125;<br></code></pre></td></tr></table></figure>
+<ol>
+<li>断言此<code>channel</code>已经没有可关注的事件了。</li>
+<li>从<code>unordered_map&lt;fd, Channel*&gt; channels</code>中删除此<code>channel</code>，根据<code>fd</code>删除。</li>
+<li>如果之前<code>channel</code>的状态是添加状态，则还需调用<code>Update</code>方法，将此<code>channel</code>从<code>epoll</code>对象中删除。</li>
+<li><code>channel</code>设置其状态为未被监视状态。</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/">项目实战</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%89%93%E9%80%A0WebServer/">从零开始打造WebServer</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/25/WebServer(2)/">
+                        <span class="hidden-mobile">WebServer(2) 重整旗鼓 Channel类</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

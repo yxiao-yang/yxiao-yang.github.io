@@ -16,20 +16,20 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="WebServer(2) 重整旗鼓再战服务端编程-Channel类实现  写在前面 距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP&#x2F;IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C++基础也在这一段">
+    <meta name="description" content="WebServer(2) 重整旗鼓 Channel类  写在前面 距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP&#x2F;IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C基础也在这一段时间迎来了大幅度提升，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="WebServer(2) 重整旗鼓再战服务端编程">
+<meta property="og:title" content="WebServer(2) 重整旗鼓 Channel类">
 <meta property="og:url" content="http://example.com/2023/01/25/WebServer(2)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="WebServer(2) 重整旗鼓再战服务端编程-Channel类实现  写在前面 距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP&#x2F;IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C++基础也在这一段">
+<meta property="og:description" content="WebServer(2) 重整旗鼓 Channel类  写在前面 距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP&#x2F;IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C基础也在这一段时间迎来了大幅度提升，">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-01-25T07:01:19.144Z">
-<meta property="article:modified_time" content="2023-01-30T05:39:34.286Z">
+<meta property="article:modified_time" content="2023-01-31T07:11:31.306Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>WebServer(2) 重整旗鼓再战服务端编程 - Hexo</title>
+  <title>WebServer(2) 重整旗鼓 Channel类 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -175,7 +175,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="WebServer(2) 重整旗鼓再战服务端编程">
+            <span class="h2" id="subtitle" title="WebServer(2) 重整旗鼓 Channel类">
               
             </span>
 
@@ -234,18 +234,19 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">WebServer(2) 重整旗鼓再战服务端编程</h1>
+            <h1 style="display: none">WebServer(2) 重整旗鼓 Channel类</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：8 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="webserver2-重整旗鼓再战服务端编程-channel类实现"><a class="markdownIt-Anchor" href="#webserver2-重整旗鼓再战服务端编程-channel类实现"></a> WebServer(2) 重整旗鼓再战服务端编程-Channel类实现</h1>
+              <h1 id="webserver2-重整旗鼓-channel类"><a class="markdownIt-Anchor" href="#webserver2-重整旗鼓-channel类"></a> WebServer(2) 重整旗鼓 Channel类</h1>
 <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
-<p>距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP/IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C++基础也在这一段时间迎来了大幅度提升，现在重启本专栏，希望能通过自己完整实现一个高性能高并发的WebServer。同时，在本项目构建过程中，我会尝试使用git做版本管理，应用Google-Style代码规范格式，用cmake编译。</p>
+<p>距离上次更新的本专栏的第一章已经过去好久好久了，虽然想速成WebServer的flag没能达成，但是期间也从未歇息，阅读了比较经典的《TCP/IP网络编程》《Linux高性能服务器编程》和《Linux多线程服务端编程》，同时也阅读了一些优秀源码（Muduo、Libevent）。自己的网络编程和C<ins>基础也在这一段时间迎来了大幅度提升，现在重启本专栏，希望能通过自己完整实现一个高性能高并发的WebServer。同时，在本项目构建过程中，我会尝试使用git做版本管理，应用Google-Style代码规范格式，用cmake编译，并全局采用c</ins>11标准。</p>
+<p>源码链接：</p>
 <h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
 <h3 id="1-什么是channel"><a class="markdownIt-Anchor" href="#1-什么是channel"></a> 1 什么是Channel</h3>
 <p>Channel 对文件描述符和事件进行了一层封装。平常我们写网络编程相关函数，基本就是创建套接字，绑定地址，转变为可监听状态（这部分我们在 Socket 类中实现过了，交给 Acceptor 调用即可），然后接受连接。</p>
@@ -322,6 +323,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2023/01/30/WebServer(3)/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">WebServer(3) Poller类</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
