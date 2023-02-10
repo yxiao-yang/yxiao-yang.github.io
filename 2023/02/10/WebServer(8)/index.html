@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/app.png">
+  <link rel="icon" href="/img/app.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="WebServer(8) 内存池模块  为什么使用内存池  避免内存碎片。 避免系统调用开销。  操作系统分用户态和内核态，我们只能在用户态进行操作。我们所使用的内存有栈和堆的，栈的内存自动分配和回收。对于程序员来说，主动申请和释放的内存是堆的内存。比如 malloc()、free()。 我们调用 malloc() 向堆申请内存，系统也分配给了我们。但是我们申请的这部分内存容易造成内部碎片，这会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebServer(8) 内存池模块">
+<meta property="og:url" content="http://example.com/2023/02/10/WebServer(8)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="WebServer(8) 内存池模块  为什么使用内存池  避免内存碎片。 避免系统调用开销。  操作系统分用户态和内核态，我们只能在用户态进行操作。我们所使用的内存有栈和堆的，栈的内存自动分配和回收。对于程序员来说，主动申请和释放的内存是堆的内存。比如 malloc()、free()。 我们调用 malloc() 向堆申请内存，系统也分配给了我们。但是我们申请的这部分内存容易造成内部碎片，这会">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669112902652-afae0f9d-d616-435f-b40d-540c1b055bc9.png#averageHue=%23fcf0ca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=600&amp;id=ucea5d58c&amp;margin=%5Bobject%20Object%5D&amp;name=1669112895386.png&amp;originHeight=750&amp;originWidth=1151&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=35521&amp;status=done&amp;style=none&amp;taskId=u46ccc8da-09b7-4970-98dc-ab02aaad40c&amp;title=&amp;width=920.8">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669112902652-afae0f9d-d616-435f-b40d-540c1b055bc9.png#averageHue=%23fcf0ca&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=url&amp;id=hCkNY&amp;margin=%5Bobject%20Object%5D&amp;originHeight=750&amp;originWidth=1151&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669114301921-19452868-4a68-4ab4-87e9-48e252b2c9a4.png#averageHue=%23faefca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=555&amp;id=u0c847d75&amp;margin=%5Bobject%20Object%5D&amp;name=1669114288241.png&amp;originHeight=694&amp;originWidth=962&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=44099&amp;status=done&amp;style=none&amp;taskId=ud074f01b-06e9-480e-a0fc-dbd7f69059c&amp;title=&amp;width=769.6">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669115103834-2be88686-ec5f-4ddb-b9b4-d3bb66a8b424.png#averageHue=%23f6eeca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=642&amp;id=u2f0ac106&amp;margin=%5Bobject%20Object%5D&amp;name=1669115099452.png&amp;originHeight=803&amp;originWidth=1321&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=50812&amp;status=done&amp;style=none&amp;taskId=u69a9a069-4c3c-407b-9842-0c08179eef7&amp;title=&amp;width=1056.8">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669116681431-a63a92f5-a9f8-4551-a087-2fee99dccdcd.png#averageHue=%23cee1ca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=610&amp;id=u80a8f6cd&amp;margin=%5Bobject%20Object%5D&amp;name=1669116675172.png&amp;originHeight=762&amp;originWidth=799&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=33719&amp;status=done&amp;style=none&amp;taskId=ua6e92a25-c476-48cb-be94-bb526d6724f&amp;title=&amp;width=639.2">
+<meta property="article:published_time" content="2023-02-10T12:30:55.049Z">
+<meta property="article:modified_time" content="2023-02-10T12:32:08.870Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669112902652-afae0f9d-d616-435f-b40d-540c1b055bc9.png#averageHue=%23fcf0ca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=600&amp;id=ucea5d58c&amp;margin=%5Bobject%20Object%5D&amp;name=1669112895386.png&amp;originHeight=750&amp;originWidth=1151&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=35521&amp;status=done&amp;style=none&amp;taskId=u46ccc8da-09b7-4970-98dc-ab02aaad40c&amp;title=&amp;width=920.8">
+  
+  
+  <title>WebServer(8) 内存池模块 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="WebServer(8) 内存池模块">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-02-10 20:30" pubdate>
+        2023年2月10日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      71 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">WebServer(8) 内存池模块</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="webserver8-内存池模块"><a class="markdownIt-Anchor" href="#webserver8-内存池模块"></a> WebServer(8) 内存池模块</h1>
+<h1 id="为什么使用内存池"><a class="markdownIt-Anchor" href="#为什么使用内存池"></a> 为什么使用内存池</h1>
+<ol>
+<li>避免内存碎片。</li>
+<li>避免系统调用开销。</li>
+</ol>
+<p>操作系统分用户态和内核态，我们只能在用户态进行操作。我们所使用的内存有栈和堆的，栈的内存自动分配和回收。对于程序员来说，主动申请和释放的内存是堆的内存。比如 <code>malloc()</code>、<code>free()</code>。<br />
+我们调用 <code>malloc()</code> 向堆申请内存，系统也分配给了我们。但是我们申请的这部分内存容易造成内部碎片，这会导致残缺的内存块不能被我们所利用。比如申请 4k 的内存块，系统剩余的内存空间也够。但是这些是不连续的，连续的块可能只有 2k 大小，那么就会发生内存分配失败的情况。<br />
+如果是公司级别的程序，不像个人写的 demo。那么随着服务器长久时间的运行，可能会出现不断蚕食剩余内存的情况，这种内存问题很难排查。<br />
+除此之外，malloc 是会涉及用户态和内核态转换的。经常这样转换会影响服务器性能，我们应尽量避免直接向系统申请内存。<br />
+因此我们需要内存池来解决上述问题，本质就是程序员自己设置一套管理内存的手段。我们向系统申请大块的内存并交由内存池来管理，编程中对应内存的申请和释放就交给内存池来处理了。这样出问题了，我们也可以从内存池那里先排查，更容易发现内存相关的问题。<br />
+<strong>内存池实现不太容易，个人造内存相关的轮子容易出bug，企业级别的内存池更加有保障一些。比较出名的内存池有 jemalloc 和 tcmalloc，这两个都是全局内存池，比较推荐使用 tcmalloc。</strong></p>
+<h1 id="全局内存池还是局部内存池"><a class="markdownIt-Anchor" href="#全局内存池还是局部内存池"></a> 全局内存池还是局部内存池</h1>
+<p>如果现在有一个服务器，他时不时会接受新用户的连接。而我们将实现一个内存池用于管理内存，我们应该考虑将内存池设计成全局还是非全局形式。</p>
+<ol>
+<li>使用一个全局内存池，这样实现比较困难。对于内存块的回收更是令人头疼（我们从内存池分配出来的内存），好在我们可以使用jemalloc/tcmalloc</li>
+<li>针对每一个连接建立一个内存池，连接销毁释放内存池。这种情况下，这个内存池的生命周期就和这个连接的生命周期是一样的了。我们就不考虑小块的回收问题了。</li>
+</ol>
+<h1 id="内存池设计思想"><a class="markdownIt-Anchor" href="#内存池设计思想"></a> 内存池设计思想</h1>
+<p>这里参照 Nginx 的内存池设计思想，Nginx 内存池设计思路精巧简单，没有那么复杂。Nginx 每收到一个请求，就创建一个内存池给新连接使用，请求处理完成后释放内存池，因此内存池并非是单例模式的。<br />
+Ngin 将内存分为大块内存和小块内存来管理，对于小块内存，用户申请后不需要主动释放，而是等待释放内存池时再释放。对于大块内存，用户可以调用相关接口进行释放，也可以等内存池释放时再释放。因此，Nginx 对于小块内存的回收并不是很在意。<br />
+同时 Nginx 内存池支持增加回调函数，当内存池释放时，自动调用回调函数释放用户申请的资源。回调函数允许增加多个，通过链表进行链接，在内存池释放时被逐一调用。<br />
+Nginx 创建内存池会先申请 PAGE_SIZE 内存，我称为 block。一部分用来容纳 ngx_pool_t 结构体，另一部分内存则是用于满足用户申请。ngx_pool_data_t 结构体中的 last 指针和 end 指针之间的内存是空闲的，当用户申请小块内存时，如果空闲的内存大小满足用户的需求，则可以分配给用户。</p>
+<h2 id="管理内存块的结点"><a class="markdownIt-Anchor" href="#管理内存块的结点"></a> 管理内存块的结点</h2>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669112902652-afae0f9d-d616-435f-b40d-540c1b055bc9.png#averageHue=%23fcf0ca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=600&amp;id=ucea5d58c&amp;margin=%5Bobject%20Object%5D&amp;name=1669112895386.png&amp;originHeight=750&amp;originWidth=1151&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=35521&amp;status=done&amp;style=none&amp;taskId=u46ccc8da-09b7-4970-98dc-ab02aaad40c&amp;title=&amp;width=920.8" srcset="/img/loading.gif" lazyload alt="1669112895386.png" /></p>
+<ol>
+<li>end_：指向当前 block 块的结尾。</li>
+<li>last_：指向当前 block 块的使用位置。</li>
+<li>quote_：表示该 block 块的被引用次数。</li>
+<li>failed_：表示该 block 块的失效次数。</li>
+<li>next_：指向下一个 block 块。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">SmallNode</span><br>&#123;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* end_;     <span class="hljs-comment">// 该块的结尾</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* last_;    <span class="hljs-comment">// 该块目前使用位置</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> quote_;     <span class="hljs-comment">// 该块被引用次数</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> failed_;    <span class="hljs-comment">// 该块失效次数</span><br>    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">SmallNode</span>* next_; <span class="hljs-comment">// 指向下一个块</span><br>&#125;; <br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">LargeNode</span><br>&#123;<br>    <span class="hljs-type">void</span>* address_;          <span class="hljs-comment">// 该块的起始地址</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> size_;      <span class="hljs-comment">// 该块大小</span><br>    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">LargeNode</span>* next_; <span class="hljs-comment">// 指向下一个大块</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="内存池结构"><a class="markdownIt-Anchor" href="#内存池结构"></a> 内存池结构</h2>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Pool</span><br>&#123;<br>    LargeNode* largeList_;   <span class="hljs-comment">// 管理大块内存链表</span><br>    SmallNode* head_;        <span class="hljs-comment">// 头节点</span><br>    SmallNode* current_;     <span class="hljs-comment">// 指向当前分配的块，这样可以避免遍历前面已经不能分配的块  </span><br>&#125;;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">MemoryPool</span><br>&#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 默认构造，真正初始化工作交给 createPool</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-built_in">MemoryPool</span>() = <span class="hljs-keyword">default</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 默认析构，真正销毁工作交给 destroyPool</span><br><span class="hljs-comment">     */</span><br>    ~<span class="hljs-built_in">MemoryPool</span>() = <span class="hljs-keyword">default</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 初始化内存池，为 pool_ 分配 PAGE_SIZE 内存</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">createPool</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 销毁内存池，遍历大块内存和小块内存且释放它们</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">destroyPool</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 申请内存的接口，内部会判断创建大块还是小块内存</span><br><span class="hljs-comment">     * @param[in] size 分配内存大小</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">malloc</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 申请内存且将内存清零，内部调用 malloc</span><br><span class="hljs-comment">     * @param[in] size 分配内存大小</span><br><span class="hljs-comment">     */</span>    <br>    <span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">calloc</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 释放内存指定内存</span><br><span class="hljs-comment">     * @param[in] p 释放内存头地址</span><br><span class="hljs-comment">     */</span>    <br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">freeMemory</span><span class="hljs-params">(<span class="hljs-type">void</span>* p)</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 重置内存池</span><br><span class="hljs-comment">     */</span>    <br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">resetPool</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function">Pool* <span class="hljs-title">getPool</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> pool_; &#125;<br><br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 分配大块节点，被 malloc 调用</span><br><span class="hljs-comment">     * @param[in] size 分配内存大小</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">mallocLargeNode</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * @brief 分配小块节点，被 malloc 调用</span><br><span class="hljs-comment">     * @param[in] size 分配内存大小</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">mallocSmallNode</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span>;<br>    <br>    Pool* pool_ = <span class="hljs-literal">nullptr</span>;    <br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="创建内存池"><a class="markdownIt-Anchor" href="#创建内存池"></a> 创建内存池</h2>
+<p>使用 posix_memalign 函数可以向操作系统申请更大的内存，我们需要传入二级指针，在内部更改指针的指向。<br />
+创建内存池会为 pool_ 分配 PAGE_SIZE 大小内存，其中包含了 Pool 结构体，SmallNode 结构体，然后才是可用的内存。<br />
+<img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669112902652-afae0f9d-d616-435f-b40d-540c1b055bc9.png#averageHue=%23fcf0ca&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=url&amp;id=hCkNY&amp;margin=%5Bobject%20Object%5D&amp;originHeight=750&amp;originWidth=1151&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;title=" srcset="/img/loading.gif" lazyload alt="" /></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MemoryPool::createPool</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">int</span> ret = <span class="hljs-built_in">posix_memalign</span>((<span class="hljs-type">void</span> **)&amp;pool_, MP_ALIGNMENT, PAGE_SIZE);<br>    <span class="hljs-keyword">if</span> (ret) <br>    &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;posix_memalign failed\n&quot;</span>);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 分配 PAGE_SIZE 内存：Pool + SmallNode + 剩余可用内存</span><br>    pool_-&gt;largeList_ = <span class="hljs-literal">nullptr</span>;<br>    pool_-&gt;head_ = (SmallNode *)((<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)pool_ + <span class="hljs-built_in">sizeof</span>(Pool));<br>    pool_-&gt;head_-&gt;last_ = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)pool_ + <span class="hljs-built_in">sizeof</span>(Pool) + <span class="hljs-built_in">sizeof</span>(SmallNode);<br>    pool_-&gt;head_-&gt;end_ = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)pool_ + PAGE_SIZE;<br>    pool_-&gt;head_-&gt;failed_ = <span class="hljs-number">0</span>;<br>    pool_-&gt;current_ = pool_-&gt;head_;<br><br>    <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="分配小块内存"><a class="markdownIt-Anchor" href="#分配小块内存"></a> 分配小块内存</h2>
+<p>MemoryPool::malloc 内部会判断向内存池申请内存的大小，如果大于 PAGE_SIZE 则调用 mallocLargeNode 直接申请一个大块内存。如果是小块内存，那么需要判断当前 block 剩余空间是否满足要求，如果不满足则去下一个 block 查看。若都不够，则需要调用 mallocSmallNode 重新申请一个 block 块。<br />
+<img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669114301921-19452868-4a68-4ab4-87e9-48e252b2c9a4.png#averageHue=%23faefca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=555&amp;id=u0c847d75&amp;margin=%5Bobject%20Object%5D&amp;name=1669114288241.png&amp;originHeight=694&amp;originWidth=962&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=44099&amp;status=done&amp;style=none&amp;taskId=ud074f01b-06e9-480e-a0fc-dbd7f69059c&amp;title=&amp;width=769.6" srcset="/img/loading.gif" lazyload alt="1669114288241.png" /></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">MemoryPool::malloc</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (size &lt;= <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;<br>    &#125;<br><br><br>    <span class="hljs-comment">// 申请大块内存</span><br>    <span class="hljs-keyword">if</span> (size &gt; PAGE_SIZE - <span class="hljs-built_in">sizeof</span>(SmallNode))<br>    &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">mallocLargeNode</span>(size);<br>    &#125;<br><br><br>    <span class="hljs-comment">// 申请小块内存</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* addr = <span class="hljs-literal">nullptr</span>;<br>    SmallNode* cur = pool_-&gt;current_;<br>    <span class="hljs-keyword">while</span> (cur) <br>    &#123;<br>        <span class="hljs-comment">// 将cur-&gt;last指向处，格式化成16整数倍</span><br>        <span class="hljs-comment">// 比如 15-&gt;16 31-&gt;32</span><br>        addr = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)<span class="hljs-built_in">mp_align_ptr</span>(cur-&gt;last_, MP_ALIGNMENT);<br>        <span class="hljs-comment">// 「当前 block 结尾 - 初始地址」 &gt;= 「申请地址」</span><br>        <span class="hljs-comment">// 说明该 block 剩余位置足够分配</span><br>        <span class="hljs-keyword">if</span> (cur-&gt;end_ - addr &gt;= size)<br>        &#123;<br>            cur-&gt;quote_++; <span class="hljs-comment">// 该 block 被引用次数增加</span><br>            cur-&gt;last_ = addr + size; <span class="hljs-comment">// 更新已使用位置</span><br>            <span class="hljs-keyword">return</span> addr;<br>        &#125;<br>        <span class="hljs-comment">// 此block不够用，去下一个block</span><br>        cur = cur-&gt;next_;<br>    &#125;<br>    <span class="hljs-comment">// 说明已有的 block 都不够用，需要创建新的 block</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">mallocSmallNode</span>(size);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>当前 block 不够，创建新的 block 并分配内存。除此之外，我们还需要让两个块连接起来，因此会遍历 block 块，并让最后一个 block 块的 next 指针指向新分配的 block 块。<br />
+这个过程中，如果超过了五个不能用的 block 块，我们就会更新 <code>pool.current</code> 让其向后跳过这五个块，避免遍历过久。<br />
+<img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669115103834-2be88686-ec5f-4ddb-b9b4-d3bb66a8b424.png#averageHue=%23f6eeca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=642&amp;id=u2f0ac106&amp;margin=%5Bobject%20Object%5D&amp;name=1669115099452.png&amp;originHeight=803&amp;originWidth=1321&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=50812&amp;status=done&amp;style=none&amp;taskId=u69a9a069-4c3c-407b-9842-0c08179eef7&amp;title=&amp;width=1056.8" srcset="/img/loading.gif" lazyload alt="1669115099452.png" /></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 分配小块内存</span><br><span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">MemoryPool::mallocSmallNode</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* block;<br>    <span class="hljs-type">int</span> ret = <span class="hljs-built_in">posix_memalign</span>((<span class="hljs-type">void</span>**)&amp;block, MP_ALIGNMENT, PAGE_SIZE);<br>    <span class="hljs-keyword">if</span> (ret)<br>    &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 获取新块的 smallnode 节点</span><br>    SmallNode* smallNode = (SmallNode*)block;<br>    smallNode-&gt;end_ = block + PAGE_SIZE;<br>    smallNode-&gt;next_ = <span class="hljs-literal">nullptr</span>;<br><br>    <span class="hljs-comment">// 分配新块的起始位置</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* addr = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)<span class="hljs-built_in">mp_align_ptr</span>(block + <span class="hljs-built_in">sizeof</span>(SmallNode), MP_ALIGNMENT);<br>    smallNode-&gt;last_ = addr + size;<br>    smallNode-&gt;quote_++;<br><br>    <span class="hljs-comment">// 重新设置current</span><br>    SmallNode* current = pool_-&gt;current_;<br>    SmallNode* cur = current;<br>    <span class="hljs-keyword">while</span> (cur-&gt;next_ != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-comment">// 失效 block 数量过大，我们直接跳过这些 block，减少遍历次数</span><br>        <span class="hljs-comment">// 超过五个不能用的块，我们再更新current指针</span><br>        <span class="hljs-keyword">if</span> (cur-&gt;failed_ &gt;= <span class="hljs-number">5</span>)<br>        &#123;<br>            current = cur-&gt;next_;<br>        &#125;<br>        cur-&gt;failed_++;<br>        cur = cur-&gt;next_;<br>    &#125;<br>    <span class="hljs-comment">// now cur = last node</span><br>    cur-&gt;next_ = smallNode;<br>    pool_-&gt;current_ = current;<br>    <span class="hljs-keyword">return</span> addr;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="分配大块内存"><a class="markdownIt-Anchor" href="#分配大块内存"></a> 分配大块内存</h2>
+<p>先申请大块内存，然后在 pool 中找寻是否有可用的 largeNode 节点，因为可能某个节点之前释放了它所管理的内存，那么我们就不需要创建新的 largeNode 节点了。若找到，则 <code>largeNode-&gt;address_ = addr</code> 然后返回。<br />
+如果没找到可用的 largeNode 节点，则分配新的 largeNode，largeNode 节点的内存由 block 管理，故释放大块节点的时候也只是释放节点所管理的内存，largeNode 随着 block 的释放而释放。largeNode 使用头插法。<br />
+<img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1669116681431-a63a92f5-a9f8-4551-a087-2fee99dccdcd.png#averageHue=%23cee1ca&amp;clientId=u8e162442-b6f3-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=610&amp;id=u80a8f6cd&amp;margin=%5Bobject%20Object%5D&amp;name=1669116675172.png&amp;originHeight=762&amp;originWidth=799&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=33719&amp;status=done&amp;style=none&amp;taskId=ua6e92a25-c476-48cb-be94-bb526d6724f&amp;title=&amp;width=639.2" srcset="/img/loading.gif" lazyload alt="1669116675172.png" /></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 分配大块内存</span><br><span class="hljs-function"><span class="hljs-type">void</span>* <span class="hljs-title">MemoryPool::mallocLargeNode</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> size)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* addr;<br>    <span class="hljs-type">int</span> ret = <span class="hljs-built_in">posix_memalign</span>((<span class="hljs-type">void</span>**)&amp;addr, MP_ALIGNMENT, size);<br>    <span class="hljs-keyword">if</span> (ret)<br>    &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;<br>    &#125;<br><br>    <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br>    LargeNode* largeNode = pool_-&gt;largeList_;<br>    <span class="hljs-keyword">while</span> (largeNode != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (largeNode-&gt;address_ == <span class="hljs-literal">nullptr</span>)<br>        &#123;<br>            largeNode-&gt;size_ = size;<br>            largeNode-&gt;address_ = addr;<br>            <span class="hljs-keyword">return</span> addr;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (count++ &gt; <span class="hljs-number">3</span>)<br>        &#123;<br>            <span class="hljs-comment">// 为了避免过多的遍历，限制次数</span><br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br>        largeNode = largeNode-&gt;next_;<br>    &#125;<br><br>    <span class="hljs-comment">// 没有找到空闲的large结构体，分配一个新的large</span><br>    <span class="hljs-comment">// 比如第一次分配large的时候</span><br>    <span class="hljs-comment">// largeNode节点空间在block中被分配，释放大块的时候也只是释放节点管理的内存</span><br>    <span class="hljs-comment">// largeNode依靠block的释放函数</span><br>    largeNode = (LargeNode*)<span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">malloc</span>(<span class="hljs-built_in">sizeof</span>(LargeNode));<br>    <span class="hljs-keyword">if</span> (largeNode == <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-built_in">free</span>(addr); <span class="hljs-comment">// 申请节点内存失败，需要释放之前申请的大内存</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;<br>    &#125;<br><br>    largeNode-&gt;size_ = size;    <span class="hljs-comment">// 设置新块大小</span><br>    largeNode-&gt;address_ = addr; <span class="hljs-comment">// 设置新块地址</span><br>    <span class="hljs-comment">// 下面用头插法方式将新块加入到 largeList 的头部</span><br>    largeNode-&gt;next_ = pool_-&gt;largeList_; <br>    pool_-&gt;largeList_ = largeNode;<br>    <span class="hljs-keyword">return</span> addr;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h1 id="释放内存"><a class="markdownIt-Anchor" href="#释放内存"></a> 释放内存</h1>
+<p>如果是大块内存，找到之后直接释放；如果是小块内存，将引用计数减1，如果引用计数为0则重置last。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MemoryPool::freeMemory</span><span class="hljs-params">(<span class="hljs-type">void</span>* p)</span></span><br><span class="hljs-function"></span>&#123;<br>    LargeNode* large = pool_-&gt;largeList_;<br>    <span class="hljs-keyword">while</span> (large != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (large-&gt;address_ == p)<br>        &#123;<br>            <span class="hljs-built_in">free</span>(large-&gt;address_);<br>            large-&gt;size_ = <span class="hljs-number">0</span>;<br>            large-&gt;address_ = <span class="hljs-literal">nullptr</span>;<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        large = large-&gt;next_;<br>    &#125;<br><br>    SmallNode* small = pool_-&gt;head_;<br>    <span class="hljs-keyword">while</span> (small != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)small &lt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)p &amp;&amp;<br>            (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *) p &lt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *)small-&gt;end_)<br>        &#123;<br>            small-&gt;quote_--;<br>            <span class="hljs-comment">// 引用计数为0才释放</span><br>            <span class="hljs-keyword">if</span> (small-&gt;quote_ == <span class="hljs-number">0</span>)<br>            &#123;<br>                <span class="hljs-keyword">if</span> (small == pool_-&gt;head_)<br>                &#123;<br>                    pool_-&gt;head_-&gt;last_ = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *)pool_ + <span class="hljs-built_in">sizeof</span>(Pool) + <span class="hljs-built_in">sizeof</span>(SmallNode);<br>                &#125;<br>                <span class="hljs-keyword">else</span><br>                &#123;<br>                    <span class="hljs-comment">// last指针回到node节点尾处</span><br>                    small-&gt;last_ = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *)small + <span class="hljs-built_in">sizeof</span>(SmallNode);<br>                &#125;<br>                small-&gt;failed_ = <span class="hljs-number">0</span>;<br>                pool_-&gt;current_ = pool_-&gt;head_;<br>            &#125;<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        small = small-&gt;next_;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="销毁内存池"><a class="markdownIt-Anchor" href="#销毁内存池"></a> 销毁内存池</h2>
+<ol>
+<li>从头遍历大块内存节点，将其所管理的大块内存释放。</li>
+<li>从头遍历小块内存节点，释放 block 块管理的内存。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MemoryPool::destroyPool</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    LargeNode* large = pool_-&gt;largeList_;<br>    <span class="hljs-keyword">while</span> (large != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (large-&gt;address_ != <span class="hljs-literal">nullptr</span>)<br>        &#123;<br>            <span class="hljs-built_in">free</span>(large-&gt;address_);<br>        &#125;<br>        large = large-&gt;next_;<br>    &#125;<br><br>    SmallNode* cur = pool_-&gt;head_-&gt;next_;<br>    SmallNode* next = <span class="hljs-literal">nullptr</span>;<br>    <span class="hljs-keyword">while</span> (cur != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        next = cur-&gt;next_;<br>        <span class="hljs-built_in">free</span>(cur);<br>        cur = cur-&gt;next_;<br>    &#125;<br>    <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span>有错误</span><br>    <span class="hljs-built_in">free</span>(pool_);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="重置内存池"><a class="markdownIt-Anchor" href="#重置内存池"></a> 重置内存池</h2>
+<ol>
+<li>释放 LargeNode 节点管理的内存，将其置为空。</li>
+<li>从头遍历 SmallNode，重置其 last_，quote_，failed_。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MemoryPool::resetPool</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    SmallNode* small = pool_-&gt;head_;<br>    LargeNode* large = pool_-&gt;largeList_;<br><br>    <span class="hljs-keyword">while</span> (large != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (large-&gt;address_)<br>        &#123;<br>            <span class="hljs-built_in">free</span>(large-&gt;address_);<br>            large-&gt;address_ = <span class="hljs-literal">nullptr</span>;<br>        &#125;<br>        large = large-&gt;next_;<br>    &#125;<br><br>    pool_-&gt;largeList_ = <span class="hljs-literal">nullptr</span>;<br>    pool_-&gt;current_ = pool_-&gt;head_;<br>    <span class="hljs-keyword">while</span> (small != <span class="hljs-literal">nullptr</span>)<br>    &#123;<br>        small-&gt;last_ = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>*)small + <span class="hljs-built_in">sizeof</span>(SmallNode);<br>        small-&gt;failed_ = <span class="hljs-number">0</span>;<br>        small-&gt;quote_ = <span class="hljs-number">0</span>;<br>        small = small-&gt;next_;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h1 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h1>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/584670074">Nginx：内存池的实现</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/">项目实战</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%89%93%E9%80%A0WebServer/">从零开始打造WebServer</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/02/09/WebServer(7)/">
+                        <span class="hidden-mobile">WebServer(7) 异步日志模块</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
