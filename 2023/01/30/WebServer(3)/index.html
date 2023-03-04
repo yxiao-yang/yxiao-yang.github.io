@@ -16,15 +16,15 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="WebServer(3) Poller类  写在前面 源码链接：  正文  1 基类Poller的设计 我们编写网络编程代码的时候少不了使用IO复用系列函数，而muduo也为我们提供了对此的封装。muduo 有 Poller 和 EPollPoller 类分别对应着epoll和poll。而我们使用的接口是Poller，muduo 以 Poller 为虚基类，派生出 Poller 和 EPollP">
+    <meta name="description" content="WebServer(3) Poller类  写在前面 源码链接：https:&#x2F;&#x2F;github.com&#x2F;yxiao-yang&#x2F;Tiny-Webserver.git  正文  1 基类Poller的设计 我们编写网络编程代码的时候少不了使用IO复用系列函数，而 muduo 也为我们提供了对此的封装。 muduo 有 Poller 和 EPollPoller 类分别对应着epoll和poll。而我们使">
 <meta property="og:type" content="article">
 <meta property="og:title" content="WebServer(3) Poller类">
 <meta property="og:url" content="http://example.com/2023/01/30/WebServer(3)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="WebServer(3) Poller类  写在前面 源码链接：  正文  1 基类Poller的设计 我们编写网络编程代码的时候少不了使用IO复用系列函数，而muduo也为我们提供了对此的封装。muduo 有 Poller 和 EPollPoller 类分别对应着epoll和poll。而我们使用的接口是Poller，muduo 以 Poller 为虚基类，派生出 Poller 和 EPollP">
+<meta property="og:description" content="WebServer(3) Poller类  写在前面 源码链接：https:&#x2F;&#x2F;github.com&#x2F;yxiao-yang&#x2F;Tiny-Webserver.git  正文  1 基类Poller的设计 我们编写网络编程代码的时候少不了使用IO复用系列函数，而 muduo 也为我们提供了对此的封装。 muduo 有 Poller 和 EPollPoller 类分别对应着epoll和poll。而我们使">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-01-30T10:40:18.532Z">
-<meta property="article:modified_time" content="2023-02-06T06:44:17.721Z">
+<meta property="article:modified_time" content="2023-02-25T02:49:50.665Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      6k 字
+      6.1k 字
     </span>
   
 
@@ -238,17 +238,17 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：11 天前
+                  本文最后更新于：7 天前
                 
               </p>
             
             <div class="markdown-body">
               <h1 id="webserver3-poller类"><a class="markdownIt-Anchor" href="#webserver3-poller类"></a> WebServer(3) Poller类</h1>
 <h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
-<p>源码链接：</p>
+<p>源码链接：<a target="_blank" rel="noopener" href="https://github.com/yxiao-yang/Tiny-Webserver.git">https://github.com/yxiao-yang/Tiny-Webserver.git</a></p>
 <h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
 <h3 id="1-基类poller的设计"><a class="markdownIt-Anchor" href="#1-基类poller的设计"></a> 1 基类Poller的设计</h3>
-<p>我们编写网络编程代码的时候少不了使用IO复用系列函数，而muduo也为我们提供了对此的封装。muduo 有 Poller 和 EPollPoller 类分别对应着<code>epoll</code>和<code>poll</code>。而我们使用的接口是<code>Poller</code>，muduo 以 Poller 为虚基类，派生出 Poller 和 EPollPoller 两个子类，用不同的形式实现 IO 复用。</p>
+<p>我们编写网络编程代码的时候少不了使用IO复用系列函数，而 muduo 也为我们提供了对此的封装。 muduo 有 Poller 和 EPollPoller 类分别对应着<code>epoll</code>和<code>poll</code>。而我们使用的接口是<code>Poller</code>， muduo 以 Poller 为虚基类，派生出 Poller 和 EPollPoller 两个子类，用不同的形式实现 IO 复用。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Poller</span> : noncopyable &#123;<br> <span class="hljs-keyword">public</span>:<br>  <span class="hljs-keyword">using</span> ChannelList = std::vector&lt;Channel*&gt;;<br><br>  <span class="hljs-built_in">Poller</span>(EventLoop *Loop);<br>  <span class="hljs-keyword">virtual</span> ~<span class="hljs-built_in">Poller</span>() = <span class="hljs-keyword">default</span>;<br><br>  <span class="hljs-comment">// 需要交给派生类实现的接口</span><br>  <span class="hljs-function"><span class="hljs-keyword">virtual</span> Timestamp <span class="hljs-title">Poll</span><span class="hljs-params">(<span class="hljs-type">int</span> timeoutMs, ChannelList *activeChannels)</span> </span>= <span class="hljs-number">0</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">UpdateChannel</span><span class="hljs-params">(Channel *channel)</span> </span>= <span class="hljs-number">0</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">RemoveChannel</span><span class="hljs-params">(Channel *channel)</span> </span>= <span class="hljs-number">0</span>;<br><br>  <span class="hljs-comment">// 判断 channel是否注册到 poller当中</span><br>  <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">HasChannel</span><span class="hljs-params">(Channel *channel)</span> <span class="hljs-type">const</span></span>;<br><br>  <span class="hljs-comment">// EventLoop可以通过该接口获取默认的IO复用实现方式(默认epoll)</span><br>  <span class="hljs-comment">/** </span><br><span class="hljs-comment">   * 它的实现并不在 Poller.cc 文件中</span><br><span class="hljs-comment">   * 如果要实现则可以预料会其会包含EPollPoller PollPoller</span><br><span class="hljs-comment">   * 那么外面就会在基类引用派生类的头文件，这个抽象的设计就不好</span><br><span class="hljs-comment">   * 所以外面会单独创建一个 DefaultPoller.cc 的文件去实现</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-function"><span class="hljs-type">static</span> Poller* <span class="hljs-title">NewDefaultPoller</span><span class="hljs-params">(EventLoop *Loop)</span></span>;<br><br> <span class="hljs-keyword">protected</span>:  <br>  <span class="hljs-keyword">using</span> ChannelMap = std::unordered_map&lt;<span class="hljs-type">int</span>, Channel*&gt;;<br>  <span class="hljs-comment">// 储存 channel 的映射，（sockfd -&gt; channel*）</span><br>  ChannelMap channels_;<br><br> <span class="hljs-keyword">private</span>:<br>  EventLoop *ownerLoop_; <span class="hljs-comment">// 定义Poller所属的事件循环EventLoop</span><br>&#125;;<br></code></pre></td></tr></table></figure>
 <ul>
 <li><code>ChannelMap</code> <code>channels_</code> 需要存储从 fd -&gt; channel 的映射</li>
