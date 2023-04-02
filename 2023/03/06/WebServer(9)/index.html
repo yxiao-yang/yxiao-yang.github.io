@@ -23,13 +23,13 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="WebServer(9) 数据库连接池模块  写在前面 数据库的连接是一个很耗时的操作，也容易对数据库造成安全隐患。所以，在程序初始化的时候，集中创建多个数据库连接，并把他们集中管理，供程序使用，可以保证较快的数据库读写速度，还更加安全可靠。 在不适用 MySQL 连接池的情况下访问数据库，那么每一次创建数据库连接都需要经过如下步骤：  TCP 建立连接的三次握手（客户端与 MySQL 服务器的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1665327082304-9b3fbc3e-b0d9-4eac-bcbc-418b381ddea8.png#averageHue=%23f8f4ef&amp;clientId=u591dc90a-ed12-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=376&amp;id=u79028632&amp;margin=%5Bobject%20Object%5D&amp;name=1665327079%281%29.png&amp;originHeight=683&amp;originWidth=718&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=126938&amp;status=done&amp;style=none&amp;taskId=uece2772f-005d-43a4-9eab-78d4504e40c&amp;title=&amp;width=395.4000244140625">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1665327140913-5fc52739-eabc-4af6-9eb9-21a517afeec3.png#averageHue=%23e2e1dd&amp;clientId=u591dc90a-ed12-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=538&amp;id=uec36a17a&amp;margin=%5Bobject%20Object%5D&amp;name=1665327138%281%29.png&amp;originHeight=672&amp;originWidth=732&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=129800&amp;status=done&amp;style=none&amp;taskId=u8caab143-4e0b-4a68-9ff3-5cef684b322&amp;title=&amp;width=585.6">
+<meta property="og:image" content="http://example.com/img/web-server/9.1.png">
+<meta property="og:image" content="http://example.com/img/web-server/9.2.png">
 <meta property="article:published_time" content="2023-03-06T07:14:31.694Z">
-<meta property="article:modified_time" content="2023-03-10T03:59:14.354Z">
+<meta property="article:modified_time" content="2023-04-02T15:22:50.878Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2022/png/26752078/1665327082304-9b3fbc3e-b0d9-4eac-bcbc-418b381ddea8.png#averageHue=%23f8f4ef&amp;clientId=u591dc90a-ed12-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=376&amp;id=u79028632&amp;margin=%5Bobject%20Object%5D&amp;name=1665327079%281%29.png&amp;originHeight=683&amp;originWidth=718&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=126938&amp;status=done&amp;style=none&amp;taskId=uece2772f-005d-43a4-9eab-78d4504e40c&amp;title=&amp;width=395.4000244140625">
+<meta name="twitter:image" content="http://example.com/img/web-server/9.1.png">
   
   
   <title>WebServer(9) 数据库连接池模块 - Hexo</title>
@@ -241,7 +241,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：几秒前
+                  本文最后更新于：1 分钟前
                 
               </p>
             
@@ -257,9 +257,9 @@
 <li>MySQL 的关闭</li>
 <li>TCP 的四次握手关闭</li>
 </ol>
-<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1665327082304-9b3fbc3e-b0d9-4eac-bcbc-418b381ddea8.png#averageHue=%23f8f4ef&amp;clientId=u591dc90a-ed12-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=376&amp;id=u79028632&amp;margin=%5Bobject%20Object%5D&amp;name=1665327079%281%29.png&amp;originHeight=683&amp;originWidth=718&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=126938&amp;status=done&amp;style=none&amp;taskId=uece2772f-005d-43a4-9eab-78d4504e40c&amp;title=&amp;width=395.4000244140625" srcset="/img/loading.gif" lazyload alt="1665327079(1).png" /><br />
+<p><img src="/img/web-server/9.1.png" srcset="/img/loading.gif" lazyload alt="" /><br />
 可以看到不使用数据库连接池需要经过许多的耗时操作，如果使用数据库连接池可以避免部分操作，加快访问速度。<br />
-<img src="https://cdn.nlark.com/yuque/0/2022/png/26752078/1665327140913-5fc52739-eabc-4af6-9eb9-21a517afeec3.png#averageHue=%23e2e1dd&amp;clientId=u591dc90a-ed12-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=538&amp;id=uec36a17a&amp;margin=%5Bobject%20Object%5D&amp;name=1665327138%281%29.png&amp;originHeight=672&amp;originWidth=732&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=129800&amp;status=done&amp;style=none&amp;taskId=u8caab143-4e0b-4a68-9ff3-5cef684b322&amp;title=&amp;width=585.6" srcset="/img/loading.gif" lazyload alt="1665327138(1).png" /></p>
+<img src="/img/web-server/9.2.png" srcset="/img/loading.gif" lazyload alt="" /></p>
 <h2 id="1-mysql接口封装"><a class="markdownIt-Anchor" href="#1-mysql接口封装"></a> 1 MySQL接口封装</h2>
 <p>我们使用 MySQL 经常进行哪些操作？首先肯定要连接数据库，然后我们会对数据库进行增删改查操作。高级操作还会涉及到事务和回滚操作。这些功能 MySQL 都为我们提供了 C API，我们需要设计一个 MysqlConn 类进一步封装这些接口。</p>
 <h3 id="11-mysql重要api"><a class="markdownIt-Anchor" href="#11-mysql重要api"></a> 1.1 MySQL重要API</h3>
