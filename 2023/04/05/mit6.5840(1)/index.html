@@ -1,0 +1,528 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/app.png">
+  <link rel="icon" href="/img/app.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="mit6.5840 lab1:MapReduce  写在前面 3月投了很多实习简历，经历了很多笔试面试，意识到自己的技术栈依然浅薄，所以开启我的第三个正式项目：基于go的分布式kv数据库。希望能掌握到go技术栈和分布式的知识。  正文  1 任务目标 构建一个MapReduce系统，实现worker进程（该进程调用应用程序 Map 和 Reduce 函数并处理文件的读取和写入）和coordina">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2023/04/05/mit6.5840(1)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="mit6.5840 lab1:MapReduce  写在前面 3月投了很多实习简历，经历了很多笔试面试，意识到自己的技术栈依然浅薄，所以开启我的第三个正式项目：基于go的分布式kv数据库。希望能掌握到go技术栈和分布式的知识。  正文  1 任务目标 构建一个MapReduce系统，实现worker进程（该进程调用应用程序 Map 和 Reduce 函数并处理文件的读取和写入）和coordina">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-05T12:18:00.209Z">
+<meta property="article:modified_time" content="2023-04-09T11:12:31.765Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>羊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-04-05 20:18" pubdate>
+        2023年4月5日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.8k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      74 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：几秒前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="mit65840-lab1mapreduce"><a class="markdownIt-Anchor" href="#mit65840-lab1mapreduce"></a> mit6.5840 lab1:MapReduce</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>3月投了很多实习简历，经历了很多笔试面试，意识到自己的技术栈依然浅薄，所以开启我的第三个正式项目：基于go的分布式kv数据库。希望能掌握到go技术栈和分布式的知识。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<h3 id="1-任务目标"><a class="markdownIt-Anchor" href="#1-任务目标"></a> 1 任务目标</h3>
+<p>构建一个MapReduce系统，实现worker进程（该进程调用应用程序 Map 和 Reduce 函数并处理文件的读取和写入）和coordinator进程（该进程将任务分发给工作线程并处理失败的worker线程）。实现mr文件夹下的三个文件即可。</p>
+<h3 id="2-任务思路"><a class="markdownIt-Anchor" href="#2-任务思路"></a> 2 任务思路</h3>
+<p>coordinator应该存在一个状态，用以告诉worker当前系统处于什么阶段，应该执行什么任务。</p>
+<p>coordinator应该存放有任务队列，用以将任务发放。</p>
+<p>coordinator应该告诉worker一些必要信息。</p>
+<p>worker完成任务后应该通知coordinator，否则若超时将视为任务失败，将把超时任务分发给其他worker。</p>
+<p>因为可能在同一时刻，有多个worker同时访问coordinator，所以coordinator在某些地方应该上锁。</p>
+<p>因为在同一个文件系统，所以worker在执行任务时，应当先创建临时文件，再通过os.Rename()重命名，以免出现一些错误。</p>
+<p>每个worker应该有一个ID，以便避免任务超时重发时出现的相关bug。</p>
+<p>在本实验中，由于每个文件都不大，所以就不进行文件切分，而是把每个小文件当成一个map任务，然后产生nReduce数量的reduce任务和最终结果。</p>
+<p>在Map阶段所有任务完成之后，再进行Reduce。</p>
+<h3 id="3-实现细节"><a class="markdownIt-Anchor" href="#3-实现细节"></a> 3 实现细节</h3>
+<h4 id="31-rpc通信"><a class="markdownIt-Anchor" href="#31-rpc通信"></a> 3.1 rpc通信</h4>
+<p>在MapReduce中worker需要不断向coordinator请求任务，在完成任务时也需要向coordinator进行汇报。在实现上worker要和coordinator通信时只需要调用call方法就可以了，注意里面的参数有三个，分别是要调用的coordinator里的方法名、要传的参数以及接收数据用的数据结构，在该lab中传参为空即可。</p>
+<p>插叙：剖析一下call方法，主要有两个步骤实现rpc通信。一是通过rpc.DialHTTP和本地的coordinator建立连接，二是调用rpc.DialHTTP的返回值的Call方法实现通信。</p>
+<p>所以要解决的事情就在接收数据用的数据结构上面，把它在rpc文件里面定义出来就行了。（这里定义的时候可以根据需要随时加入内容，图方便就全放上来了。）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// Task worker向coordinator获取task的结构体</span><br><span class="hljs-keyword">type</span> Task <span class="hljs-keyword">struct</span> &#123;<br>	TaskType   TaskType <span class="hljs-comment">// 任务类型判断到底是map还是reduce</span><br>	TaskId     <span class="hljs-type">int</span>      <span class="hljs-comment">// 任务的id</span><br>	ReducerNum <span class="hljs-type">int</span>      <span class="hljs-comment">// 传入的reducer的数量，用于hash</span><br>	FileSlice  []<span class="hljs-type">string</span> <span class="hljs-comment">// 输入文件的切片，map一个文件对应一个文件，reduce是对应多个temp中间值文件</span><br>&#125;<br><br><span class="hljs-comment">// TaskArgs rpc应该传入的参数，可实际上应该什么都不用传,因为只是worker获取一个任务</span><br><span class="hljs-keyword">type</span> TaskArgs <span class="hljs-keyword">struct</span>&#123;&#125;<br><br><span class="hljs-comment">// TaskType 对于下方枚举任务的父类型</span><br><span class="hljs-keyword">type</span> TaskType <span class="hljs-type">int</span><br><br><span class="hljs-comment">// Phase 对于分配任务阶段的父类型</span><br><span class="hljs-keyword">type</span> Phase <span class="hljs-type">int</span><br><br><span class="hljs-comment">// State 任务的状态的父类型</span><br><span class="hljs-keyword">type</span> State <span class="hljs-type">int</span><br><br><span class="hljs-comment">// 枚举任务的类型</span><br><span class="hljs-keyword">const</span> (<br>	MapTask TaskType = <span class="hljs-literal">iota</span><br>	ReduceTask<br>	WaittingTask <span class="hljs-comment">// Waittingen任务代表此时为任务都分发完了，但是任务还没完成，阶段未改变</span><br>	ExitTask     <span class="hljs-comment">// exit</span><br>)<br><br><span class="hljs-comment">// 枚举阶段的类型</span><br><span class="hljs-keyword">const</span> (<br>	MapPhase    Phase = <span class="hljs-literal">iota</span> <span class="hljs-comment">// 此阶段在分发MapTask</span><br>	ReducePhase              <span class="hljs-comment">// 此阶段在分发ReduceTask</span><br>	AllDone                  <span class="hljs-comment">// 此阶段已完成</span><br>)<br><br><span class="hljs-comment">// 任务状态类型</span><br><span class="hljs-keyword">const</span> (<br>	Working State = <span class="hljs-literal">iota</span> <span class="hljs-comment">// 此阶段在工作</span><br>	Waiting              <span class="hljs-comment">// 此阶段在等待执行</span><br>	Done                 <span class="hljs-comment">// 此阶段已经做完</span><br>)<br></code></pre></td></tr></table></figure>
+<h4 id="32-worker主函数"><a class="markdownIt-Anchor" href="#32-worker主函数"></a> 3.2 worker主函数</h4>
+<p>主函数要做的就是不断循环，通过rpc向coordinator获取任务，再根据任务的类型做相应的处理（调不同的函数就行了）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Worker</span><span class="hljs-params">(mapf <span class="hljs-keyword">func</span>(<span class="hljs-type">string</span>, <span class="hljs-type">string</span>)</span></span> []KeyValue, reducef <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(<span class="hljs-type">string</span>, []<span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span>) &#123;<br>	<span class="hljs-comment">//CallExample()</span><br>	<span class="hljs-comment">// 唤醒此worker</span><br>	keepFlag := <span class="hljs-literal">true</span><br>	<span class="hljs-keyword">for</span> keepFlag &#123;<br>		task := GetTask()<br>		<span class="hljs-keyword">switch</span> task.TaskType &#123;<br>		<span class="hljs-keyword">case</span> MapTask:<br>			&#123;<br>				DoMapTask(mapf, &amp;task)<br>				callDone(&amp;task)<br>			&#125;<br>		<span class="hljs-keyword">case</span> WaittingTask:<br>			&#123;<br>				time.Sleep(time.Second * <span class="hljs-number">5</span>)<br>			&#125;<br>		<span class="hljs-keyword">case</span> ReduceTask:<br>			&#123;<br>				DoReduceTask(reducef, &amp;task)<br>				callDone(&amp;task)<br>			&#125;<br>		<span class="hljs-keyword">case</span> ExitTask:<br>			&#123;<br>				time.Sleep(time.Second)<br>				fmt.Println(<span class="hljs-string">&quot;All tasks are Done ,will be exiting...&quot;</span>)<br>				keepFlag = <span class="hljs-literal">false</span><br>			&#125;<br>		&#125;<br>	&#125;<br>	time.Sleep(time.Second)<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="33-worker向coordinator获取任务"><a class="markdownIt-Anchor" href="#33-worker向coordinator获取任务"></a> 3.3 worker向coordinator获取任务</h4>
+<p>上面介绍rpc时候说了，调call方法就行，放置一个在rpc里定义的结构体去接收coordinator传回来的任务。这里调的Coordinator.PollTask就是在coordinator里面用来发任务的函数。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// GetTask 获取任务（需要知道是Map任务，还是Reduce）</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetTask</span><span class="hljs-params">()</span></span> Task &#123;<br>	args := TaskArgs&#123;&#125;<br>	reply := Task&#123;&#125;<br>	ok := call(<span class="hljs-string">&quot;Coordinator.PollTask&quot;</span>, &amp;args, &amp;reply)<br>	<span class="hljs-comment">//wMu.Unlock()</span><br>	<span class="hljs-keyword">if</span> ok &#123;<br>		<span class="hljs-comment">//fmt.Println(&quot;worker get &quot;, reply.TaskType, &quot;task :Id[&quot;, reply.TaskId, &quot;]&quot;)</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		fmt.Printf(<span class="hljs-string">&quot;call failed!\n&quot;</span>)<br>	&#125;<br>	<span class="hljs-keyword">return</span> reply<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="34-worker处理map任务"><a class="markdownIt-Anchor" href="#34-worker处理map任务"></a> 3.4 worker处理map任务</h4>
+<p>核心其实是mapf函数，但原代码已经提供给我们了，所以只需要把mapf的参数弄好就可以了。简简单单读取个文件，作为参数调用mapf，然后按照MapReduce的逻辑，将mapf返回来的kv数组划分成长度为nReduce（系统提供）的二维切片保存到本地作为临时文件。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">DoMapTask</span><span class="hljs-params">(mapf <span class="hljs-keyword">func</span>(<span class="hljs-type">string</span>, <span class="hljs-type">string</span>)</span></span> []KeyValue, response *Task) &#123;<br>	<span class="hljs-keyword">var</span> intermediate []KeyValue<br>	filename := response.FileSlice[<span class="hljs-number">0</span>]<br><br>	file, err := os.Open(filename)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">&quot;cannot open %v&quot;</span>, filename)<br>	&#125;<br>	<span class="hljs-comment">// 通过io工具包获取content作为mapf的参数</span><br>	content, err := ioutil.ReadAll(file)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">&quot;cannot read %v&quot;</span>, filename)<br>	&#125;<br>	file.Close()<br>	<span class="hljs-comment">// mapf返回一组KV结构体数组</span><br>	intermediate = mapf(filename, <span class="hljs-type">string</span>(content))<br><br>	<span class="hljs-comment">//initialize and loop over []KeyValue</span><br>	rn := response.ReducerNum<br>	<span class="hljs-comment">// 创建一个长度为nReduce的二维切片</span><br>	HashedKV := <span class="hljs-built_in">make</span>([][]KeyValue, rn)<br><br>	<span class="hljs-keyword">for</span> _, kv := <span class="hljs-keyword">range</span> intermediate &#123;<br>		HashedKV[ihash(kv.Key)%rn] = <span class="hljs-built_in">append</span>(HashedKV[ihash(kv.Key)%rn], kv)<br>	&#125;<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; rn; i++ &#123;<br>		oname := <span class="hljs-string">&quot;mr-tmp-&quot;</span> + strconv.Itoa(response.TaskId) + <span class="hljs-string">&quot;-&quot;</span> + strconv.Itoa(i)<br>		ofile, _ := os.Create(oname)<br>		enc := json.NewEncoder(ofile)<br>		<span class="hljs-keyword">for</span> _, kv := <span class="hljs-keyword">range</span> HashedKV[i] &#123;<br>			err := enc.Encode(kv)<br>			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>				<span class="hljs-keyword">return</span><br>			&#125;<br>		&#125;<br>		ofile.Close()<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="35-worker处理reduce任务"><a class="markdownIt-Anchor" href="#35-worker处理reduce任务"></a> 3.5 worker处理reduce任务</h4>
+<p>大体思路和map差不多，不同点在于在调用reducef前要先取出来该任务对应的这些中间文件，对它们做一次洗牌（按键值从小到大排序，下面再说）。在调用reducef后将返回值写入到一个文件就行了。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">DoReduceTask</span><span class="hljs-params">(reducef <span class="hljs-keyword">func</span>(<span class="hljs-type">string</span>, []<span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span>, response *Task) &#123;<br>	reduceFileNum := response.TaskId<br>	intermediate := shuffle(response.FileSlice)<br>	dir, _ := os.Getwd()<br>	tempFile, err := ioutil.TempFile(dir, <span class="hljs-string">&quot;mr-tmp-*&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">&quot;Failed to create temp file&quot;</span>, err)<br>	&#125;<br>	i := <span class="hljs-number">0</span><br>	<span class="hljs-keyword">for</span> i &lt; <span class="hljs-built_in">len</span>(intermediate) &#123;<br>		j := i + <span class="hljs-number">1</span><br>		<span class="hljs-keyword">for</span> j &lt; <span class="hljs-built_in">len</span>(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key &#123;<br>			j++<br>		&#125;<br>		<span class="hljs-keyword">var</span> values []<span class="hljs-type">string</span><br>		<span class="hljs-keyword">for</span> k := i; k &lt; j; k++ &#123;<br>			values = <span class="hljs-built_in">append</span>(values, intermediate[k].Value)<br>		&#125;<br>		output := reducef(intermediate[i].Key, values)<br>		fmt.Fprintf(tempFile, <span class="hljs-string">&quot;%v %v\n&quot;</span>, intermediate[i].Key, output)<br>		i = j<br>	&#125;<br>	tempFile.Close()<br><br>	<span class="hljs-comment">// 在完全写入后进行重命名</span><br>	fn := fmt.Sprintf(<span class="hljs-string">&quot;mr-out-%d&quot;</span>, reduceFileNum)<br>	os.Rename(tempFile.Name(), fn)<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="36-洗牌排序"><a class="markdownIt-Anchor" href="#36-洗牌排序"></a> 3.6 洗牌（排序）</h4>
+<p>为了模拟真正分布式运行的操作方式，在这里用了一个json编码解码的冗余操作。核心在于让键值对结构体按键做排序，所以重写了sort接口，在实例程序中有所体现，复用即可（正好前几天美团二面时也问到了这个问题）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 洗牌方法，得到一组排序好的kv数组</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">shuffle</span><span class="hljs-params">(files []<span class="hljs-type">string</span>)</span></span> []KeyValue &#123;<br>	<span class="hljs-keyword">var</span> kva []KeyValue<br>	<span class="hljs-keyword">for</span> _, filepath := <span class="hljs-keyword">range</span> files &#123;<br>		file, _ := os.Open(filepath)<br>		dec := json.NewDecoder(file)<br>		<span class="hljs-keyword">for</span> &#123;<br>			<span class="hljs-keyword">var</span> kv KeyValue<br>			<span class="hljs-keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="hljs-literal">nil</span> &#123;<br>				<span class="hljs-keyword">break</span><br>			&#125;<br>			kva = <span class="hljs-built_in">append</span>(kva, kv)<br>		&#125;<br>		file.Close()<br>	&#125;<br>	<span class="hljs-comment">// 重写sort接口</span><br>	sort.Sort(SortedKey(kva))<br>	<span class="hljs-keyword">return</span> kva<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> SortedKey []KeyValue<br><br><span class="hljs-comment">// Len 重写len,swap,less才能排序</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(k SortedKey)</span></span> Len() <span class="hljs-type">int</span>           &#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(k) &#125;<br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(k SortedKey)</span></span> Swap(i, j <span class="hljs-type">int</span>)      &#123; k[i], k[j] = k[j], k[i] &#125;<br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(k SortedKey)</span></span> Less(i, j <span class="hljs-type">int</span>) <span class="hljs-type">bool</span> &#123; <span class="hljs-keyword">return</span> k[i].Key &lt; k[j].Key &#125;<br></code></pre></td></tr></table></figure>
+<h4 id="37-coordinator定义"><a class="markdownIt-Anchor" href="#37-coordinator定义"></a> 3.7 coordinator定义</h4>
+<p>注释详细。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 定义为全局，worker之间访问coordinator时加锁</span><br><span class="hljs-keyword">var</span> (<br>	mu sync.Mutex<br>)<br><br><span class="hljs-keyword">type</span> Coordinator <span class="hljs-keyword">struct</span> &#123;<br>	<span class="hljs-comment">// Your definitions here.</span><br>	ReducerNum        <span class="hljs-type">int</span>            <span class="hljs-comment">// 传入的参数决定需要多少个reducer</span><br>	TaskId            <span class="hljs-type">int</span>            <span class="hljs-comment">// 用于生成task的特殊id</span><br>	DistPhase         Phase          <span class="hljs-comment">// 目前整个框架应该处于什么任务阶段</span><br>	ReduceTaskChannel <span class="hljs-keyword">chan</span> *Task     <span class="hljs-comment">// 使用chan保证并发安全</span><br>	MapTaskChannel    <span class="hljs-keyword">chan</span> *Task     <span class="hljs-comment">// 使用chan保证并发安全</span><br>	taskMetaHolder    TaskMetaHolder <span class="hljs-comment">// 存着task</span><br>	files             []<span class="hljs-type">string</span>       <span class="hljs-comment">// 传入的文件数组</span><br>&#125;<br><br><span class="hljs-comment">// TaskMetaInfo 保存任务的元数据</span><br><span class="hljs-keyword">type</span> TaskMetaInfo <span class="hljs-keyword">struct</span> &#123;<br>	state     State     <span class="hljs-comment">// 任务的状态</span><br>	StartTime time.Time <span class="hljs-comment">// 任务的开始时间，为crash做准备</span><br>	TaskAdr   *Task     <span class="hljs-comment">// 传入任务的指针,为的是这个任务从通道中取出来后，还能通过地址标记这个任务已经完成</span><br>&#125;<br><br><span class="hljs-comment">// TaskMetaHolder 保存全部任务的元数据</span><br><span class="hljs-keyword">type</span> TaskMetaHolder <span class="hljs-keyword">struct</span> &#123;<br>	MetaMap <span class="hljs-keyword">map</span>[<span class="hljs-type">int</span>]*TaskMetaInfo <span class="hljs-comment">// 通过下标hash快速定位</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="38-coordinator主函数"><a class="markdownIt-Anchor" href="#38-coordinator主函数"></a> 3.8 coordinator主函数</h4>
+<p>初始化coodinator，然后调函数把文件全部放入map队列里面，再开启server监听worker的请求就行了。最后又起了一个线程去做crash检测，目的是通过最后一项crash test，稍后再说。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MakeCoordinator</span><span class="hljs-params">(files []<span class="hljs-type">string</span>, nReduce <span class="hljs-type">int</span>)</span></span> *Coordinator &#123;<br>	c := Coordinator&#123;<br>		files:             files,<br>		ReducerNum:        nReduce,<br>		DistPhase:         MapPhase,<br>		MapTaskChannel:    <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Task, <span class="hljs-built_in">len</span>(files)),<br>		ReduceTaskChannel: <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Task, nReduce),<br>		taskMetaHolder: TaskMetaHolder&#123;<br>			MetaMap: <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">int</span>]*TaskMetaInfo, <span class="hljs-built_in">len</span>(files)+nReduce), <span class="hljs-comment">// 任务的总数应该是files + Reducer的数量</span><br>		&#125;,<br>	&#125;<br>	c.makeMapTasks(files)<br>	c.server()<br>	<span class="hljs-keyword">go</span> c.CrashDetector()<br>	<span class="hljs-keyword">return</span> &amp;c<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="39-coordinator初始化map队列"><a class="markdownIt-Anchor" href="#39-coordinator初始化map队列"></a> 3.9 coordinator初始化map队列</h4>
+<p>把文件名字符串数组挨个转化成task形式，加入到map队列里就行了。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// makeMapTasks 对map任务进行处理,初始化map任务</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Coordinator)</span></span> makeMapTasks(files []<span class="hljs-type">string</span>) &#123;<br>	<span class="hljs-comment">// 文件-&gt;任务-&gt;map队列</span><br>	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> files &#123;<br>		id := c.generateTaskId()<br>		task := Task&#123;<br>			TaskType:   MapTask,<br>			TaskId:     id,<br>			ReducerNum: c.ReducerNum,<br>			FileSlice:  []<span class="hljs-type">string</span>&#123;v&#125;,<br>		&#125;<br><br>		<span class="hljs-comment">// 保存任务的初始状态</span><br>		taskMetaInfo := TaskMetaInfo&#123;<br>			state:   Waiting, <span class="hljs-comment">// 任务等待被执行</span><br>			TaskAdr: &amp;task,   <span class="hljs-comment">// 保存任务的地址</span><br>		&#125;<br>		c.taskMetaHolder.acceptMeta(&amp;taskMetaInfo)<br><br>		<span class="hljs-comment">// 新生成的任务加入到map队列</span><br>		c.MapTaskChannel &lt;- &amp;task<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="310-coordinator初始化reduce队列"><a class="markdownIt-Anchor" href="#310-coordinator初始化reduce队列"></a> 3.10 coordinator初始化reduce队列</h4>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// makeReduceTasks 初始化reduce队列</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Coordinator)</span></span> makeReduceTasks() &#123;<br>	<span class="hljs-comment">// map任务-&gt;reduce队列</span><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; c.ReducerNum; i++ &#123;<br>		id := c.generateTaskId()<br>		task := Task&#123;<br>			TaskId:    id,<br>			TaskType:  ReduceTask,<br>			FileSlice: selectReduceName(i),<br>		&#125;<br><br>		<span class="hljs-comment">// 保存任务的初始状态</span><br>		taskMetaInfo := TaskMetaInfo&#123;<br>			state:   Waiting, <span class="hljs-comment">// 任务等待被执行</span><br>			TaskAdr: &amp;task,   <span class="hljs-comment">// 保存任务的地址</span><br>		&#125;<br>		c.taskMetaHolder.acceptMeta(&amp;taskMetaInfo)<br><br>		<span class="hljs-comment">// 新生成的任务加入到map队列</span><br>		c.ReduceTaskChannel &lt;- &amp;task<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="311-补充crash-test"><a class="markdownIt-Anchor" href="#311-补充crash-test"></a> 3.11 补充：crash test？</h4>
+<p>这一部分是应对当worker崩溃时候的措施。循环检查当前任务状态，如果超时就将任务收回，重新加入到队列中去。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// CrashDetector crash检测</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Coordinator)</span></span> CrashDetector() &#123;<br>	<span class="hljs-keyword">for</span> &#123;<br>		time.Sleep(time.Second * <span class="hljs-number">2</span>)<br>		mu.Lock()<br>		<span class="hljs-keyword">if</span> c.DistPhase == AllDone &#123;<br>			mu.Unlock()<br>			<span class="hljs-keyword">break</span><br>		&#125;<br><br>		<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> c.taskMetaHolder.MetaMap &#123;<br>			<span class="hljs-keyword">if</span> v.state == Working &#123;<br>				<span class="hljs-comment">//fmt.Println(&quot;task[&quot;, v.TaskAdr.TaskId, &quot;] is working: &quot;, time.Since(v.StartTime), &quot;s&quot;)</span><br>			&#125;<br><br>			<span class="hljs-keyword">if</span> v.state == Working &amp;&amp; time.Since(v.StartTime) &gt; <span class="hljs-number">9</span>*time.Second &#123;<br>				fmt.Printf(<span class="hljs-string">&quot;the task[ %d ] is crash,take [%d] s\n&quot;</span>, v.TaskAdr.TaskId, time.Since(v.StartTime))<br><br>				<span class="hljs-keyword">switch</span> v.TaskAdr.TaskType &#123;<br>				<span class="hljs-keyword">case</span> MapTask:<br>					c.MapTaskChannel &lt;- v.TaskAdr<br>					v.state = Waiting<br>				<span class="hljs-keyword">case</span> ReduceTask:<br>					c.ReduceTaskChannel &lt;- v.TaskAdr<br>					v.state = Waiting<br><br>				&#125;<br>			&#125;<br>		&#125;<br>		mu.Unlock()<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
+<p>大概主要的函数都写在上面了，有一些简单的函数没体现在上面，不过大致思路弄明白了相信就能轻松实现了。这一个lab大概明白了分布式的一个基本思路，不过还没接触到真正分布式的东西，接着往后学吧。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/">项目实战</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/%E5%88%86%E5%B8%83%E5%BC%8Fkv%E6%95%B0%E6%8D%AE%E5%BA%93/">分布式kv数据库</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/03/06/WebServer(9)/">
+                        <span class="hidden-mobile">WebServer(9) 数据库连接池模块</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
