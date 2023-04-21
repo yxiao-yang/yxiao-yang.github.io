@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/mit6.5840/2.1.jpg">
 <meta property="article:published_time" content="2023-04-19T15:01:34.402Z">
-<meta property="article:modified_time" content="2023-04-21T03:48:03.921Z">
+<meta property="article:modified_time" content="2023-04-21T03:52:10.473Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/mit6.5840/2.1.jpg">
@@ -207,7 +207,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      86 分钟
+      85 分钟
     </span>
   
 
@@ -240,7 +240,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -276,8 +276,8 @@
 <h3 id="6-getstate返回当前节点状态"><a class="markdownIt-Anchor" href="#6-getstate返回当前节点状态"></a> 6 GetState：返回当前节点状态</h3>
 <p>测试程序会调用。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(rf *Raft)</span></span> GetState() (<span class="hljs-type">int</span>, <span class="hljs-type">bool</span>) &#123;<br>	<span class="hljs-comment">// 加锁</span><br>	rf.mu.Lock()<br>	<span class="hljs-keyword">defer</span> rf.mu.Unlock()<br><br>	<span class="hljs-comment">// 返回值</span><br>	<span class="hljs-keyword">var</span> term <span class="hljs-type">int</span>      <span class="hljs-comment">// 当前节点term</span><br>	<span class="hljs-keyword">var</span> isleader <span class="hljs-type">bool</span> <span class="hljs-comment">// 是否是leader</span><br><br>	<span class="hljs-comment">// Your code here (2A).</span><br>	term = rf.currentTerm<br>	<span class="hljs-keyword">if</span> rf.status == Leader &#123;<br>		isleader = <span class="hljs-literal">true</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		isleader = <span class="hljs-literal">false</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> term, isleader<br>&#125;<br></code></pre></td></tr></table></figure>
-<h3 id="7-运行结果"><a class="markdownIt-Anchor" href="#7-运行结果"></a> 7 运行结果</h3>
-<p><img src="/img/mit6.5840/2.1.jpg" srcset="/img/loading.gif" lazyload alt="图为Reactor架构图（图源知乎）" /></p>
+<h2 id="运行结果"><a class="markdownIt-Anchor" href="#运行结果"></a> 运行结果</h2>
+<p><img src="/img/mit6.5840/2.1.jpg" srcset="/img/loading.gif" lazyload alt="图为测试程序运行结果" /></p>
 
             </div>
             <hr>
