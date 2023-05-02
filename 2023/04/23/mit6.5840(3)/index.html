@@ -23,10 +23,12 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="mit6.5840 lab2B:Raft日志同步  写在前面 这一节实现上一节中未实现的日志增量内容，去看2b的test可以发现其实是调用raft中的start函数，对leader节点写入log，然后检测log是否成功其实就是通过applyChan协程一直检测，可以自己多去看看test的源码。然后具体的代码编写、字段其实paper中也提到了，包括一些实现的细节也在figure中有提到。 为减少代">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/mit6.5840/2.2.jpg">
 <meta property="article:published_time" content="2023-04-23T14:53:23.078Z">
-<meta property="article:modified_time" content="2023-04-25T03:02:40.537Z">
+<meta property="article:modified_time" content="2023-05-02T14:50:15.816Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/mit6.5840/2.2.jpg">
   
   
   <title>mit6.5840 lab2B:Raft日志同步 - Hexo</title>
@@ -238,7 +240,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：3 天前
+                  本文最后更新于：39 分钟前
                 
               </p>
             
@@ -269,7 +271,8 @@
 <h4 id="34-sendappendentries新增三种状态处理"><a class="markdownIt-Anchor" href="#34-sendappendentries新增三种状态处理"></a> 3.4 sendAppendEntries新增三种状态处理</h4>
 <p>对于一轮发送的日志请求，与vote一致，超过半数节点就可以更新自身的commitIndex，并apply至客户端，对于一些返回的任期比自己大的reply那么说明肯定是经历了网络分区，需要进行投票重排。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 目标节点正常返回</span><br><span class="hljs-keyword">case</span> AppNormal:<br>    &#123;<br>        <span class="hljs-comment">// 2A的test目的是让Leader能不能连续任期，所以2A只需要对节点初始化然后返回就好</span><br>        <span class="hljs-comment">// 2B需要判断返回的节点是否超过半数commit，才能将自身commit</span><br>        <span class="hljs-keyword">if</span> reply.Success &amp;&amp; reply.Term == rf.currentTerm &amp;&amp; *appendNums &lt;= <span class="hljs-built_in">len</span>(rf.peers)/<span class="hljs-number">2</span> &#123;<br>            *appendNums++<br>        &#125;<br><br>        <span class="hljs-comment">// 说明返回的值已经大过了自身数组</span><br>        <span class="hljs-keyword">if</span> rf.nextIndex[server] &gt; <span class="hljs-built_in">len</span>(rf.logs)+<span class="hljs-number">1</span> &#123;<br>            <span class="hljs-keyword">return</span><br>        &#125;<br><br>        rf.nextIndex[server] += <span class="hljs-built_in">len</span>(args.Entries)<br>        <span class="hljs-keyword">if</span> *appendNums &gt; <span class="hljs-built_in">len</span>(rf.peers)/<span class="hljs-number">2</span> &#123;<br>            <span class="hljs-comment">// 保证幂等性，不会提交第二次</span><br>            *appendNums = <span class="hljs-number">0</span><br><br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(rf.logs) == <span class="hljs-number">0</span> || rf.logs[<span class="hljs-built_in">len</span>(rf.logs)<span class="hljs-number">-1</span>].Term != rf.currentTerm &#123;<br>                <span class="hljs-keyword">return</span><br>            &#125;<br><br>            <span class="hljs-keyword">for</span> rf.lastApplied &lt; <span class="hljs-built_in">len</span>(rf.logs) &#123;<br>                rf.lastApplied++<br>                applyMsg := ApplyMsg&#123;<br>                    CommandValid: <span class="hljs-literal">true</span>,<br>                    Command:      rf.logs[rf.lastApplied<span class="hljs-number">-1</span>].Command,<br>                    CommandIndex: rf.lastApplied,<br>                &#125;<br>                rf.applyChan &lt;- applyMsg<br>                rf.commitIndex = rf.lastApplied<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span><br>    &#125;<br><br><span class="hljs-keyword">case</span> Mismatch:<br>    <span class="hljs-keyword">if</span> args.Term != rf.currentTerm &#123;<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    rf.nextIndex[server] = reply.UpNextIndex<br><br><span class="hljs-keyword">case</span> AppCommitted:<br>    <span class="hljs-keyword">if</span> args.Term != rf.currentTerm &#123;<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    rf.nextIndex[server] = reply.UpNextIndex<br>&#125;<br></code></pre></td></tr></table></figure>
-<h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
+<h2 id="运行结果"><a class="markdownIt-Anchor" href="#运行结果"></a> 运行结果</h2>
+<p><img src="/img/mit6.5840/2.2.jpg" srcset="/img/loading.gif" lazyload alt="图为测试程序运行结果" /></p>
 <p>难度非常大的一节，代码量稍微上去了一些，主要难点在于排错…</p>
 
             </div>
@@ -299,6 +302,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2023/05/02/mit6.5840(4)/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">mit6.5840 lab2C:Raft日志同步</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
