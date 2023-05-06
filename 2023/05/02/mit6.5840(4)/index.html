@@ -16,20 +16,20 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="mit6.5840 lab2C:Raft日志同步">
+    <meta name="description" content="mit6.5840 lab2C:Raft持久化  写在前面 本节实现raft状态的persist（持久化），为了能在机器crash的时候能够restore原来的状态。持久化需要保存的内容是currentTerm、voteFor、log[]三个变量。因此只要当raft节点的这三个状态发生改变时，就直接persist就好了。 当然在课程的lab2C介绍中还要求做到paper中p7末到p7顶部那一段的">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mit6.5840 lab2C:Raft日志同步">
+<meta property="og:title" content="mit6.5840 lab2C:Raft持久化">
 <meta property="og:url" content="http://example.com/2023/05/02/mit6.5840(4)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="mit6.5840 lab2C:Raft日志同步">
+<meta property="og:description" content="mit6.5840 lab2C:Raft持久化  写在前面 本节实现raft状态的persist（持久化），为了能在机器crash的时候能够restore原来的状态。持久化需要保存的内容是currentTerm、voteFor、log[]三个变量。因此只要当raft节点的这三个状态发生改变时，就直接persist就好了。 当然在课程的lab2C介绍中还要求做到paper中p7末到p7顶部那一段的">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-05-02T05:36:18.574Z">
-<meta property="article:modified_time" content="2023-05-02T14:49:12.743Z">
+<meta property="article:modified_time" content="2023-05-06T10:27:08.527Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>mit6.5840 lab2C:Raft日志同步 - Hexo</title>
+  <title>mit6.5840 lab2C:Raft持久化 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -175,7 +175,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="mit6.5840 lab2C:Raft日志同步">
+            <span class="h2" id="subtitle" title="mit6.5840 lab2C:Raft持久化">
               
             </span>
 
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      23 字
+      3.4k 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1 分钟
+      29 分钟
     </span>
   
 
@@ -234,16 +234,31 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">mit6.5840 lab2C:Raft日志同步</h1>
+            <h1 style="display: none">mit6.5840 lab2C:Raft持久化</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：40 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="mit65840-lab2craft日志同步"><a class="markdownIt-Anchor" href="#mit65840-lab2craft日志同步"></a> mit6.5840 lab2C:Raft日志同步</h1>
+              <h1 id="mit65840-lab2craft持久化"><a class="markdownIt-Anchor" href="#mit65840-lab2craft持久化"></a> mit6.5840 lab2C:Raft持久化</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>本节实现raft状态的persist（持久化），为了能在机器crash的时候能够restore原来的状态。持久化需要保存的内容是currentTerm、voteFor、log[]三个变量。因此只要当raft节点的这三个状态发生改变时，就直接persist就好了。</p>
+<p>当然在课程的lab2C介绍中还要求做到paper中p7末到p7顶部那一段的细节实现。实现的细节就是你可以在RPC的时候，如果有冲突，直接返回冲突的下标，或者term，然后返回冲突的下标，进行修改nextIndex[i]亦或者是term，达到减少RPC的次数。而2C的实验中的Figure 8 (unreliable)也是基于此方法，测试你的RPC次数会不会过多。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<h3 id="1-persistgo实现持久化操作"><a class="markdownIt-Anchor" href="#1-persistgo实现持久化操作"></a> 1 persist.go：实现持久化操作</h3>
+<p>原代码里面已经有了非常详细的example，比较简单。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></div></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> raft<br><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// support for Raft and kvraft to save persistent</span><br><span class="hljs-comment">// Raft state (log &amp;c) and k/v server snapshots.</span><br><span class="hljs-comment">//</span><br><span class="hljs-comment">// we will use the original persister.go to test your code for grading.</span><br><span class="hljs-comment">// so, while you can modify this code to help you debug, please</span><br><span class="hljs-comment">// test with the original before submitting.</span><br><span class="hljs-comment">//</span><br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;sync&quot;</span><br><br><span class="hljs-keyword">type</span> Persister <span class="hljs-keyword">struct</span> &#123;<br>	mu        sync.Mutex<br>	raftstate []<span class="hljs-type">byte</span><br>	snapshot  []<span class="hljs-type">byte</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MakePersister</span><span class="hljs-params">()</span></span> *Persister &#123;<br>	<span class="hljs-keyword">return</span> &amp;Persister&#123;&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">clone</span><span class="hljs-params">(orig []<span class="hljs-type">byte</span>)</span></span> []<span class="hljs-type">byte</span> &#123;<br>	x := <span class="hljs-built_in">make</span>([]<span class="hljs-type">byte</span>, <span class="hljs-built_in">len</span>(orig))<br>	<span class="hljs-built_in">copy</span>(x, orig)<br>	<span class="hljs-keyword">return</span> x<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> Copy() *Persister &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	np := MakePersister()<br>	np.raftstate = ps.raftstate<br>	np.snapshot = ps.snapshot<br>	<span class="hljs-keyword">return</span> np<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> ReadRaftState() []<span class="hljs-type">byte</span> &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	<span class="hljs-keyword">return</span> clone(ps.raftstate)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> RaftStateSize() <span class="hljs-type">int</span> &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	<span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(ps.raftstate)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> SaveRaftState(state []<span class="hljs-type">byte</span>) &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	ps.raftstate = clone(state)<br>&#125;<br><br><span class="hljs-comment">// Save both Raft state and K/V snapshot as a single atomic action,</span><br><span class="hljs-comment">// to help avoid them getting out of sync.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> Save(raftstate []<span class="hljs-type">byte</span>, snapshot []<span class="hljs-type">byte</span>) &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	ps.raftstate = clone(raftstate)<br>	ps.snapshot = clone(snapshot)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> ReadSnapshot() []<span class="hljs-type">byte</span> &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	<span class="hljs-keyword">return</span> clone(ps.snapshot)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ps *Persister)</span></span> SnapshotSize() <span class="hljs-type">int</span> &#123;<br>	ps.mu.Lock()<br>	<span class="hljs-keyword">defer</span> ps.mu.Unlock()<br>	<span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(ps.snapshot)<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="2-persist和readpersist编码解码"><a class="markdownIt-Anchor" href="#2-persist和readpersist编码解码"></a> 2 persist()和readpersist()：编码解码</h3>
+<p>值得一提的是要注意自己编码与解码时变量是否一致，否则在解码(decode)的时候会取不到值，而爆出decode error，这个坑也花了笔者的两三个小时。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// save Raft&#x27;s persistent state to stable storage,</span><br><span class="hljs-comment">// where it can later be retrieved after a crash and restart.</span><br><span class="hljs-comment">// see paper&#x27;s Figure 2 for a description of what should be persistent.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(rf *Raft)</span></span> persist() &#123;<br>	<span class="hljs-comment">// Your code here (2C).</span><br>	<span class="hljs-comment">// Example:</span><br>	w := <span class="hljs-built_in">new</span>(bytes.Buffer)<br>	e := labgob.NewEncoder(w)<br>	e.Encode(rf.currentTerm)<br>	e.Encode(rf.votedFor)<br>	e.Encode(rf.logs)<br>	data := w.Bytes()<br>	rf.persister.SaveRaftState(data)<br>&#125;<br><br><span class="hljs-comment">// restore previously persisted state.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(rf *Raft)</span></span> readPersist(data []<span class="hljs-type">byte</span>) &#123;<br>	<span class="hljs-keyword">if</span> data == <span class="hljs-literal">nil</span> || <span class="hljs-built_in">len</span>(data) &lt; <span class="hljs-number">1</span> &#123; <span class="hljs-comment">// bootstrap without any state?</span><br>		<span class="hljs-keyword">return</span><br>	&#125;<br>	<span class="hljs-comment">// Your code here (2C).</span><br>	<span class="hljs-comment">// Example:</span><br>	r := bytes.NewBuffer(data)<br>	d := labgob.NewDecoder(r)<br>	<span class="hljs-keyword">var</span> currentTerm <span class="hljs-type">int</span><br>	<span class="hljs-keyword">var</span> votedFor <span class="hljs-type">int</span><br>	<span class="hljs-keyword">var</span> logs []LogEntry<br>	<span class="hljs-keyword">if</span> d.Decode(&amp;currentTerm) != <span class="hljs-literal">nil</span> ||<br>		d.Decode(&amp;votedFor) != <span class="hljs-literal">nil</span> ||<br>		d.Decode(&amp;logs) != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(<span class="hljs-string">&quot;decode error&quot;</span>)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		rf.currentTerm = currentTerm<br>		rf.votedFor = votedFor<br>		rf.logs = logs<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="3-调整mismatch和appcommitted"><a class="markdownIt-Anchor" href="#3-调整mismatch和appcommitted"></a> 3 调整Mismatch和AppCommitted</h3>
+<p>需要在追加不匹配和日志已提交这两种状态下将节点置为跟随者状态，并且重置raft状态。最后与过时不同的是，我们需要将下一个执行的日志索引置为已知最新，即reply。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">case</span> Mismatch, AppCommitted:<br>    <span class="hljs-keyword">if</span> reply.Term &gt; rf.currentTerm &#123;<br>        rf.status = Follower<br>        rf.votedFor = <span class="hljs-number">-1</span><br>        rf.timer.Reset(rf.overtime)<br>        rf.currentTerm = reply.Term<br>        rf.persist()<br>    &#125;<br>    rf.nextIndex[server] = reply.UpNextIndex<br></code></pre></td></tr></table></figure>
+<h3 id="4-在适当位置调用persist方法"><a class="markdownIt-Anchor" href="#4-在适当位置调用persist方法"></a> 4 在适当位置调用persist方法</h3>
+<p>按论文中阐述的，每当currentTerm、voteFor、log[]三个state发生改变就调用persist就好了。</p>
 
             </div>
             <hr>
