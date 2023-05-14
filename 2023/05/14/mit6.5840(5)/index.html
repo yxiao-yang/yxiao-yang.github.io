@@ -26,7 +26,7 @@
 <meta property="og:image" content="http://example.com/img/mit6.5840/2.4.1.jpg">
 <meta property="og:image" content="http://example.com/img/mit6.5840/2.4.2.jpg">
 <meta property="article:published_time" content="2023-05-14T09:20:23.423Z">
-<meta property="article:modified_time" content="2023-05-14T16:16:27.528Z">
+<meta property="article:modified_time" content="2023-05-14T16:21:36.118Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/mit6.5840/2.4.1.jpg">
@@ -241,7 +241,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -276,7 +276,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// InstallSnapShot RPC Handler</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(rf *Raft)</span></span> InstallSnapShot(args *InstallSnapshotArgs, reply *InstallSnapshotReply) &#123;<br>	rf.mu.Lock()<br>	<span class="hljs-keyword">if</span> rf.currentTerm &gt; args.Term &#123;<br>		reply.Term = rf.currentTerm<br>		rf.mu.Unlock()<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	rf.currentTerm = args.Term<br>	reply.Term = args.Term<br><br>	rf.status = Follower<br>	rf.votedFor = <span class="hljs-number">-1</span><br>	rf.voteNum = <span class="hljs-number">0</span><br>	rf.persist()<br>	rf.votedTimer = time.Now()<br><br>	<span class="hljs-keyword">if</span> rf.lastIncludeIndex &gt;= args.LastIncludeIndex &#123;<br>		rf.mu.Unlock()<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	<span class="hljs-comment">// 将快照后的logs切割，快照前的直接applied</span><br>	index := args.LastIncludeIndex<br>	tempLog := <span class="hljs-built_in">make</span>([]LogEntry, <span class="hljs-number">0</span>)<br>	tempLog = <span class="hljs-built_in">append</span>(tempLog, LogEntry&#123;&#125;)<br><br>	<span class="hljs-keyword">for</span> i := index + <span class="hljs-number">1</span>; i &lt;= rf.getLastIndex(); i++ &#123;<br>		tempLog = <span class="hljs-built_in">append</span>(tempLog, rf.restoreLog(i))<br>	&#125;<br><br>	rf.lastIncludeTerm = args.LastIncludeTerm<br>	rf.lastIncludeIndex = args.LastIncludeIndex<br><br>	rf.logs = tempLog<br>	<span class="hljs-keyword">if</span> index &gt; rf.commitIndex &#123;<br>		rf.commitIndex = index<br>	&#125;<br>	<span class="hljs-keyword">if</span> index &gt; rf.lastApplied &#123;<br>		rf.lastApplied = index<br>	&#125;<br>	rf.persister.Save(rf.persistData(), args.Data)<br><br>	msg := ApplyMsg&#123;<br>		SnapshotValid: <span class="hljs-literal">true</span>,<br>		Snapshot:      args.Data,<br>		SnapshotTerm:  rf.lastIncludeTerm,<br>		SnapshotIndex: rf.lastIncludeIndex,<br>	&#125;<br>	rf.mu.Unlock()<br><br>	rf.applyChan &lt;- msg<br>&#125;<br></code></pre></td></tr></table></figure>
 <h2 id="写在后面"><a class="markdownIt-Anchor" href="#写在后面"></a> 写在后面</h2>
 <p>lab2大结局。</p>
-<p><img src="/img/mit6.5840/2.4.2.jpg" srcset="/img/loading.gif" lazyload alt="图为Snapshot机制效果" /></p>
+<p><img src="/img/mit6.5840/2.4.2.jpg" srcset="/img/loading.gif" lazyload alt="图为lab2测试结果" /></p>
 
             </div>
             <hr>
