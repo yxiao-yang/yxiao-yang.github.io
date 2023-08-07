@@ -16,20 +16,20 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="2023&#x2F;7&#x2F;22 字节-智能创作提前批C++研发一面 1、自我介绍。 2、项目中谈到二级页表，谈一谈页表。 说了一下页表的作用和原理，顺势提了下之前看到的局部性原理，然后就引出了下面两道。 3、谈页表时提到了局部性原理，借着这个说一下虚拟内存和物理内存。 4、进程间内存关系。 5、谈谈你对const的理解。 背八股时没复习到这个。。现场硬想，也不知道全不全。 6、用const修饰成员函数，但是">
+    <meta name="description" content="c++类内成员的内存分配问题  写在前面 刚刚快手一面时问到了类内成员的内存分配问题，之前没有了解过，特来复盘。  正文 123456789101112131415161718192021222324#include &lt;iostream&gt;using namespace std;class test &amp;#123; public:  void start() &amp;#123;    cout">
 <meta property="og:type" content="article">
-<meta property="og:title" content="2023&#x2F;7&#x2F;22 字节-智能创作提前批C++研发一面">
-<meta property="og:url" content="http://example.com/2023/07/22/Interview(1)/index.html">
+<meta property="og:title" content="c++类内成员的内存分配问题">
+<meta property="og:url" content="http://example.com/2023/08/07/Cpp(3)/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="2023&#x2F;7&#x2F;22 字节-智能创作提前批C++研发一面 1、自我介绍。 2、项目中谈到二级页表，谈一谈页表。 说了一下页表的作用和原理，顺势提了下之前看到的局部性原理，然后就引出了下面两道。 3、谈页表时提到了局部性原理，借着这个说一下虚拟内存和物理内存。 4、进程间内存关系。 5、谈谈你对const的理解。 背八股时没复习到这个。。现场硬想，也不知道全不全。 6、用const修饰成员函数，但是">
+<meta property="og:description" content="c++类内成员的内存分配问题  写在前面 刚刚快手一面时问到了类内成员的内存分配问题，之前没有了解过，特来复盘。  正文 123456789101112131415161718192021222324#include &lt;iostream&gt;using namespace std;class test &amp;#123; public:  void start() &amp;#123;    cout">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-07-22T15:58:26.946Z">
-<meta property="article:modified_time" content="2023-07-30T10:05:46.502Z">
+<meta property="article:published_time" content="2023-08-07T12:41:45.859Z">
+<meta property="article:modified_time" content="2023-08-07T12:55:34.934Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>2023/7/22 字节-智能创作提前批C++研发一面 - Hexo</title>
+  <title>c++类内成员的内存分配问题 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -175,7 +175,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="2023/7/22 字节-智能创作提前批C++研发一面">
+            <span class="h2" id="subtitle" title="c++类内成员的内存分配问题">
               
             </span>
 
@@ -185,8 +185,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2023-07-22 23:58" pubdate>
-        2023年7月22日 晚上
+      <time datetime="2023-08-07 20:41" pubdate>
+        2023年8月7日 晚上
       </time>
     </span>
   
@@ -196,7 +196,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      526 字
+      902 字
     </span>
   
 
@@ -205,7 +205,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      5 分钟
+      8 分钟
     </span>
   
 
@@ -234,36 +234,27 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">2023/7/22 字节-智能创作提前批C++研发一面</h1>
+            <h1 style="display: none">c++类内成员的内存分配问题</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：8 天前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="2023722-字节-智能创作提前批c研发一面"><a class="markdownIt-Anchor" href="#2023722-字节-智能创作提前批c研发一面"></a> 2023/7/22 字节-智能创作提前批C++研发一面</h1>
-<p>1、自我介绍。</p>
-<p>2、项目中谈到二级页表，谈一谈页表。</p>
-<p>说了一下页表的作用和原理，顺势提了下之前看到的局部性原理，然后就引出了下面两道。</p>
-<p>3、谈页表时提到了局部性原理，借着这个说一下虚拟内存和物理内存。</p>
-<p>4、进程间内存关系。</p>
-<p>5、谈谈你对const的理解。</p>
-<p>背八股时没复习到这个。。现场硬想，也不知道全不全。</p>
-<p>6、用const修饰成员函数，但是还想在函数内改变类内成员怎么做？</p>
-<p>想了一会答了个mutable关键字，然后面试官问是修饰函数还是变量，我答修饰函数（脑子已经空白了。。）。</p>
-<p>7、谈谈static。</p>
-<p>8、谈谈虚函数，虚表指针存在哪个位置？构造函数和析构函数能是虚函数吗？</p>
-<p>9、做道题：手写LRU。</p>
-<p>直接飞书白板安排，写的时候面试官告诉我不用实现具体细节。写了一个双向链表结构体，实现了LRU的构造和析构函数，写了个添加和查找的函数，内部结点的移动就直接写注释里面了。最后面试官提醒没写容量。。</p>
-<p>10、谈谈TCP和UDP。</p>
-<p>11、谈谈智能指针。</p>
-<p>说了一下四个指针，然后提了一下项目中的应用场景。</p>
-<p>12、反问。</p>
-<p>部门做什么？sdk和中台，会写一些后端接口。</p>
-<p>什么时候出结果？一周。</p>
-<p>面试官在面试过程中问我可不可以现在去那实习，答复可以。</p>
+              <h1 id="c类内成员的内存分配问题"><a class="markdownIt-Anchor" href="#c类内成员的内存分配问题"></a> c++类内成员的内存分配问题</h1>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>刚刚快手一面时问到了类内成员的内存分配问题，之前没有了解过，特来复盘。</p>
+<h2 id="正文"><a class="markdownIt-Anchor" href="#正文"></a> 正文</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">test</span> &#123;<br> <span class="hljs-keyword">public</span>:<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">start</span><span class="hljs-params">()</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;success&quot;</span> &lt;&lt; endl;<br>  &#125;<br><br> <span class="hljs-keyword">private</span>:<br>  <span class="hljs-type">int</span> _n;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>  test* A = <span class="hljs-keyword">new</span> <span class="hljs-built_in">test</span>();<br>  A-&gt;<span class="hljs-built_in">start</span>();<br><br>  test* B = <span class="hljs-literal">nullptr</span>;<br>  B-&gt;<span class="hljs-built_in">start</span>();<br><br>  <span class="hljs-built_in">system</span>(<span class="hljs-string">&quot;pause&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs subunit"><span class="hljs-keyword">success</span><br><span class="hljs-keyword"></span>success<br></code></pre></td></tr></table></figure>
+<p>由此可见，所有的函数都是存放在代码区的，不管是全局函数，还是成员函数。要是成员函数占用类的对象空间，那么定义一次类对象就有成员函数占用一段空间。</p>
+<p>再来补充一下静态成员函数的存放问题，静态成员函数与一般成员函数的唯一区别就是没有this指针，因此不能访问非静态数据成员，就像我前面提到的，所有函数都存放在代码区，静态函数也不例外。所有有人一看到 static 这个单词就主观的认为是存放在全局数据区，那是不对的。</p>
+<p>但要是在成员函数里面用到私有变量呢？</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">test</span> &#123;<br> <span class="hljs-keyword">public</span>:<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">start</span><span class="hljs-params">()</span> </span>&#123;<br>    cout &lt;&lt; _n &lt;&lt; endl;<br>  &#125;<br><br> <span class="hljs-keyword">private</span>:<br>  <span class="hljs-type">int</span> _n;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>  test* A = <span class="hljs-keyword">new</span> <span class="hljs-built_in">test</span>();<br>  A-&gt;<span class="hljs-built_in">start</span>();<br><br>  test* B = <span class="hljs-literal">nullptr</span>;<br>  B-&gt;<span class="hljs-built_in">start</span>();<br><br>  <span class="hljs-built_in">system</span>(<span class="hljs-string">&quot;pause&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>编译期间直接报段错误。</p>
 
             </div>
             <hr>
@@ -273,7 +264,7 @@
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/%E9%9D%A2%E7%BB%8F/">面经</a>
+                      <a class="hover-with-bg" href="/categories/C/">C+++</a>
                     
                   </div>
                 
@@ -291,18 +282,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/08/07/Interview(2)/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">2023/8/7 快手-桌面客户端开发一面</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/05/14/mit6.5840(5)/">
-                        <span class="hidden-mobile">mit6.5840 lab2D:Raft日志压缩</span>
+                      <a href="/2023/08/07/Interview(2)/">
+                        <span class="hidden-mobile">2023/8/7 快手-桌面客户端开发一面</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
